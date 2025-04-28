@@ -3,7 +3,19 @@ import requests
 from bs4 import BeautifulSoup
 import time
 from datetime import datetime
+from human_like_requester import HumanLikeRequester
+import os
+import random
 
+# Create a global requester instance
+requester = HumanLikeRequester()
+
+def random_sleep():
+    # Generate a random float between 3.0 and 7.0 seconds
+    wait_time = random.uniform(3.0, 7.0)
+    print(f"Waiting for {wait_time:.2f} seconds...")
+    time.sleep(wait_time)
+    return wait_time
 
 def get_draft_class(year):
     """
@@ -12,9 +24,16 @@ def get_draft_class(year):
     print(f"Scraping draft year: {year}")
     url = f"https://www.pro-football-reference.com/years/{year}/draft.htm"
     draft_table = None
+    csv_file_path = os.path.join('draft_data', f'draft_class_{year}.csv')
     
+    if os.path.exists(csv_file_path):
+        print(f"Draft class for {year} already exists. Loading from CSV.")
+        with open(csv_file_path, 'r', encoding='utf-8') as f:
+            draft_table = pd.read_csv(f)
+        return draft_table
+
     try:
-        response = requests.get(url)
+        response = requester.get(url)
         soup = BeautifulSoup(response.text, 'html.parser')       
         
         # Print out all table ids to help debug
@@ -50,12 +69,22 @@ def get_draft_class(year):
     except requests.RequestException as e:
         print(f"No page found for draft year: {year}")
     
+    os.makedirs('draft_data', exist_ok=True)  # Create directory if it doesn't exist
+    if draft_table:
+        # Save the draft table to a CSV file
+        with open(csv_file_path, 'w', encoding='utf-8') as f:
+            f.write(str(draft_table))
+        print(f"Draft class for {year} saved to {csv_file_path}")
+    else:
+        print(f"No Draft table, so write to CSV failed for: {year}")
+    
     return draft_table
 
 def get_first_round_QBS (draft_class, year):
     """
     Returns a list of first round QBs from the given draft class.
     """
+    
     # Find all rows in the table
     rows = draft_class.find('tbody').find_all('tr')
     print(f"Found {len(rows)} rows in the draft table")
@@ -130,7 +159,7 @@ def get_player_ids():
         try:
             fantasy_year = f"https://www.pro-football-reference.com/years/{year}/fantasy.htm"
             print(f"Fetching data for {year}...")
-            response = requests.get(fantasy_year, headers=headers)
+            response = requester.get(fantasy_year, headers=headers)
             
             # Check if the request was successful
             if response.status_code != 200:
@@ -208,7 +237,7 @@ def get_qb_seasons(qb_name, qb_id, draft_year=None, draft_team=None):
     Player_url = f"https://www.pro-football-reference.com/players/{qb_id[0]}/{qb_id}.htm"
     print(f"Scraping player page: {Player_url}")
     try:
-        response = requests.get(Player_url)
+        response = requester.get(Player_url)
         soup = BeautifulSoup(response.text, 'html.parser')
         
         # Find the table with the player's passing stats
