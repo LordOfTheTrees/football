@@ -11,7 +11,15 @@ import random
 requester = HumanLikeRequester()
 
 def random_sleep():
-    # Generate a random float between 3.0 and 7.0 seconds
+    """
+    Pauses execution for a random duration between 3.0 and 7.0 seconds.
+    
+    This function helps avoid overwhelming the target website with too many
+    rapid requests by simulating human-like browsing behavior.
+    
+    Returns:
+        float: The actual wait time in seconds
+    """
     wait_time = random.uniform(3.0, 7.0)
     print(f"Waiting for {wait_time:.2f} seconds...")
     time.sleep(wait_time)
@@ -19,7 +27,22 @@ def random_sleep():
 
 def get_draft_class(year):
     """
-    Returns a list of players drafted in the given year.
+    Retrieves NFL draft class data for a specified year.
+    
+    This function scrapes the Pro Football Reference website to obtain
+    draft information. It first checks if the data is cached locally as a CSV
+    file before making a web request.
+    
+    Args:
+        year (int): The NFL draft year to retrieve
+        
+    Returns:
+        BeautifulSoup object: The parsed HTML table containing the draft class data,
+                             or None if the data couldn't be retrieved
+                             
+    Notes:
+        - Data is cached in the 'draft_data' directory as 'draft_class_{year}.csv'
+        - Uses various fallback methods to locate the draft table on the page
     """
     print(f"Scraping draft year: {year}")
     url = f"https://www.pro-football-reference.com/years/{year}/draft.htm"
@@ -82,7 +105,24 @@ def get_draft_class(year):
 
 def get_first_round_QBS (draft_class, year):
     """
-    Returns a list of first round QBs from the given draft class.
+    Extracts first-round quarterback selections from a draft class.
+    
+    This function parses the draft class HTML to identify quarterbacks selected
+    in the first round of the specified draft year.
+    
+    Args:
+        draft_class (BeautifulSoup object): The parsed HTML table containing draft data
+        year (int): The NFL draft year
+        
+    Returns:
+        list: A list of dictionaries containing information about each first-round QB:
+              - 'name': Player's name
+              - 'draft_year': Year drafted
+              - 'draft_team': Team that drafted the player
+              
+    Notes:
+        - Handles variations in HTML structure by trying multiple data-stat attributes
+        - Skips header and spacer rows in the table
     """
     
     # Find all rows in the table
@@ -148,6 +188,20 @@ def get_first_round_QBS (draft_class, year):
 
 #function to get a csv file of all players since 2000
 def get_player_ids():
+    """
+    Creates a comprehensive CSV database of NFL player IDs since 2000.
+    
+    This function scrapes the Pro Football Reference fantasy stats pages for each year
+    to build a database of player names and their corresponding unique IDs in the PFR system.
+    
+    Returns:
+        None: The function saves the data directly to 'player_ids.csv'
+        
+    Notes:
+        - Each record contains 'player_name', 'player_id', and 'year'
+        - Uses HumanLikeRequester to respect server load
+        - Includes pause times between requests to avoid rate limiting
+    """
     current_year = datetime.now().year
     all_players = []
     
@@ -158,7 +212,7 @@ def get_player_ids():
     for year in range(2000, current_year + 1):
         try:
             fantasy_year = f"https://www.pro-football-reference.com/years/{year}/fantasy.htm"
-            print(f"Fetching data for {year}...")
+            print(f"Fetching playerID data for {year}...")
             response = requester.get(fantasy_year, headers=headers)
             
             # Check if the request was successful
@@ -203,6 +257,8 @@ def get_player_ids():
                             })
             else:
                 print(f"Fantasy table not found for year {year}")
+            
+            random_sleep()  # Sleep to avoid overwhelming the server
         
         except requests.RequestException as e:
             print(f"Error fetching data for year {year}: {e}")
@@ -221,7 +277,19 @@ def get_player_ids():
     return None
 
 def get_player_id(player_name):                
-    # This function should return the player ID based on the player's name
+    """
+    Retrieves a player's unique Pro Football Reference ID based on their name.
+    
+    Args:
+        player_name (str): The player's full name
+        
+    Returns:
+        str or None: The player's unique ID if found, None otherwise
+        
+    Notes:
+        - Requires 'player_ids.csv' file to be present
+        - Returns the first matching player ID if multiple matches exist
+    """
     player_id = None
     player_ids_df = pd.read_csv('player_ids.csv')
     player_ids_df = player_ids_df[player_ids_df['player_name'] == player_name]
@@ -231,10 +299,42 @@ def get_player_id(player_name):
 
 # Function to get all seasons for a QB with comprehensive stats
 def get_qb_seasons(qb_name, qb_id, draft_year=None, draft_team=None):
-
+    """
+    Retrieves comprehensive career statistics for a quarterback.
+    
+    This function scrapes passing, rushing, and advanced passing statistics 
+    for each season of a quarterback's career from Pro Football Reference.
+    
+    Args:
+        qb_name (str): The quarterback's full name
+        qb_id (str): The quarterback's unique Pro Football Reference ID
+        draft_year (int, optional): Filter to include only seasons from this year onward
+        draft_team (str, optional): The team that drafted the quarterback
+        
+    Returns:
+        DataFrame: A pandas DataFrame containing season-by-season statistics for the quarterback,
+                  including:
+                  - Basic passing stats (completions, attempts, yards, TDs, etc.)
+                  - Rushing stats
+                  - Advanced passing metrics
+                  - Added total yards column (passing + rushing)
+                  
+    Notes:
+        - Filters seasons to include only those from 2000 to the current year
+        - Combines passing and rushing statistics into a single row per season
+        - Drops rows with NaN values
+        - Uses HumanLikeRequester to respect server load
+    """
     current_year = datetime.now().year
     seasons = []
     Player_url = f"https://www.pro-football-reference.com/players/{qb_id[0]}/{qb_id}.htm"
+    
+    csv_file_path = os.path.join('QB_Data', f'{qb_id}_year_{year}.csv')
+    if os.path.exists(csv_file_path):
+        print(f"data for {qb_id} already exists. Loading from CSV.")
+        with open(csv_file_path, 'r', encoding='utf-8') as f:
+            return pd.read_csv(f)
+    
     print(f"Scraping player page: {Player_url}")
     try:
         response = requester.get(Player_url)
@@ -337,9 +437,18 @@ def get_qb_seasons(qb_name, qb_id, draft_year=None, draft_team=None):
         seasons_df = seasons_df[seasons_df['season'] >= 2000]  # Filter for years >= 2000
         seasons_df = seasons_df[seasons_df['season'] <= current_year]  # Filter for years <= current year
         seasons_df = seasons_df.dropna()  # Drop rows with NaN values
-        seasons_df = seasons_df.reset_index(drop=True)  # Reset the index        
+        seasons_df = seasons_df.reset_index(drop=True)  # Reset the index
+
+        os.makedirs('QB_Data', exist_ok=True)  # Create directory if it doesn't exist
+        if seasons_df is not None:
+            # Save the seasons DataFrame to a CSV file
+            with open(csv_file_path, 'w', encoding='utf-8') as f:
+                f.writepd.DataFrame.to_csv(seasons_df, index=False)
+            print(f"Data for {qb_id} saved to {csv_file_path}")
+        else:
+            print(f"QB data pull failed, so write to CSV failed for: {qb_name}, {qb_id}")
 
     except requests.RequestException as e:
-        print(f"No page found for player: {qb_name} - {e}")
+        print(f"No page found for player: {qb_name}, {qb_id} - {e}")
 
     return seasons_df   
