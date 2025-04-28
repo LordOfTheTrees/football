@@ -6,6 +6,7 @@ from datetime import datetime
 from human_like_requester import HumanLikeRequester
 import os
 import random
+import io
 
 # Create a global requester instance
 requester = HumanLikeRequester()
@@ -24,6 +25,177 @@ def random_sleep():
     print(f"Waiting for {wait_time:.2f} seconds...")
     time.sleep(wait_time)
     return wait_time
+
+def extract_table_from_page(soup, table_type):
+    """
+    Extracts a specific table from the page, checking both visible tables and tables in comments.
+    
+    Args:
+        soup (BeautifulSoup): Parsed HTML
+        table_type (str): Type of table to extract ('passing', 'rushing', or 'advanced_passing')
+    
+    Returns:
+        DataFrame or None: Extracted table as DataFrame, or None if not found
+    """
+    import pandas as pd
+    import re
+    from bs4 import Comment
+    
+    # Map table_type to likely table IDs
+    table_id_patterns = {
+        'passing': ['passing$', 'passing_', 'passing_regular_season', 'Passing'],
+        'rushing': ['rushing$', 'rushing_', 'rushing_regular_season', 'Rushing'],
+        'advanced_passing': ['advanced_passing$', 'passing_advanced', 'Advanced_Passing']
+    }
+    
+    patterns = table_id_patterns.get(table_type, [])
+    
+    # Check visible tables
+    for pattern in patterns:
+        for tbl in soup.find_all('table'):
+            if tbl.get('id') and re.search(pattern, tbl.get('id'), re.IGNORECASE):
+                print(f"Found {table_type} table with ID: {tbl.get('id')}")
+                try:
+                    return pd.read_html(str(tbl))[0]
+                except Exception as e:
+                    print(f"Error reading {table_type} table: {e}")
+    
+    # Check tables within comments
+    comments = soup.find_all(string=lambda text: isinstance(text, Comment))
+    for comment in comments:
+        comment_soup = BeautifulSoup(str(comment), 'html.parser')
+        for tbl in comment_soup.find_all('table'):
+            if tbl.get('id') and any(re.search(pattern, tbl.get('id'), re.IGNORECASE) for pattern in patterns):
+                print(f"Found {table_type} table in comment with ID: {tbl.get('id')}")
+                try:
+                    return pd.read_html(str(tbl))[0]
+                except Exception as e:
+                    print(f"Error reading {table_type} table from comment: {e}")
+            
+    # Check for div containers that might have the tables
+    for div in soup.find_all('div', class_=['table_container', 'overthrow table_container']):
+        for tbl in div.find_all('table'):
+            if tbl.get('id') and any(re.search(pattern, tbl.get('id'), re.IGNORECASE) for pattern in patterns):
+                print(f"Found {table_type} table in div container with ID: {tbl.get('id')}")
+                try:
+                    return pd.read_html(str(tbl))[0]
+                except Exception as e:
+                    print(f"Error reading {table_type} table from div container: {e}")
+    
+    # If nothing is found, print information about all tables on the page
+    if table_type == 'passing':  # Only do this once
+        print("\nAll table IDs found on page:")
+        for tbl in soup.find_all('table'):
+            if tbl.get('id'):
+                print(f"- {tbl.get('id')}")
+        
+        print("\nAll table IDs found in comments:")
+        for comment in comments:
+            comment_soup = BeautifulSoup(str(comment), 'html.parser')
+            for tbl in comment_soup.find_all('table'):
+                if tbl.get('id'):
+                    print(f"- {tbl.get('id')}")
+    
+    return None
+
+def inspect_player_tables(player_url):
+    """
+    A diagnostic function that inspects the structure of tables on a player's page.
+    
+    Args:
+        player_url (str): URL to the player's page on Pro Football Reference
+        
+    Returns:
+        None: This function just prints diagnostic information
+    """
+    
+    print(f"Inspecting tables at: {player_url}")
+    
+    try:
+        response = requests.get(player_url)
+        soup = BeautifulSoup(response.text, 'html.parser')
+        
+        # List all tables
+        print("\nAll tables found:")
+        tables = soup.find_all('table')
+        print(f"Found {len(tables)} tables on the page")
+        
+        for i, table in enumerate(tables):
+            table_id = table.get('id', 'No ID')
+            print(f"\nTable {i+1}: ID = {table_id}")
+            
+            # Print table structure
+            print("  Structure:")
+            
+            # Check if table has a thead
+            thead = table.find('thead')
+            if thead:
+                print("  - Found <thead> element")
+                thead_rows = thead.find_all('tr')
+                print(f"    - Contains {len(thead_rows)} header rows")
+                
+                # Print each header row
+                for j, row in enumerate(thead_rows):
+                    headers = row.find_all(['th', 'td'])
+                    header_texts = [h.get_text(strip=True) for h in headers]
+                    print(f"    - Header row {j+1}: {header_texts[:5]}... ({len(headers)} columns)")
+            else:
+                print("  - No <thead> element found")
+            
+            # Check if table has a tbody
+            tbody = table.find('tbody')
+            if tbody:
+                print("  - Found <tbody> element")
+                tbody_rows = tbody.find_all('tr')
+                print(f"    - Contains {len(tbody_rows)} data rows")
+                
+                # Print first data row as example
+                if tbody_rows:
+                    first_row = tbody_rows[0]
+                    cells = first_row.find_all(['th', 'td'])
+                    cell_texts = [c.get_text(strip=True) for c in cells]
+                    print(f"    - First row example: {cell_texts[:5]}... ({len(cells)} cells)")
+                    
+                    # Print data-stat attributes for the cells
+                    data_stats = [c.get('data-stat', 'No data-stat') for c in cells]
+                    print(f"    - data-stat attributes: {data_stats[:5]}...")
+            else:
+                print("  - No <tbody> element found")
+            
+        # Special analysis of passing table
+        passing_table = soup.find('table', id='passing')
+        if passing_table:
+            print("\nDetailed analysis of passing table:")
+            
+            # Get all rows including header rows
+            all_rows = passing_table.find_all('tr')
+            print(f"Total rows in passing table: {len(all_rows)}")
+            
+            # Check first few rows
+            for i, row in enumerate(all_rows[:5]):
+                print(f"\nRow {i+1}:")
+                
+                # Check for th cells
+                th_cells = row.find_all('th')
+                td_cells = row.find_all('td')
+                print(f"  TH cells: {len(th_cells)}, TD cells: {len(td_cells)}")
+                
+                if th_cells:
+                    print(f"  TH cell values: {[h.get_text(strip=True) for h in th_cells]}")
+                    print(f"  TH data-stat attributes: {[h.get('data-stat', 'None') for h in th_cells]}")
+                
+                if td_cells:
+                    print(f"  TD cell values: {[d.get_text(strip=True) for d in td_cells[:5]]}...")
+                    print(f"  TD data-stat attributes: {[d.get('data-stat', 'None') for d in td_cells[:5]]}...")
+        
+    except Exception as e:
+        print(f"Error inspecting tables: {e}")
+        import traceback
+        traceback.print_exc()
+
+# Example usage
+if __name__ == "__main__":
+    inspect_player_tables("https://www.pro-football-reference.com/players/A/AlleJo02.htm")
 
 def get_draft_class(year):
     """
@@ -344,13 +516,9 @@ def update_qb_ids():
 
     return True
 
-# Function to get all seasons for a QB with comprehensive stats
-def get_qb_seasons(qb_name, qb_id, draft_year=None, draft_team=None):
+def get_qb_seasons(qb_name, qb_id, draft_year=None, draft_team=None, debugging=False):
     """
     Retrieves comprehensive career statistics for a quarterback.
-    
-    This function scrapes passing, rushing, and advanced passing statistics 
-    for each season of a quarterback's career from Pro Football Reference.
     
     Args:
         qb_name (str): The quarterback's full name
@@ -359,143 +527,307 @@ def get_qb_seasons(qb_name, qb_id, draft_year=None, draft_team=None):
         draft_team (str, optional): The team that drafted the quarterback
         
     Returns:
-        DataFrame: A pandas DataFrame containing season-by-season statistics for the quarterback,
-                  including:
-                  - Basic passing stats (completions, attempts, yards, TDs, etc.)
-                  - Rushing stats
-                  - Advanced passing metrics
-                  - Added total yards column (passing + rushing)
-                  
-    Notes:
-        - Filters seasons to include only those from 2000 to the current year
-        - Combines passing and rushing statistics into a single row per season
-        - Drops rows with NaN values
-        - Uses HumanLikeRequester to respect server load
+        DataFrame: A pandas DataFrame containing season-by-season statistics
     """
+    
     current_year = datetime.now().year
-    seasons = []
-    Player_url = f"https://www.pro-football-reference.com/players/{qb_id[0]}/{qb_id}.htm"
+    player_url = f"https://www.pro-football-reference.com/players/{qb_id[0]}/{qb_id}.htm"
     
     csv_file_path = os.path.join('QB_Data', f'{qb_id}.csv')
     if os.path.exists(csv_file_path):
-        print(f"data for {qb_id} already exists. Loading from CSV.")
-        with open(csv_file_path, 'r', encoding='utf-8') as f:
-            return pd.read_csv(f)
+        print(f"Data for {qb_id} already exists. Loading from CSV.")
+        return pd.read_csv(csv_file_path)
     
-    print(f"Scraping player page: {Player_url}")
+    print(f"Scraping player page: {player_url}")
     try:
-        response = requester.get(Player_url)
+        # Try to use requester if it exists, otherwise use requests directly
+        try:
+            response = requester.get(player_url)
+        except NameError:
+            response = requests.get(player_url)
+            
         soup = BeautifulSoup(response.text, 'html.parser')
         
-        # Find the table with the player's passing stats
-        # Try various possible table IDs
-        Passing_log_table = soup.find('table', id='Passing')
+        # Print all table IDs for debugging
+        if debugging:
+            print("\nAll table IDs found on page:")
+            for tbl in soup.find_all('table'):
+                if tbl.get('id'):
+                    print(f"- {tbl.get('id')}")
         
-        if Passing_log_table:
-            # Find all rows in the table
-            rows = Passing_log_table.find('tbody').find_all('tr')
-            print(f"Found {len(rows)} rows in the Passing table for {qb_name}")
-            seasons.append(rows[0].find_all('th')) #should add the passing header row to the seasons list
-            for row in rows:
-                # Skip header rows or spacer rows
-                if 'class' in row.attrs and ('thead' in row['class'] or 'divider' in row['class']):
-                    continue
+        # 1. Get passing table - this is our base table
+        passing_table = soup.find('table', id='passing')
+        if not passing_table:
+            print(f"Passing table not found for {qb_name}")
+            return None
+        
+        # Use pandas to parse the passing table
+        print("Found passing table")
+        passing_df = pd.read_html(io.StringIO(str(passing_table)))[0]
+        
+        # Print column names for debugging
+        if debugging: print(f"Passing table columns: {passing_df.columns.tolist()}")
+        
+        # Find the season column in passing table
+        pass_year_col = None
+        
+        # Handle multi-level columns if present
+        if isinstance(passing_df.columns, pd.MultiIndex):
+            # Flatten the columns first
+            passing_df.columns = ['_'.join(str(col).strip() for col in tup if str(col).strip()) 
+                                  if isinstance(tup, tuple) else tup 
+                                  for tup in passing_df.columns]
+            
+            # Now look for potential season column names in the flattened columns
+            for col in passing_df.columns:
+                if 'Season' in col or 'season' in col or 'Year' in col or 'year' in col:
+                    pass_year_col = col
+                    print(f"Found season column in passing table: {pass_year_col}")
+                    break
+        else:
+            # Look for standard column names
+            if 'Season' in passing_df.columns:
+                pass_year_col = 'Season'
+            elif 'season' in passing_df.columns:
+                pass_year_col = 'season'
+            elif 'Year' in passing_df.columns:
+                pass_year_col = 'Year'
+            else:
+                # Try to guess based on data - usually first column
+                if len(passing_df.columns) > 0:
+                    first_col = passing_df.columns[0]
+                    # Check if first column contains years
+                    if all(str(x).isdigit() for x in passing_df[first_col].dropna()):
+                        pass_year_col = first_col
+                        print(f"Using first column as season: {pass_year_col}")
+        
+        if not pass_year_col:
+            print("Could not find season column in passing table")
+            print(f"Available columns: {passing_df.columns.tolist()}")
+            return None
+        
+        # 2. Get rushing table if available
+        rushing_table = soup.find('table', id='rushing_and_receiving')
+        rushing_df = None
+        if rushing_table:
+            print("Found rushing_and_receiving table")
+            rushing_df = pd.read_html(io.StringIO(str(rushing_table)))[0]
+            
+            # Print column names for debugging
+            if debugging: print(f"Rushing table columns: {rushing_df.columns.tolist()}")
+            
+            # Find the season column in rushing table
+            rush_year_col = None
+            
+            # Handle multi-level columns
+            if isinstance(rushing_df.columns, pd.MultiIndex):
+                # Try to directly find the common column structure you mentioned
+                if 'Unnamed: 0_level_0' in [col[0] if isinstance(col, tuple) else col for col in rushing_df.columns]:
+                    for col in rushing_df.columns:
+                        if isinstance(col, tuple) and col[0] == 'Unnamed: 0_level_0' and 'Season' in col[1]:
+                            rush_year_col = col
+                            print(f"Found multi-level season column in rushing table: {rush_year_col}")
+                            break
                 
-                year_cell = row.find('th', {'data-stat': 'season'})
-                if year_cell:
-                    year = year_cell.text.strip()
-                    # Check if the year is in the range of interest
-                    if draft_year and int(year) < draft_year:
-                        continue
-                    print(f"Processing passing season: {year} for {qb_name}")
-                    # add the whole row to the seasons list
-                    seasons.append(row)
-        else:
-            print(f"passing log table not found for {qb_name}")
+                # Flatten the columns
+                rushing_df.columns = ['_'.join(str(col).strip() for col in tup if str(col).strip()) 
+                                      if isinstance(tup, tuple) else tup 
+                                      for tup in rushing_df.columns]
+                
+                # If no season column was identified before flattening, look for it now
+                if not rush_year_col:
+                    for col in rushing_df.columns:
+                        if 'Season' in col or 'season' in col or 'Year' in col or 'year' in col:
+                            rush_year_col = col
+                            print(f"Found season column in rushing table after flattening: {rush_year_col}")
+                            break
+            else:
+                # Look for standard column names
+                if 'Season' in rushing_df.columns:
+                    rush_year_col = 'Season'
+                elif 'season' in rushing_df.columns:
+                    rush_year_col = 'season'
+                elif 'Year' in rushing_df.columns:
+                    rush_year_col = 'Year'
+                else:
+                    # Try to guess based on data
+                    if len(rushing_df.columns) > 0:
+                        first_col = rushing_df.columns[0]
+                        if all(str(x).isdigit() for x in rushing_df[first_col].dropna()):
+                            rush_year_col = first_col
         
-        rushing_log_table = soup.find('table', id='Rushing')
-        if rushing_log_table:
-            # Find all rows in the table
-            rows = rushing_log_table.find('tbody').find_all('tr')
-            print(f"Found {len(rows)} rows in the Rushing table for {qb_name}")
-            seasons.append('Rushing' + rows[0].find_all('th')[1:]) #should add the rushing header row to the seasons list
-            for row in rows:
-                # Skip header rows or spacer rows
-                if 'class' in row.attrs and ('thead' in row['class'] or 'divider' in row['class']):
-                    continue
-                year_cell = row.find('th', {'data-stat': 'season'})
-                if year_cell:
-                    year = year_cell.text.strip()
-                    # Check if the year is in the range of interest
-                    if draft_year and int(year) < draft_year:
-                        continue
-                    print(f"Processing rushing season: {year} for {qb_name}")
-                    if seasons.find(year) is not None:
-                        # Check if the year already exists in the seasons list
-                        # If it does, append the rushing stats to that entry
-                        rushing_stats = row.find_all('td')
-                        for stat in rushing_stats:
-                            print(f"adding rushing season to passing season: {year} for {qb_name}")
-                            seasons.find(year).append(stat.text.strip())
-                    else:
-                        print(f"Rushing season not found for {year} for {qb_name}")
-                    # add the whole row to the seasons list
-        else:
-            print(f"Rushing log table not found for {qb_name}")
+        # 3. Get advanced passing table if available
+        adv_passing_table = soup.find('table', id='passing_advanced')
+        adv_passing_df = None
+        if adv_passing_table:
+            print("Found passing_advanced table")
+            adv_passing_df = pd.read_html(io.StringIO(str(adv_passing_table)))[0]
+            
+            # Print column names for debugging
+            if debugging: print(f"Advanced passing table columns: {adv_passing_df.columns.tolist()}")
+            
+            # Find the season column in advanced passing table
+            adv_year_col = None
+            
+            # Handle multi-level columns
+            if isinstance(adv_passing_df.columns, pd.MultiIndex):
+                # Try to directly find the common column structure
+                if 'Unnamed: 0_level_0' in [col[0] if isinstance(col, tuple) else col for col in adv_passing_df.columns]:
+                    for col in adv_passing_df.columns:
+                        if isinstance(col, tuple) and col[0] == 'Unnamed: 0_level_0' and 'Season' in col[1]:
+                            adv_year_col = col
+                            print(f"Found multi-level season column in advanced passing table: {adv_year_col}")
+                            break
+                
+                # Flatten the columns
+                adv_passing_df.columns = ['_'.join(str(col).strip() for col in tup if str(col).strip()) 
+                                          if isinstance(tup, tuple) else tup 
+                                          for tup in adv_passing_df.columns]
+                
+                # If no season column was identified before flattening, look for it now
+                if not adv_year_col:
+                    for col in adv_passing_df.columns:
+                        if 'Season' in col or 'season' in col or 'Year' in col or 'year' in col:
+                            adv_year_col = col
+                            print(f"Found season column in advanced passing table after flattening: {adv_year_col}")
+                            break
+            else:
+                # Look for standard column names
+                if 'Season' in adv_passing_df.columns:
+                    adv_year_col = 'Season'
+                elif 'season' in adv_passing_df.columns:
+                    adv_year_col = 'season'
+                elif 'Year' in adv_passing_df.columns:
+                    adv_year_col = 'Year'
+                else:
+                    # Try to guess based on data
+                    if len(adv_passing_df.columns) > 0:
+                        first_col = adv_passing_df.columns[0]
+                        if all(str(x).isdigit() for x in adv_passing_df[first_col].dropna()):
+                            adv_year_col = first_col
         
-        advanced_passing_log_table = soup.find('table', id='Rushing')
-        if advanced_passing_log_table:
-            # Find all rows in the table
-            rows = advanced_passing_log_table.find('tbody').find_all('tr')
-            print(f"Found {len(rows)} rows in the Rushing table for {qb_name}")
-            seasons.append(rows[0].find_all('th')) #should add the advanced passing header row to the seasons list
-            for row in rows:
-                # Skip header rows or spacer rows
-                if 'class' in row.attrs and ('thead' in row['class'] or 'divider' in row['class']):
-                    continue
-                year_cell = row.find('th', {'data-stat': 'season'})
-                if year_cell:
-                    year = year_cell.text.strip()
-                    # Check if the year is in the range of interest
-                    if draft_year and int(year) < draft_year:
-                        continue
-                    print(f"Processing advanced passing season: {year} for {qb_name}")
-                    if seasons.find(year) is not None:
-                        # Check if the year already exists in the seasons list
-                        # If it does, append the rushing stats to that entry
-                        advanced_passing_stats = row.find_all('td')
-                        for stat in advanced_passing_stats:
-                            print(f"adding advanced passing season to passing season: {year} for {qb_name}")
-                            seasons.find(year).append(stat.text.strip())
-                    else:
-                        print(f"advanced passing season not found for {year} for {qb_name}")
-                    # add the whole row to the seasons list
+        # Now we'll prefix columns to avoid conflicts when joining
+        # 1. Prefix passing columns
+        cols_to_prefix = [col for col in passing_df.columns 
+                          if col != pass_year_col and col not in ['Tm', 'G', 'GS', 'Age', 'Pos']]
+        for col in cols_to_prefix:
+            passing_df.rename(columns={col: f'Pass_{col}'}, inplace=True)
+        
+        # 2. Prefix rushing columns if available
+        if rushing_df is not None and rush_year_col is not None:
+            cols_to_prefix = [col for col in rushing_df.columns 
+                             if col != rush_year_col and col not in ['Tm', 'G', 'GS', 'Age', 'Pos']]
+            for col in cols_to_prefix:
+                rushing_df.rename(columns={col: f'Rush_{col}'}, inplace=True)
+        
+        # 3. Prefix advanced passing columns if available
+        if adv_passing_df is not None and adv_year_col is not None:
+            cols_to_prefix = [col for col in adv_passing_df.columns 
+                             if col != adv_year_col and col not in ['Tm', 'G', 'GS', 'Age', 'Pos']]
+            for col in cols_to_prefix:
+                adv_passing_df.rename(columns={col: f'AdvPass_{col}'}, inplace=True)
+        
+        # Standardize all year column names to 'season' for consistency in the final DataFrame
+        passing_df.rename(columns={pass_year_col: 'season'}, inplace=True)
+        
+        if rushing_df is not None and rush_year_col is not None:
+            rushing_df.rename(columns={rush_year_col: 'season'}, inplace=True)
+        
+        if adv_passing_df is not None and adv_year_col is not None:
+            adv_passing_df.rename(columns={adv_year_col: 'season'}, inplace=True)
+        
+        # Ensure season column is properly formatted
+        passing_df['season'] = passing_df['season'].astype(str)
+        if rushing_df is not None and 'season' in rushing_df.columns:
+            rushing_df['season'] = rushing_df['season'].astype(str)
+        if adv_passing_df is not None and 'season' in adv_passing_df.columns:
+            adv_passing_df['season'] = adv_passing_df['season'].astype(str)
+        
+        # Start with the base passing DataFrame
+        seasons_df = passing_df.copy()
+        
+        # Create a dictionary of season -> row index for quick lookups
+        season_to_idx = {str(year): idx for idx, year in enumerate(seasons_df['season'])}
+        
+        # Add rushing stats if available
+        if rushing_df is not None and 'season' in rushing_df.columns:
+            for _, rush_row in rushing_df.iterrows():
+                season_val = str(rush_row['season'])
+                if season_val in season_to_idx:
+                    # Add each rushing stat to the corresponding passing row
+                    idx = season_to_idx[season_val]
+                    for col in rushing_df.columns:
+                        if col.startswith('Rush_'):
+                            seasons_df.loc[idx, col] = rush_row[col]
+        
+        # Add advanced passing stats if available
+        if adv_passing_df is not None and 'season' in adv_passing_df.columns:
+            for _, adv_row in adv_passing_df.iterrows():
+                season_val = str(adv_row['season'])
+                if season_val in season_to_idx:
+                    # Add each advanced stat to the corresponding row
+                    idx = season_to_idx[season_val]
+                    for col in adv_passing_df.columns:
+                        if col.startswith('AdvPass_'):
+                            seasons_df.loc[idx, col] = adv_row[col]
+        
+        # Add player metadata
+        seasons_df['player_name'] = qb_name
+        seasons_df['player_id'] = qb_id
+        if draft_year:
+            seasons_df['draft_year'] = draft_year
+        if draft_team:
+            seasons_df['draft_team'] = draft_team
+        
+        # Calculate total yards if possible
+        passing_yds_col = next((col for col in seasons_df.columns if 'Yds' in col and 'Pass_' in col), None)
+        rushing_yds_col = next((col for col in seasons_df.columns if 'Yds' in col and 'Rush_' in col), None)
+        
+        if passing_yds_col and rushing_yds_col:
+            try:
+                # Convert to numeric and calculate total
+                seasons_df[passing_yds_col] = pd.to_numeric(seasons_df[passing_yds_col], errors='coerce').fillna(0)
+                seasons_df[rushing_yds_col] = pd.to_numeric(seasons_df[rushing_yds_col], errors='coerce').fillna(0)
+                seasons_df['total_yards'] = seasons_df[passing_yds_col] + seasons_df[rushing_yds_col]
+                print(f"Calculated total_yards by adding {passing_yds_col} and {rushing_yds_col}")
+            except Exception as e:
+                print(f"Error calculating total yards: {e}")
+        
+        # Filter by year if needed
+        try:
+            if 'season' in seasons_df.columns:
+                # Convert season to numeric for filtering
+                seasons_df['season'] = pd.to_numeric(seasons_df['season'], errors='coerce')
+                
+                # Filter for draft year if specified
+                if draft_year:
+                    seasons_df = seasons_df[seasons_df['season'] >= int(draft_year)]
+                
+                # Filter for modern era (2000+)
+                seasons_df = seasons_df[(seasons_df['season'] >= 2000) & (seasons_df['season'] <= current_year)]
+        except Exception as e:
+            print(f"Error filtering by year: {e}")
+        
+        # Clean up and save
+        seasons_df = seasons_df.dropna(how='all')
+        seasons_df = seasons_df.reset_index(drop=True)
+        
+        # Print debug info
+        print(f"Final DataFrame shape: {seasons_df.shape}")
+        
+        # Save to CSV
+        os.makedirs('QB_Data', exist_ok=True)
+        if not seasons_df.empty:
+            seasons_df.to_csv(csv_file_path, index=False)
+            print(f"Data for {qb_name} ({qb_id}) saved to {csv_file_path}")
+            print(f"Found {len(seasons_df)} seasons with {len(seasons_df.columns)} stats columns")
         else:
-            print(f"Advanced Passing log table not found for {qb_name}")
-        seasons_df = pd.DataFrame(seasons)
-        seasons_df.columns = seasons_df.iloc[0]  # Set the first row as the header
-        seasons_df = seasons_df[1:]  # Remove the header row from the DataFrame
-        seasons_df.reset_index(drop=True, inplace=True)  # Reset the index
-        seasons_df['player_name'] = qb_name  # Add player name to the DataFrame
-        seasons_df['draft_year'] = draft_year  # Add draft year to the DataFrame
-        seasons_df['draft_team'] = draft_team  # Add draft team to the DataFrame
-        seasons_df['total_yards'] = seasons_df['Yds'] + seasons_df['Rush Yds']  # Add total yards column
-        seasons_df['season'] = seasons_df['season'].astype(int)  # Convert year to integer
-        seasons_df = seasons_df[seasons_df['season'] >= 2000]  # Filter for years >= 2000
-        seasons_df = seasons_df[seasons_df['season'] <= current_year]  # Filter for years <= current year
-        seasons_df = seasons_df.dropna()  # Drop rows with NaN values
-        seasons_df = seasons_df.reset_index(drop=True)  # Reset the index
-
-        os.makedirs('QB_Data', exist_ok=True)  # Create directory if it doesn't exist
-        if seasons_df is not None:
-            # Save the seasons DataFrame to a CSV file
-            with open(csv_file_path, 'w', encoding='utf-8') as f:
-                f.writepd.DataFrame.to_csv(seasons_df, index=False)
-            print(f"Data for {qb_id} saved to {csv_file_path}")
-        else:
-            print(f"QB data pull failed, so write to CSV failed for: {qb_name}, {qb_id}")
-
-    except requests.RequestException as e:
-        print(f"No page found for player: {qb_name}, {qb_id} - {e}")
-
-    return seasons_df   
+            print(f"No data to save for {qb_name}")
+        
+        return seasons_df
+    
+    except Exception as e:
+        print(f"Error getting QB seasons for {qb_name} ({qb_id}): {e}")
+        import traceback
+        traceback.print_exc()
+        return None

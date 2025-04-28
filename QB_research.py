@@ -40,7 +40,7 @@ JoshAllenTest.append("Josh Allen")
 JoshAllenTest.append(PFR.get_player_id(JoshAllenTest[0]))
 TestResults = []
 print("Testing QB data retrieval for Josh Allen...")
-TestResults = PFR.get_qb_seasons(JoshAllenTest[0], JoshAllenTest[1])
+TestResults = PFR.get_qb_seasons(JoshAllenTest[0], JoshAllenTest[1], debugging=True)
 #print("Testing QB data retrieval for All...")
 #pull_updated_QB_data()
 
