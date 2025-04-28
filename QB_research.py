@@ -7,6 +7,43 @@ import PFR_Tools as PFR
 import random
 import os
 
+def pull_updated_QB_data():
+    if os.path.exists("1sr_rd_qb_ids.csv"):
+        first_round_qbs = pd.read_csv("1sr_rd_qb_ids.csv")
+        all_seasons_df = pd.DataFrame()
+        best_seasons_df = pd.DataFrame()
+        # Loop through each QB in the first round
+        for qb in first_round_qbs:
+            qb_stats = PFR.get_qb_seasons(qb[0], qb[1], qb[2], qb[3])
+            if qb_stats is not None:
+                all_seasons_df = pd.concat([all_seasons_df, qb_stats], ignore_index=True)
+                total_yards = qb_stats[qb_stats.find('Yds')] + qb_stats[qb_stats.find('Rush Yds')]
+                # Check if this is the best season for the QB
+                if qb_stats['total_yards'].max() == qb_stats['total_yards']:
+                    print(f"Best season for {qb[0]} ({qb[1]}) in {qb[2]}: {qb_stats['season']}")
+                    # Append the best season to the best_seasons_df DataFrame
+                    best_seasons_df = pd.concat([best_seasons_df, qb_stats], ignore_index=True)
+            PFR.random_sleep()
+        print("Iterated through the entire 1st round QB list:")
+    else:
+        print("1st round QB IDs file not found. Please run the script to generate it.")
+        return False
+    # Save the DataFrames to CSV files
+    all_seasons_df.to_csv("all_seasons_df.csv", index=False)
+    best_seasons_df.to_csv("best_seasons_df.csv", index=False)
+    return True
+
+#PFR.get_player_ids()
+#PFR.update_qb_ids()
+JoshAllenTest = []
+JoshAllenTest.append("Josh Allen")
+JoshAllenTest.append(PFR.get_player_id(JoshAllenTest[0]))
+TestResults = []
+print("Testing QB data retrieval for Josh Allen...")
+TestResults = PFR.get_qb_seasons(JoshAllenTest[0], JoshAllenTest[1])
+#print("Testing QB data retrieval for All...")
+#pull_updated_QB_data()
+
 def main():
     all_seasons_df = pd.DataFrame()
     best_seasons_df = pd.DataFrame()
@@ -100,8 +137,3 @@ def main():
             print(f"An error occurred while processing year {year}: {str(e)}")
     
     return all_seasons_df, best_seasons_df
-
-# Run the main function
-#main()
-
-PFR.get_player_ids()

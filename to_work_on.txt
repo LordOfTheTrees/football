@@ -1,5 +1,3 @@
 to fix:
-avoiding crawler issues
-pulling the player ids
 testing player id
 get QB seasons

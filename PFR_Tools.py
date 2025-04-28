@@ -204,16 +204,12 @@ def get_player_ids():
     """
     current_year = datetime.now().year
     all_players = []
-    
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-    }
-    
+        
     for year in range(2000, current_year + 1):
         try:
             fantasy_year = f"https://www.pro-football-reference.com/years/{year}/fantasy.htm"
             print(f"Fetching playerID data for {year}...")
-            response = requester.get(fantasy_year, headers=headers)
+            response = requester.get(fantasy_year)
             
             # Check if the request was successful
             if response.status_code != 200:
@@ -297,6 +293,57 @@ def get_player_id(player_name):
         player_id = player_ids_df.iloc[0]['player_id']
     return player_id
 
+def update_qb_ids():
+    """
+    Updates the player IDs for all quarterbacks in the 'player_ids.csv' file.
+    
+    This function reads the existing player IDs from the CSV file, takes the list
+     of first round QBs and then makes a second file of QB IDs for each one.
+    
+    Returns:
+        None: The function creates a new CSV file '1st_rd_qb_ids.csv' with updated QB IDs.
+    """
+    qb_draft_df = pd.read_csv('first_round_qbs.csv')
+    player_ids = pd.read_csv('player_ids.csv')
+    qb_ids = pd.DataFrame(columns=['player_name', 'player_id', 'draft_year', 'draft_team'])
+    for index, row in qb_draft_df.iterrows():
+        qb_name = row['name']
+        qb_draft_year = row['draft_year']
+        qb_draft_team = row['draft_team']
+        
+        # Get the player ID from the player_ids DataFrame
+        matching_players = player_ids[player_ids['player_name'] == qb_name]
+        
+        if not matching_players.empty:
+            if len(matching_players) > 1:
+                print(f"Multiple IDs found for {qb_name}: {matching_players['player_id'].tolist()}")
+                # Look for the ID with the matching year
+                matching_year_player = matching_players[matching_players['year'] == qb_draft_year]
+                if not matching_year_player.empty:
+                    player_id = matching_year_player.iloc[0]['player_id']
+                    print(f"Found matching ID in draft year for {qb_name}: {player_id}")
+                    qb_ids = pd.concat([qb_ids, pd.DataFrame({'player_name': [qb_name], 'player_id': [player_id], 'draft_year': [qb_draft_year], 'draft_team': [qb_draft_team]})], ignore_index=True)
+                else:
+                    # Use the first one if no matching year is found
+                    player_id = matching_players.iloc[0]['player_id']
+                    qb_ids = pd.concat([qb_ids, pd.DataFrame({'player_name': [qb_name], 'player_id': [player_id], 'draft_year': [qb_draft_year], 'draft_team': [qb_draft_team]})], ignore_index=True)
+            else:
+                player_id = matching_players.iloc[0]['player_id']
+                qb_ids = pd.concat([qb_ids, pd.DataFrame({'player_name': [qb_name], 'player_id': [player_id], 'draft_year': [qb_draft_year], 'draft_team': [qb_draft_team]})], ignore_index=True)
+        else:
+            print(f"No ID found for first round qb: {qb_name} in master ID list")
+    
+    # Check if qb_ids is not empty before writing to CSV
+    if not qb_ids.empty:
+        csv_file_path = '1st_rd_qb_ids.csv'
+        # Fix the CSV writing code - this had a syntax error too
+        qb_ids.to_csv(csv_file_path, index=False)
+        print(f"QB IDs saved to 1st_rd_qb_ids.csv")
+    else:
+        print(f"No QB IDs, so write to CSV failed for the QB specific IDs:")
+
+    return True
+
 # Function to get all seasons for a QB with comprehensive stats
 def get_qb_seasons(qb_name, qb_id, draft_year=None, draft_team=None):
     """
@@ -329,7 +376,7 @@ def get_qb_seasons(qb_name, qb_id, draft_year=None, draft_team=None):
     seasons = []
     Player_url = f"https://www.pro-football-reference.com/players/{qb_id[0]}/{qb_id}.htm"
     
-    csv_file_path = os.path.join('QB_Data', f'{qb_id}_year_{year}.csv')
+    csv_file_path = os.path.join('QB_Data', f'{qb_id}.csv')
     if os.path.exists(csv_file_path):
         print(f"data for {qb_id} already exists. Loading from CSV.")
         with open(csv_file_path, 'r', encoding='utf-8') as f:
