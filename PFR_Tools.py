@@ -516,7 +516,7 @@ def update_qb_ids():
 
     return True
 
-def get_qb_seasons(qb_name, qb_id, draft_year=None, draft_team=None, debugging=False):
+def get_qb_seasons(qb_name, qb_id, draft_year=None, draft_team=None, debugging=False, overwrite=False):
     """
     Retrieves comprehensive career statistics for a quarterback.
     
@@ -525,6 +525,7 @@ def get_qb_seasons(qb_name, qb_id, draft_year=None, draft_team=None, debugging=F
         qb_id (str): The quarterback's unique Pro Football Reference ID
         draft_year (int, optional): Filter to include only seasons from this year onward
         draft_team (str, optional): The team that drafted the quarterback
+        debugging (bool, optional): Whether to print debugging information
         
     Returns:
         DataFrame: A pandas DataFrame containing season-by-season statistics
@@ -534,7 +535,7 @@ def get_qb_seasons(qb_name, qb_id, draft_year=None, draft_team=None, debugging=F
     player_url = f"https://www.pro-football-reference.com/players/{qb_id[0]}/{qb_id}.htm"
     
     csv_file_path = os.path.join('QB_Data', f'{qb_id}.csv')
-    if os.path.exists(csv_file_path):
+    if os.path.exists(csv_file_path) and not overwrite:
         print(f"Data for {qb_id} already exists. Loading from CSV.")
         return pd.read_csv(csv_file_path)
     
@@ -566,45 +567,24 @@ def get_qb_seasons(qb_name, qb_id, draft_year=None, draft_team=None, debugging=F
         passing_df = pd.read_html(io.StringIO(str(passing_table)))[0]
         
         # Print column names for debugging
-        if debugging: print(f"Passing table columns: {passing_df.columns.tolist()}")
+        if debugging: 
+            print(f"Passing table columns: {passing_df.columns.tolist()}")
         
         # Find the season column in passing table
         pass_year_col = None
-        
-        # Handle multi-level columns if present
-        if isinstance(passing_df.columns, pd.MultiIndex):
-            # Flatten the columns first
-            passing_df.columns = ['_'.join(str(col).strip() for col in tup if str(col).strip()) 
-                                  if isinstance(tup, tuple) else tup 
-                                  for tup in passing_df.columns]
-            
-            # Now look for potential season column names in the flattened columns
-            for col in passing_df.columns:
-                if 'Season' in col or 'season' in col or 'Year' in col or 'year' in col:
-                    pass_year_col = col
-                    print(f"Found season column in passing table: {pass_year_col}")
-                    break
+        if 'Season' in passing_df.columns:
+            pass_year_col = 'Season'
+        elif 'season' in passing_df.columns:
+            pass_year_col = 'season'
+        elif 'Year' in passing_df.columns:
+            pass_year_col = 'Year'
         else:
-            # Look for standard column names
-            if 'Season' in passing_df.columns:
-                pass_year_col = 'Season'
-            elif 'season' in passing_df.columns:
-                pass_year_col = 'season'
-            elif 'Year' in passing_df.columns:
-                pass_year_col = 'Year'
-            else:
-                # Try to guess based on data - usually first column
-                if len(passing_df.columns) > 0:
-                    first_col = passing_df.columns[0]
-                    # Check if first column contains years
-                    if all(str(x).isdigit() for x in passing_df[first_col].dropna()):
-                        pass_year_col = first_col
-                        print(f"Using first column as season: {pass_year_col}")
-        
-        if not pass_year_col:
-            print("Could not find season column in passing table")
-            print(f"Available columns: {passing_df.columns.tolist()}")
-            return None
+            # Try to guess based on data - usually first column
+            if len(passing_df.columns) > 0:
+                first_col = passing_df.columns[0]
+                pass_year_col = first_col
+                if debugging:
+                    print(f"Using first column as season: {pass_year_col}")
         
         # 2. Get rushing table if available
         rushing_table = soup.find('table', id='rushing_and_receiving')
@@ -614,47 +594,15 @@ def get_qb_seasons(qb_name, qb_id, draft_year=None, draft_team=None, debugging=F
             rushing_df = pd.read_html(io.StringIO(str(rushing_table)))[0]
             
             # Print column names for debugging
-            if debugging: print(f"Rushing table columns: {rushing_df.columns.tolist()}")
+            if debugging: 
+                print(f"Rushing table columns: {rushing_df.columns.tolist()}")
             
-            # Find the season column in rushing table
-            rush_year_col = None
-            
-            # Handle multi-level columns
+            # Handle multi-level columns if present
             if isinstance(rushing_df.columns, pd.MultiIndex):
-                # Try to directly find the common column structure you mentioned
-                if 'Unnamed: 0_level_0' in [col[0] if isinstance(col, tuple) else col for col in rushing_df.columns]:
-                    for col in rushing_df.columns:
-                        if isinstance(col, tuple) and col[0] == 'Unnamed: 0_level_0' and 'Season' in col[1]:
-                            rush_year_col = col
-                            print(f"Found multi-level season column in rushing table: {rush_year_col}")
-                            break
-                
-                # Flatten the columns
-                rushing_df.columns = ['_'.join(str(col).strip() for col in tup if str(col).strip()) 
-                                      if isinstance(tup, tuple) else tup 
-                                      for tup in rushing_df.columns]
-                
-                # If no season column was identified before flattening, look for it now
-                if not rush_year_col:
-                    for col in rushing_df.columns:
-                        if 'Season' in col or 'season' in col or 'Year' in col or 'year' in col:
-                            rush_year_col = col
-                            print(f"Found season column in rushing table after flattening: {rush_year_col}")
-                            break
-            else:
-                # Look for standard column names
-                if 'Season' in rushing_df.columns:
-                    rush_year_col = 'Season'
-                elif 'season' in rushing_df.columns:
-                    rush_year_col = 'season'
-                elif 'Year' in rushing_df.columns:
-                    rush_year_col = 'Year'
-                else:
-                    # Try to guess based on data
-                    if len(rushing_df.columns) > 0:
-                        first_col = rushing_df.columns[0]
-                        if all(str(x).isdigit() for x in rushing_df[first_col].dropna()):
-                            rush_year_col = first_col
+                # Flatten the columns to single level
+                rushing_df.columns = [f"{col[0]}_{col[1]}" if isinstance(col, tuple) else col for col in rushing_df.columns]
+                if debugging:
+                    print(f"Flattened rushing columns: {rushing_df.columns.tolist()}")
         
         # 3. Get advanced passing table if available
         adv_passing_table = soup.find('table', id='passing_advanced')
@@ -664,170 +612,237 @@ def get_qb_seasons(qb_name, qb_id, draft_year=None, draft_team=None, debugging=F
             adv_passing_df = pd.read_html(io.StringIO(str(adv_passing_table)))[0]
             
             # Print column names for debugging
-            if debugging: print(f"Advanced passing table columns: {adv_passing_df.columns.tolist()}")
+            if debugging: 
+                print(f"Advanced passing table columns: {adv_passing_df.columns.tolist()}")
             
-            # Find the season column in advanced passing table
-            adv_year_col = None
-            
-            # Handle multi-level columns
+            # Handle multi-level columns if present
             if isinstance(adv_passing_df.columns, pd.MultiIndex):
-                # Try to directly find the common column structure
-                if 'Unnamed: 0_level_0' in [col[0] if isinstance(col, tuple) else col for col in adv_passing_df.columns]:
-                    for col in adv_passing_df.columns:
-                        if isinstance(col, tuple) and col[0] == 'Unnamed: 0_level_0' and 'Season' in col[1]:
-                            adv_year_col = col
-                            print(f"Found multi-level season column in advanced passing table: {adv_year_col}")
-                            break
-                
-                # Flatten the columns
-                adv_passing_df.columns = ['_'.join(str(col).strip() for col in tup if str(col).strip()) 
-                                          if isinstance(tup, tuple) else tup 
-                                          for tup in adv_passing_df.columns]
-                
-                # If no season column was identified before flattening, look for it now
-                if not adv_year_col:
-                    for col in adv_passing_df.columns:
-                        if 'Season' in col or 'season' in col or 'Year' in col or 'year' in col:
-                            adv_year_col = col
-                            print(f"Found season column in advanced passing table after flattening: {adv_year_col}")
-                            break
-            else:
-                # Look for standard column names
-                if 'Season' in adv_passing_df.columns:
-                    adv_year_col = 'Season'
-                elif 'season' in adv_passing_df.columns:
-                    adv_year_col = 'season'
-                elif 'Year' in adv_passing_df.columns:
-                    adv_year_col = 'Year'
-                else:
-                    # Try to guess based on data
-                    if len(adv_passing_df.columns) > 0:
-                        first_col = adv_passing_df.columns[0]
-                        if all(str(x).isdigit() for x in adv_passing_df[first_col].dropna()):
-                            adv_year_col = first_col
+                # Flatten the columns to single level
+                adv_passing_df.columns = [f"{col[0]}_{col[1]}" if isinstance(col, tuple) else col for col in adv_passing_df.columns]
+                if debugging:
+                    print(f"Flattened advanced passing columns: {adv_passing_df.columns.tolist()}")
         
-        # Now we'll prefix columns to avoid conflicts when joining
-        # 1. Prefix passing columns
-        cols_to_prefix = [col for col in passing_df.columns 
-                          if col != pass_year_col and col not in ['Tm', 'G', 'GS', 'Age', 'Pos']]
-        for col in cols_to_prefix:
-            passing_df.rename(columns={col: f'Pass_{col}'}, inplace=True)
+        # Filter out career summary rows from passing DataFrame - these cause problems!
+        if pass_year_col:
+            # Identify rows that represent actual years (4-digit number)
+            passing_df = passing_df[passing_df[pass_year_col].astype(str).str.match(r'^\d{4}$')]
+            if debugging:
+                print(f"Filtered passing seasons: {passing_df[pass_year_col].tolist()}")
         
-        # 2. Prefix rushing columns if available
-        if rushing_df is not None and rush_year_col is not None:
-            cols_to_prefix = [col for col in rushing_df.columns 
-                             if col != rush_year_col and col not in ['Tm', 'G', 'GS', 'Age', 'Pos']]
-            for col in cols_to_prefix:
-                rushing_df.rename(columns={col: f'Rush_{col}'}, inplace=True)
-        
-        # 3. Prefix advanced passing columns if available
-        if adv_passing_df is not None and adv_year_col is not None:
-            cols_to_prefix = [col for col in adv_passing_df.columns 
-                             if col != adv_year_col and col not in ['Tm', 'G', 'GS', 'Age', 'Pos']]
-            for col in cols_to_prefix:
-                adv_passing_df.rename(columns={col: f'AdvPass_{col}'}, inplace=True)
-        
-        # Standardize all year column names to 'season' for consistency in the final DataFrame
+        # Rename columns to standardize them
         passing_df.rename(columns={pass_year_col: 'season'}, inplace=True)
         
-        if rushing_df is not None and rush_year_col is not None:
-            rushing_df.rename(columns={rush_year_col: 'season'}, inplace=True)
+        # Start with prefixing the passing columns
+        for col in passing_df.columns:
+            if col != 'season' and col not in ['Team', 'Lg', 'Pos', 'G', 'GS', 'Age']:
+                passing_df.rename(columns={col: f'Pass_{col}'}, inplace=True)
         
-        if adv_passing_df is not None and adv_year_col is not None:
-            adv_passing_df.rename(columns={adv_year_col: 'season'}, inplace=True)
+        # Now we can use pandas merge to join the tables on season
+        final_df = passing_df.copy()
         
-        # Ensure season column is properly formatted
-        passing_df['season'] = passing_df['season'].astype(str)
-        if rushing_df is not None and 'season' in rushing_df.columns:
-            rushing_df['season'] = rushing_df['season'].astype(str)
-        if adv_passing_df is not None and 'season' in adv_passing_df.columns:
-            adv_passing_df['season'] = adv_passing_df['season'].astype(str)
+        # Find the season columns in the other tables
+        rush_season_col = None
+        adv_season_col = None
         
-        # Start with the base passing DataFrame
-        seasons_df = passing_df.copy()
+        # For rushing table
+        if rushing_df is not None:
+            # Look for likely season column names
+            for col in rushing_df.columns:
+                if 'Season' in col or 'season' in col:
+                    rush_season_col = col
+                    break
+            
+            # If not found, assume it's first column like in passing table
+            if not rush_season_col and len(rushing_df.columns) > 0:
+                rush_season_col = rushing_df.columns[0]
+                if debugging:
+                    print(f"Using first column as rushing season: {rush_season_col}")
+            
+            # Filter out summary rows
+            if rush_season_col:
+                # Convert to string and filter for 4-digit years
+                rushing_df = rushing_df[rushing_df[rush_season_col].astype(str).str.match(r'^\d{4}$')]
+                if debugging:
+                    print(f"Filtered rushing seasons: {rushing_df[rush_season_col].tolist()}")
+                
+                # Rename to standard 'season'
+                rushing_df.rename(columns={rush_season_col: 'season'}, inplace=True)
+                
+                # Prefix all other columns
+                for col in rushing_df.columns:
+                    if col != 'season' and col not in ['Team', 'Lg', 'Pos', 'G', 'GS', 'Age']:
+                        rushing_df.rename(columns={col: f'Rush_{col}'}, inplace=True)
+                
+                # Merge with final_df
+                if debugging:
+                    print(f"Merging rushing data on season")
+                    print(f"Final DF seasons: {final_df['season'].tolist()}")
+                    print(f"Rushing DF seasons: {rushing_df['season'].tolist()}")
+                
+                # Ensure seasons are strings for merging
+                final_df['season'] = final_df['season'].astype(str)
+                rushing_df['season'] = rushing_df['season'].astype(str)
+                
+                final_df = pd.merge(final_df, rushing_df, on='season', how='left')
+                
+                if debugging:
+                    print(f"After rushing merge, DataFrame shape: {final_df.shape}")
         
-        # Create a dictionary of season -> row index for quick lookups
-        season_to_idx = {str(year): idx for idx, year in enumerate(seasons_df['season'])}
-        
-        # Add rushing stats if available
-        if rushing_df is not None and 'season' in rushing_df.columns:
-            for _, rush_row in rushing_df.iterrows():
-                season_val = str(rush_row['season'])
-                if season_val in season_to_idx:
-                    # Add each rushing stat to the corresponding passing row
-                    idx = season_to_idx[season_val]
-                    for col in rushing_df.columns:
-                        if col.startswith('Rush_'):
-                            seasons_df.loc[idx, col] = rush_row[col]
-        
-        # Add advanced passing stats if available
-        if adv_passing_df is not None and 'season' in adv_passing_df.columns:
-            for _, adv_row in adv_passing_df.iterrows():
-                season_val = str(adv_row['season'])
-                if season_val in season_to_idx:
-                    # Add each advanced stat to the corresponding row
-                    idx = season_to_idx[season_val]
-                    for col in adv_passing_df.columns:
-                        if col.startswith('AdvPass_'):
-                            seasons_df.loc[idx, col] = adv_row[col]
+        # For advanced passing table
+        if adv_passing_df is not None:
+            # Look for likely season column names
+            for col in adv_passing_df.columns:
+                if 'Season' in col or 'season' in col:
+                    adv_season_col = col
+                    break
+            
+            # If not found, assume it's first column like in passing table
+            if not adv_season_col and len(adv_passing_df.columns) > 0:
+                adv_season_col = adv_passing_df.columns[0]
+                if debugging:
+                    print(f"Using first column as advanced passing season: {adv_season_col}")
+            
+            # Filter out summary rows
+            if adv_season_col:
+                # Convert to string and filter for 4-digit years
+                adv_passing_df = adv_passing_df[adv_passing_df[adv_season_col].astype(str).str.match(r'^\d{4}$')]
+                if debugging:
+                    print(f"Filtered advanced passing seasons: {adv_passing_df[adv_season_col].tolist()}")
+                
+                # Rename to standard 'season'
+                adv_passing_df.rename(columns={adv_season_col: 'season'}, inplace=True)
+                
+                # Prefix all other columns
+                for col in adv_passing_df.columns:
+                    if col != 'season' and col not in ['Team', 'Lg', 'Pos', 'G', 'GS', 'Age']:
+                        adv_passing_df.rename(columns={col: f'AdvPass_{col}'}, inplace=True)
+                
+                # Merge with final_df
+                if debugging:
+                    print(f"Merging advanced passing data on season")
+                    print(f"Final DF seasons: {final_df['season'].tolist()}")
+                    print(f"Advanced passing DF seasons: {adv_passing_df['season'].tolist()}")
+                
+                # Ensure seasons are strings for merging
+                final_df['season'] = final_df['season'].astype(str)
+                adv_passing_df['season'] = adv_passing_df['season'].astype(str)
+                
+                final_df = pd.merge(final_df, adv_passing_df, on='season', how='left')
+                
+                if debugging:
+                    print(f"After advanced passing merge, DataFrame shape: {final_df.shape}")
         
         # Add player metadata
-        seasons_df['player_name'] = qb_name
-        seasons_df['player_id'] = qb_id
+        final_df['player_name'] = qb_name
+        final_df['player_id'] = qb_id
         if draft_year:
-            seasons_df['draft_year'] = draft_year
+            final_df['draft_year'] = draft_year
         if draft_team:
-            seasons_df['draft_team'] = draft_team
+            final_df['draft_team'] = draft_team
         
         # Calculate total yards if possible
-        passing_yds_col = next((col for col in seasons_df.columns if 'Yds' in col and 'Pass_' in col), None)
-        rushing_yds_col = next((col for col in seasons_df.columns if 'Yds' in col and 'Rush_' in col), None)
+        passing_yds_col = next((col for col in final_df.columns if 'Yds' in col and 'Pass_' in col), None)
+        rushing_yds_col = next((col for col in final_df.columns if 'Yds' in col and 'Rush_' in col), None)
         
         if passing_yds_col and rushing_yds_col:
             try:
                 # Convert to numeric and calculate total
-                seasons_df[passing_yds_col] = pd.to_numeric(seasons_df[passing_yds_col], errors='coerce').fillna(0)
-                seasons_df[rushing_yds_col] = pd.to_numeric(seasons_df[rushing_yds_col], errors='coerce').fillna(0)
-                seasons_df['total_yards'] = seasons_df[passing_yds_col] + seasons_df[rushing_yds_col]
+                final_df[passing_yds_col] = pd.to_numeric(final_df[passing_yds_col], errors='coerce').fillna(0)
+                final_df[rushing_yds_col] = pd.to_numeric(final_df[rushing_yds_col], errors='coerce').fillna(0)
+                final_df['total_yards'] = final_df[passing_yds_col] + final_df[rushing_yds_col]
                 print(f"Calculated total_yards by adding {passing_yds_col} and {rushing_yds_col}")
             except Exception as e:
                 print(f"Error calculating total yards: {e}")
         
         # Filter by year if needed
-        try:
-            if 'season' in seasons_df.columns:
-                # Convert season to numeric for filtering
-                seasons_df['season'] = pd.to_numeric(seasons_df['season'], errors='coerce')
-                
-                # Filter for draft year if specified
-                if draft_year:
-                    seasons_df = seasons_df[seasons_df['season'] >= int(draft_year)]
-                
-                # Filter for modern era (2000+)
-                seasons_df = seasons_df[(seasons_df['season'] >= 2000) & (seasons_df['season'] <= current_year)]
-        except Exception as e:
-            print(f"Error filtering by year: {e}")
+        if draft_year:
+            final_df = final_df[final_df['season'].astype(int) >= int(draft_year)]
         
         # Clean up and save
-        seasons_df = seasons_df.dropna(how='all')
-        seasons_df = seasons_df.reset_index(drop=True)
+        final_df = final_df.reset_index(drop=True)
         
         # Print debug info
-        print(f"Final DataFrame shape: {seasons_df.shape}")
+        print(f"Final DataFrame shape: {final_df.shape}")
         
         # Save to CSV
         os.makedirs('QB_Data', exist_ok=True)
-        if not seasons_df.empty:
-            seasons_df.to_csv(csv_file_path, index=False)
+        if not final_df.empty:
+            final_df.to_csv(csv_file_path, index=False)
             print(f"Data for {qb_name} ({qb_id}) saved to {csv_file_path}")
-            print(f"Found {len(seasons_df)} seasons with {len(seasons_df.columns)} stats columns")
+            print(f"Found {len(final_df)} seasons with {len(final_df.columns)} stats columns")
         else:
             print(f"No data to save for {qb_name}")
         
-        return seasons_df
+        return final_df
     
     except Exception as e:
         print(f"Error getting QB seasons for {qb_name} ({qb_id}): {e}")
         import traceback
         traceback.print_exc()
         return None
+
+def pull_updated_QB_data():
+    """
+    Retrieves statistics for all first-round quarterbacks and compiles them into two DataFrames:
+    1. all_seasons_df - containing all seasons for all QBs
+    2. best_seasons_df - containing only each QB's best season by total yards
+    
+    Returns:
+        bool: True if successful, False otherwise
+    """
+    if os.path.exists("1st_rd_qb_ids.csv"):  # Fixed the typo in filename (1sr → 1st)
+        first_round_qbs = pd.read_csv("1st_rd_qb_ids.csv")
+        all_seasons_df = pd.DataFrame()
+        best_seasons_df = pd.DataFrame()
+        
+        # Loop through each QB in the first round
+        for _, qb in first_round_qbs.iterrows():  # Use proper DataFrame iteration
+            qb_stats = get_qb_seasons(
+                qb_name=qb['player_name'], 
+                qb_id=qb['player_id'], 
+                draft_year=qb['draft_year'], 
+                draft_team=qb['draft_team']
+            )
+            
+            print(f"Found QB stats for: {qb['player_name']} ({qb['player_id']})")
+            
+            if qb_stats is not None and not qb_stats.empty:
+                # Add to all seasons DataFrame
+                if all_seasons_df.empty:
+                    print("First QB stats found, creating DataFrame")
+                    all_seasons_df = qb_stats.copy()
+                else:
+                    all_seasons_df = pd.concat([all_seasons_df, qb_stats], ignore_index=True)
+                    print(f"Added all {qb['player_name']} stats to global DataFrame")
+                
+                # Find the best season for the QB (maximum total yards)
+                if 'total_yards' in qb_stats.columns:
+                    best_season = qb_stats.loc[qb_stats['total_yards'].idxmax()]
+                    print(f"Best season for {qb['player_name']} ({qb['player_id']}): {best_season['season']} with {best_season['total_yards']} total yards")
+                    
+                    # Append the best season to the best_seasons_df DataFrame
+                    best_seasons_df = pd.concat([best_seasons_df, pd.DataFrame([best_season])], ignore_index=True)
+                else:
+                    print(f"No total yards column found for {qb['player_name']}")
+                    
+            random_sleep()
+            
+        print("Iterated through the entire 1st round QB list")
+        
+        # Save the DataFrames to CSV files
+        if not all_seasons_df.empty:
+            all_seasons_df.to_csv("all_seasons_df.csv", index=False)
+            print(f"Saved all seasons data with {len(all_seasons_df)} rows and {len(all_seasons_df.columns)} columns")
+        else:
+            print("No QB seasons data to save")
+            
+        if not best_seasons_df.empty:
+            best_seasons_df.to_csv("best_seasons_df.csv", index=False)
+            print(f"Saved best seasons data with {len(best_seasons_df)} rows")
+        else:
+            print("No best seasons data to save")
+            
+        return True
+    else:
+        print("1st round QB IDs file not found. Please run the script to generate it.")
+        return False
