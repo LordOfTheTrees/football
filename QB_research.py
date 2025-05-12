@@ -7,6 +7,12 @@ import PFR_Tools as PFR
 import random
 import os
 from IPython.display import display
+import anthropic
+
+# Initialize the client with your API key
+client = anthropic(
+    anthropic="your-api-key-here"  # You can also set this as an environment variable ANTHROPIC_API_KEY
+)
 
 if __name__ == "__main__":
     # Uncomment these if you need to regenerate the data
