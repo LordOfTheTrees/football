@@ -172,3 +172,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# my config.py file
+# This file is used to store sensitive information such as API keys, database URLs, etc.
+config.py
