@@ -1,2 +1,3 @@
-to fix:
+to investigate:
 
+making charts for my data analysis
