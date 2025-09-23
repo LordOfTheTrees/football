@@ -1,7 +1,5 @@
 to investigate:
 
-scrape the season averages: https://www.pro-football-reference.com/years/NFL/
-
-scrape win loss records by year: https://www.pro-football-reference.com/years/2000/
+fix 403 error for scraping win loss records by year: https://www.pro-football-reference.com/years/2000/
 
 making charts for my data analysis using tableau
