@@ -1,5 +1,5 @@
 to investigate:
 
-fix 403 error for scraping win loss records by year: https://www.pro-football-reference.com/years/2000/
+standardize the way team names are used (contracts by full names vs trigraphs)
 
 making charts for my data analysis using tableau
