@@ -29,3 +29,15 @@ Rk,Season,Team,W,G,W,L,T,W-L%,Pts,PtsO,PtDif
 QB data location: QB_Data
 all first round qb seasons are located in: all_seasons_df.csv
 best seasons (using total combined rush and pass yds) for each first round qb are located in: best_seasons_df.csv
+
+
+here is the running team mapping if it comes up:
+Unique QB teams (35): ['2TM', 'ARI', 'ATL', 'BAL', 'BUF', 'CAR', 'CHI', 'CIN', 'CLE', 'DAL', 'DEN', 'DET', 'GNB', 'HOU', 'IND', 'JAX', 'KAN', 'LAC', 'LAR', 'LVR', 'MIA', 'MIN', 'NOR', 'NWE', 'NYG', 'NYJ', 'OAK', 'PHI', 'PIT', 'SDG', 'SFO', 'STL', 'TAM', 'TEN', 'WAS']
+
+Unique season record teams (35): ['ARI', 'ATL', 'BAL', 'BUF', 'CAR', 'CHI', 'CIN', 'CLE', 'DAL', 'DEN', 'DET', 'GNB', 'HOU', 'IND', 'JAX', 'KAN', 'LAC', 'LAR', 'LVR', 'MIA', 'MIN', 'NOR', 'NWE', 'NYG', 'NYJ', 'OAK', 'PHI', 'PIT', 'SDG', 'SEA', 'SFO', 'STL', 'TAM', 'TEN', 'WAS']
+
+Teams in both datasets (34): ['ARI', 'ATL', 'BAL', 'BUF', 'CAR', 'CHI', 'CIN', 'CLE', 'DAL', 'DEN', 'DET', 'GNB', 'HOU', 'IND', 'JAX', 'KAN', 'LAC', 'LAR', 'LVR', 'MIA', 'MIN', 'NOR', 'NWE', 'NYG', 'NYJ', 'OAK', 'PHI', 'PIT', 'SDG', 'SFO', 'STL', 'TAM', 'TEN', 'WAS']
+
+Teams only in QB data (1): ['2TM'] (means 2 teams in one season, not relevant for this analysis)
+
+Teams only in season records (1): ['SEA'] (Seattle Seahawks)
