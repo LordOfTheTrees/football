@@ -1307,7 +1307,6 @@ def load_first_round_qbs():
             print("ERROR: 1st_rd_qb_ids.csv also not found")
             return None
 
-
 def load_first_round_qbs_with_ids():
     """
     Loads the first round QB data with player IDs.
@@ -1600,6 +1599,745 @@ def create_contract_player_mapping(force_refresh=False):
     
     return mapped_contracts
 
+def create_payment_year_mapping(contract_df):
+    """
+    Creates a lightweight mapping of player_id -> payment_year.
+    
+    This identifies when each QB got paid (2nd contract/extension) and returns
+    a simple dictionary for runtime lookup.
+    
+    Args:
+        contract_df (DataFrame): Contract data with player_id and Year columns
+    
+    Returns:
+        dict: {player_id: payment_year} for QBs who got paid
+    """
+    print("\n" + "="*80)
+    print("CREATING PAYMENT YEAR MAPPING")
+    print("="*80)
+    
+    # Filter to only contracts with player_id (matched to first round QBs)
+    paid_contracts = contract_df[contract_df['player_id'].notna()].copy()
+    
+    print(f"Found {len(paid_contracts)} contracts with player_id")
+    
+    # Group by player and get the first payment year
+    # (This is their 2nd contract / first big payday)
+    payment_mapping = {}
+    
+    for player_id, group in paid_contracts.groupby('player_id'):
+        # Get the earliest contract year (their first big payday)
+        first_payment_year = group['Year'].min()
+        payment_mapping[player_id] = int(first_payment_year)
+    
+    print(f"Created payment mapping for {len(payment_mapping)} QBs")
+    
+    # Show some examples
+    if payment_mapping:
+        print("\nExample mappings:")
+        for i, (player_id, year) in enumerate(list(payment_mapping.items())[:5]):
+            player_name = paid_contracts[paid_contracts['player_id'] == player_id].iloc[0]['Player']
+            print(f"  {player_name} ({player_id}): Paid in {year}")
+    
+    return payment_mapping
+
+def create_pick_number_mapping(pick_numbers_file='first_round_qbs_with_picks.csv'):
+    """
+    Creates a lightweight mapping of player_id -> pick_number.
+    
+    Args:
+        pick_numbers_file (str): Path to CSV with pick numbers
+    
+    Returns:
+        dict: {player_id: pick_number} for all first round QBs
+    """
+    print("\n" + "="*80)
+    print("CREATING PICK NUMBER MAPPING")
+    print("="*80)
+    
+    if not os.path.exists(pick_numbers_file):
+        print(f"✗ ERROR: File not found: {pick_numbers_file}")
+        return {}
+    
+    df = pd.read_csv(pick_numbers_file)
+    print(f"Loaded {len(df)} QBs with pick numbers")
+    print(f"Columns: {df.columns.tolist()}")
+    
+    # Create mapping
+    pick_mapping = dict(zip(df['player_id'], df['pick_number']))
+    
+    print(f"Created pick number mapping for {len(pick_mapping)} QBs")
+    
+    # Show some examples
+    if pick_mapping:
+        print("\nExample mappings:")
+        for i, (player_id, pick) in enumerate(list(pick_mapping.items())[:5]):
+            player_name = df[df['player_id'] == player_id].iloc[0]['player_name']
+            print(f"  {player_name} ({player_id}): Pick #{pick}")
+    
+    return pick_mapping
+
+def label_seasons_relative_to_payment(qb_seasons_df, payment_mapping):
+    """
+    Labels each QB season with years relative to their payment year.
+    
+    For QBs who got paid in year Y:
+    - Y-4 = 4 years before payment
+    - Y-3 = 3 years before payment
+    - Y-2 = 2 years before payment
+    - Y-1 = 1 year before payment (most recent year before decision)
+    - Y = payment year
+    - Y+1 = 1 year after payment
+    - Y+2 = 2 years after payment
+    etc.
+    
+    For QBs who never got paid: years_to_payment = NaN
+    
+    Args:
+        qb_seasons_df (DataFrame): All QB seasons data
+        payment_mapping (dict): {player_id: payment_year}
+    
+    Returns:
+        DataFrame: Original df with new columns:
+            - payment_year: The year they got paid (NaN if never paid)
+            - years_to_payment: Relative year (negative before, 0 at, positive after)
+            - got_paid: Boolean indicator
+    """
+    print("\n" + "="*80)
+    print("LABELING SEASONS RELATIVE TO PAYMENT")
+    print("="*80)
+    
+    df = qb_seasons_df.copy()
+    
+    # Ensure season is integer
+    df['season'] = pd.to_numeric(df['season'], errors='coerce')
+    df = df.dropna(subset=['season'])
+    df['season'] = df['season'].astype(int)
+    
+    # Add payment year from mapping
+    df['payment_year'] = df['player_id'].map(payment_mapping)
+    
+    # Calculate years relative to payment
+    # Negative = before payment, 0 = payment year, positive = after payment
+    df['years_to_payment'] = df['season'] - df['payment_year']
+    
+    # Add boolean indicator
+    df['got_paid'] = df['payment_year'].notna()
+    
+    # Stats
+    paid_qbs = df['got_paid'].sum() / len(df) * 100
+    unique_paid = df[df['got_paid']]['player_id'].nunique()
+    unique_total = df['player_id'].nunique()
+    
+    print(f"\nTotal seasons: {len(df)}")
+    print(f"Seasons from QBs who got paid: {df['got_paid'].sum()} ({paid_qbs:.1f}%)")
+    print(f"QBs who got paid: {unique_paid}/{unique_total}")
+    
+    # Show distribution of years_to_payment
+    print("\nDistribution of years relative to payment:")
+    for year_rel in sorted(df[df['got_paid']]['years_to_payment'].unique()):
+        count = (df['years_to_payment'] == year_rel).sum()
+        print(f"  Y{year_rel:+d}: {count} seasons")
+    
+    # Show examples
+    print("\nExample labeled seasons:")
+    sample_qb = df[df['got_paid']].iloc[0]['player_id']
+    sample_data = df[df['player_id'] == sample_qb][['season', 'player_name', 'payment_year', 'years_to_payment', 'got_paid']].head(10)
+    print(sample_data.to_string(index=False))
+    
+    return df
+
+def create_lookback_performance_features(labeled_df, metrics=['Pass_ANY/A', 'Pass_Rate', 'total_yards']):
+    """
+    Creates lookback features for discrete-time modeling.
+    
+    For each season at time t, creates columns for performance in previous years:
+    - metric_lag1: Performance 1 year ago (t-1)
+    - metric_lag2: Performance 2 years ago (t-2)
+    - metric_lag3: Performance 3 years ago (t-3)
+    - metric_lag4: Performance 4 years ago (t-4)
+    
+    This enables modeling payment decisions based on recent performance history.
+    
+    Args:
+        labeled_df (DataFrame): QB seasons with years_to_payment labels
+        metrics (list): Performance metrics to create lags for
+    
+    Returns:
+        DataFrame: Original df with lag features added
+    """
+    print("\n" + "="*80)
+    print("CREATING LOOKBACK PERFORMANCE FEATURES")
+    print("="*80)
+    
+    df = labeled_df.copy()
+    
+    # Sort by player and season
+    df = df.sort_values(['player_id', 'season']).reset_index(drop=True)
+    
+    # For each metric, create lag features
+    for metric in metrics:
+        if metric not in df.columns:
+            print(f"⚠️  Warning: {metric} not found in dataframe, skipping")
+            continue
+        
+        print(f"\nCreating lags for {metric}...")
+        
+        # Convert to numeric
+        df[metric] = pd.to_numeric(df[metric], errors='coerce')
+        
+        # Create lags (1-4 years back)
+        for lag in range(1, 5):
+            lag_col = f"{metric}_lag{lag}"
+            df[lag_col] = df.groupby('player_id')[metric].shift(lag)
+            
+            # Count non-null values
+            non_null = df[lag_col].notna().sum()
+            print(f"  {lag_col}: {non_null} non-null values")
+    
+    print(f"\nTotal columns after adding lags: {len(df.columns)}")
+    
+    # Show example of lookback features
+    print("\nExample lookback features (showing Pass_ANY/A):")
+    sample_qb = df[df['got_paid']].iloc[0]['player_id']
+    sample_data = df[df['player_id'] == sample_qb][
+        ['season', 'player_name', 'Pass_ANY/A', 'Pass_ANY/A_lag1', 'Pass_ANY/A_lag2', 'Pass_ANY/A_lag3']
+    ].head(10)
+    print(sample_data.to_string(index=False))
+    
+    return df
+
+def create_decision_point_dataset(labeled_df, decision_year_relative=0, metrics=['Pass_ANY/A']):
+    """
+    Creates a dataset for modeling payment decisions at a specific decision point.
+    
+    For example, decision_year_relative=-1 means we're modeling whether the QB got paid
+    based on their performance up to 1 year before payment (Y-1, Y-2, Y-3, Y-4).
+    
+    This is useful for discrete-time logistic regression at each decision point:
+    - Year 3 decisions (5th year option): decision_year_relative=-2
+    - Year 4 decisions (extension): decision_year_relative=-1
+    - Year 5 decisions (2nd contract): decision_year_relative=0
+    
+    Args:
+        labeled_df (DataFrame): QB seasons with lookback features
+        decision_year_relative (int): Which year to evaluate at (relative to payment)
+        metrics (list): Which performance metrics to include
+    
+    Returns:
+        DataFrame: Dataset ready for modeling payment probability
+    """
+    print("\n" + "="*80)
+    print(f"CREATING DECISION POINT DATASET (Y{decision_year_relative:+d})")
+    print("="*80)
+    
+    df = labeled_df.copy()
+    
+    # Filter to the specific decision year
+    decision_df = df[df['years_to_payment'] == decision_year_relative].copy()
+    
+    print(f"Seasons at Y{decision_year_relative:+d}: {len(decision_df)}")
+    
+    # Select relevant columns
+    feature_cols = ['player_id', 'player_name', 'season', 'draft_year', 'got_paid']
+    
+    # Add the performance metrics and their lags
+    for metric in metrics:
+        if metric in decision_df.columns:
+            feature_cols.append(metric)
+        
+        # Add lags
+        for lag in range(1, 5):
+            lag_col = f"{metric}_lag{lag}"
+            if lag_col in decision_df.columns:
+                feature_cols.append(lag_col)
+    
+    # Add pick number if available
+    if 'pick_number' in decision_df.columns:
+        feature_cols.append('pick_number')
+    
+    decision_df = decision_df[feature_cols].copy()
+    
+    # Remove rows with missing lag data (can't evaluate without history)
+    initial_count = len(decision_df)
+    decision_df = decision_df.dropna(subset=[col for col in feature_cols if '_lag' in col], how='all')
+    final_count = len(decision_df)
+    
+    print(f"After removing seasons with insufficient history: {final_count} ({initial_count - final_count} dropped)")
+    
+    # Show payment statistics
+    if 'got_paid' in decision_df.columns:
+        paid_count = decision_df['got_paid'].sum()
+        paid_pct = paid_count / len(decision_df) * 100 if len(decision_df) > 0 else 0
+        print(f"\nPayment outcome distribution:")
+        print(f"  Got paid: {paid_count} ({paid_pct:.1f}%)")
+        print(f"  Not paid: {len(decision_df) - paid_count} ({100-paid_pct:.1f}%)")
+    
+    # Show sample
+    print("\nSample decision point data:")
+    sample_cols = ['player_name', 'season', 'got_paid'] + [col for col in feature_cols if 'Pass_ANY/A' in col][:4]
+    print(decision_df[sample_cols].head(10).to_string(index=False))
+    
+    return decision_df
+
+def prepare_qb_payment_data(
+    qb_seasons_file='all_seasons_df.csv',
+    contract_file='QB_contract_data.csv', 
+    pick_numbers_file='first_round_qbs_with_picks.csv',
+    save_output=True,
+    output_file='qb_seasons_payment_labeled.csv'
+):
+    """
+    Master function that runs the full data preparation pipeline.
+    
+    Steps:
+    1. Load QB seasons data
+    2. Load and map contract data (payment years)
+    3. Load and map pick numbers
+    4. Label seasons relative to payment
+    5. Create lookback performance features
+    
+    Args:
+        qb_seasons_file (str): Path to QB seasons CSV
+        contract_file (str): Path to contract data CSV
+        pick_numbers_file (str): Path to pick numbers CSV
+        save_output (bool): Whether to save the prepared dataset
+        output_file (str): Where to save the output
+    
+    Returns:
+        DataFrame: Fully prepared dataset ready for modeling
+    """
+    print("\n" + "="*80)
+    print("MASTER DATA PREPARATION PIPELINE")
+    print("="*80)
+    
+    # Step 1: Load QB seasons
+    print("\n[1/5] Loading QB seasons data...")
+    if not os.path.exists(qb_seasons_file):
+        print(f"✗ ERROR: {qb_seasons_file} not found")
+        return None
+    
+    qb_seasons = pd.read_csv(qb_seasons_file)
+    print(f"✓ Loaded {len(qb_seasons)} QB seasons")
+    
+    # Step 2: Create payment mapping
+    print("\n[2/5] Creating payment year mapping...")
+    
+    # First need to load contract data with player_id mapping
+    if os.path.exists('cache/contract_player_id_mapping.csv'):
+        contracts = pd.read_csv('cache/contract_player_id_mapping.csv')
+        print(f"✓ Loaded {len(contracts)} contracts from cache")
+    elif os.path.exists(contract_file):
+        print("⚠️  Using raw contract file without player_id mapping")
+        print("   Consider running create_contract_player_mapping() first")
+        contracts = pd.read_csv(contract_file)
+    else:
+        print(f"✗ ERROR: {contract_file} not found")
+        return None
+    
+    payment_mapping = create_payment_year_mapping(contracts)
+    
+    # Step 3: Create pick number mapping
+    print("\n[3/5] Creating pick number mapping...")
+    pick_mapping = create_pick_number_mapping(pick_numbers_file)
+    
+    # Add pick numbers to QB seasons
+    qb_seasons['pick_number'] = qb_seasons['player_id'].map(pick_mapping)
+    print(f"✓ Added pick numbers to {qb_seasons['pick_number'].notna().sum()} seasons")
+    
+    # Step 4: Label seasons relative to payment
+    print("\n[4/5] Labeling seasons relative to payment...")
+    labeled_df = label_seasons_relative_to_payment(qb_seasons, payment_mapping)
+    
+    # Step 5: Create lookback features
+    print("\n[5/5] Creating lookback performance features...")
+    metrics_to_lag = ['Pass_ANY/A', 'Pass_Rate', 'Pass_TD', 'Pass_Yds', 'total_yards', 'Pass_Succ%']
+    final_df = create_lookback_performance_features(labeled_df, metrics=metrics_to_lag)
+    
+    # Save if requested
+    if save_output:
+        final_df.to_csv(output_file, index=False)
+        print(f"\n✓ Saved prepared dataset to: {output_file}")
+        print(f"  Total rows: {len(final_df)}")
+        print(f"  Total columns: {len(final_df.columns)}")
+    
+    print("\n" + "="*80)
+    print("DATA PREPARATION COMPLETE")
+    print("="*80)
+    
+    return final_df
+
+# ==============================================================================
+# DATA PREPARATION FUNCTIONS FOR PAYMENT ANALYSIS
+# ==============================================================================
+
+def create_payment_year_mapping(contract_df):
+    """
+    Creates a lightweight mapping of player_id -> payment_year.
+    
+    This identifies when each QB got paid (2nd contract/extension) and returns
+    a simple dictionary for runtime lookup.
+    
+    Args:
+        contract_df (DataFrame): Contract data with player_id and Year columns
+    
+    Returns:
+        dict: {player_id: payment_year} for QBs who got paid
+    """
+    print("\n" + "="*80)
+    print("CREATING PAYMENT YEAR MAPPING")
+    print("="*80)
+    
+    # Filter to only contracts with player_id (matched to first round QBs)
+    paid_contracts = contract_df[contract_df['player_id'].notna()].copy()
+    
+    print(f"Found {len(paid_contracts)} contracts with player_id")
+    
+    # Group by player and get the first payment year
+    # (This is their 2nd contract / first big payday)
+    payment_mapping = {}
+    
+    for player_id, group in paid_contracts.groupby('player_id'):
+        # Get the earliest contract year (their first big payday)
+        first_payment_year = group['Year'].min()
+        payment_mapping[player_id] = int(first_payment_year)
+    
+    print(f"Created payment mapping for {len(payment_mapping)} QBs")
+    
+    # Show some examples
+    if payment_mapping:
+        print("\nExample mappings:")
+        for i, (player_id, year) in enumerate(list(payment_mapping.items())[:5]):
+            player_name = paid_contracts[paid_contracts['player_id'] == player_id].iloc[0]['Player']
+            print(f"  {player_name} ({player_id}): Paid in {year}")
+    
+    return payment_mapping
+
+def create_pick_number_mapping(pick_numbers_file='first_round_qbs_with_picks.csv'):
+    """
+    Creates a lightweight mapping of player_id -> pick_number.
+    
+    Args:
+        pick_numbers_file (str): Path to CSV with pick numbers
+    
+    Returns:
+        dict: {player_id: pick_number} for all first round QBs
+    """
+    print("\n" + "="*80)
+    print("CREATING PICK NUMBER MAPPING")
+    print("="*80)
+    
+    if not os.path.exists(pick_numbers_file):
+        print(f"✗ ERROR: File not found: {pick_numbers_file}")
+        return {}
+    
+    df = pd.read_csv(pick_numbers_file)
+    print(f"Loaded {len(df)} QBs with pick numbers")
+    print(f"Columns: {df.columns.tolist()}")
+    
+    # Create mapping
+    pick_mapping = dict(zip(df['player_id'], df['pick_number']))
+    
+    print(f"Created pick number mapping for {len(pick_mapping)} QBs")
+    
+    # Show some examples
+    if pick_mapping:
+        print("\nExample mappings:")
+        for i, (player_id, pick) in enumerate(list(pick_mapping.items())[:5]):
+            player_name = df[df['player_id'] == player_id].iloc[0]['player_name']
+            print(f"  {player_name} ({player_id}): Pick #{pick}")
+    
+    return pick_mapping
+
+def label_seasons_relative_to_payment(qb_seasons_df, payment_mapping):
+    """
+    Labels each QB season with years relative to their payment year.
+    
+    For QBs who got paid in year Y:
+    - Y-4 = 4 years before payment
+    - Y-3 = 3 years before payment
+    - Y-2 = 2 years before payment
+    - Y-1 = 1 year before payment (most recent year before decision)
+    - Y = payment year
+    - Y+1 = 1 year after payment
+    - Y+2 = 2 years after payment
+    etc.
+    
+    For QBs who never got paid: years_to_payment = NaN
+    
+    Args:
+        qb_seasons_df (DataFrame): All QB seasons data
+        payment_mapping (dict): {player_id: payment_year}
+    
+    Returns:
+        DataFrame: Original df with new columns:
+            - payment_year: The year they got paid (NaN if never paid)
+            - years_to_payment: Relative year (negative before, 0 at, positive after)
+            - got_paid: Boolean indicator
+    """
+    print("\n" + "="*80)
+    print("LABELING SEASONS RELATIVE TO PAYMENT")
+    print("="*80)
+    
+    df = qb_seasons_df.copy()
+    
+    # Ensure season is integer
+    df['season'] = pd.to_numeric(df['season'], errors='coerce')
+    df = df.dropna(subset=['season'])
+    df['season'] = df['season'].astype(int)
+    
+    # Add payment year from mapping
+    df['payment_year'] = df['player_id'].map(payment_mapping)
+    
+    # Calculate years relative to payment
+    # Negative = before payment, 0 = payment year, positive = after payment
+    df['years_to_payment'] = df['season'] - df['payment_year']
+    
+    # Add boolean indicator
+    df['got_paid'] = df['payment_year'].notna()
+    
+    # Stats
+    paid_qbs = df['got_paid'].sum() / len(df) * 100
+    unique_paid = df[df['got_paid']]['player_id'].nunique()
+    unique_total = df['player_id'].nunique()
+    
+    print(f"\nTotal seasons: {len(df)}")
+    print(f"Seasons from QBs who got paid: {df['got_paid'].sum()} ({paid_qbs:.1f}%)")
+    print(f"QBs who got paid: {unique_paid}/{unique_total}")
+    
+    # Show distribution of years_to_payment
+    print("\nDistribution of years relative to payment:")
+    for year_rel in sorted(df[df['got_paid']]['years_to_payment'].unique()):
+        count = (df['years_to_payment'] == year_rel).sum()
+        print(f"  Y{year_rel:+d}: {count} seasons")
+    
+    # Show examples
+    print("\nExample labeled seasons:")
+    sample_qb = df[df['got_paid']].iloc[0]['player_id']
+    sample_data = df[df['player_id'] == sample_qb][['season', 'player_name', 'payment_year', 'years_to_payment', 'got_paid']].head(10)
+    print(sample_data.to_string(index=False))
+    
+    return df
+
+def create_lookback_performance_features(labeled_df, metrics=['Pass_ANY/A', 'Pass_Rate', 'total_yards']):
+    """
+    Creates lookback features for discrete-time modeling.
+    
+    For each season at time t, creates columns for performance in previous years:
+    - metric_lag1: Performance 1 year ago (t-1)
+    - metric_lag2: Performance 2 years ago (t-2)
+    - metric_lag3: Performance 3 years ago (t-3)
+    - metric_lag4: Performance 4 years ago (t-4)
+    
+    This enables modeling payment decisions based on recent performance history.
+    
+    Args:
+        labeled_df (DataFrame): QB seasons with years_to_payment labels
+        metrics (list): Performance metrics to create lags for
+    
+    Returns:
+        DataFrame: Original df with lag features added
+    """
+    print("\n" + "="*80)
+    print("CREATING LOOKBACK PERFORMANCE FEATURES")
+    print("="*80)
+    
+    df = labeled_df.copy()
+    
+    # Sort by player and season
+    df = df.sort_values(['player_id', 'season']).reset_index(drop=True)
+    
+    # For each metric, create lag features
+    for metric in metrics:
+        if metric not in df.columns:
+            print(f"⚠️  Warning: {metric} not found in dataframe, skipping")
+            continue
+        
+        print(f"\nCreating lags for {metric}...")
+        
+        # Convert to numeric
+        df[metric] = pd.to_numeric(df[metric], errors='coerce')
+        
+        # Create lags (1-4 years back)
+        for lag in range(1, 5):
+            lag_col = f"{metric}_lag{lag}"
+            df[lag_col] = df.groupby('player_id')[metric].shift(lag)
+            
+            # Count non-null values
+            non_null = df[lag_col].notna().sum()
+            print(f"  {lag_col}: {non_null} non-null values")
+    
+    print(f"\nTotal columns after adding lags: {len(df.columns)}")
+    
+    # Show example of lookback features
+    print("\nExample lookback features (showing Pass_ANY/A):")
+    sample_qb = df[df['got_paid']].iloc[0]['player_id']
+    sample_data = df[df['player_id'] == sample_qb][
+        ['season', 'player_name', 'Pass_ANY/A', 'Pass_ANY/A_lag1', 'Pass_ANY/A_lag2', 'Pass_ANY/A_lag3']
+    ].head(10)
+    print(sample_data.to_string(index=False))
+    
+    return df
+
+def create_decision_point_dataset(labeled_df, decision_year_relative=0, metrics=['Pass_ANY/A']):
+    """
+    Creates a dataset for modeling payment decisions at a specific decision point.
+    
+    For example, decision_year_relative=-1 means we're modeling whether the QB got paid
+    based on their performance up to 1 year before payment (Y-1, Y-2, Y-3, Y-4).
+    
+    This is useful for discrete-time logistic regression at each decision point:
+    - Year 3 decisions (5th year option): decision_year_relative=-2
+    - Year 4 decisions (extension): decision_year_relative=-1
+    - Year 5 decisions (2nd contract): decision_year_relative=0
+    
+    Args:
+        labeled_df (DataFrame): QB seasons with lookback features
+        decision_year_relative (int): Which year to evaluate at (relative to payment)
+        metrics (list): Which performance metrics to include
+    
+    Returns:
+        DataFrame: Dataset ready for modeling payment probability
+    """
+    print("\n" + "="*80)
+    print(f"CREATING DECISION POINT DATASET (Y{decision_year_relative:+d})")
+    print("="*80)
+    
+    df = labeled_df.copy()
+    
+    # Filter to the specific decision year
+    decision_df = df[df['years_to_payment'] == decision_year_relative].copy()
+    
+    print(f"Seasons at Y{decision_year_relative:+d}: {len(decision_df)}")
+    
+    # Select relevant columns
+    feature_cols = ['player_id', 'player_name', 'season', 'draft_year', 'got_paid']
+    
+    # Add the performance metrics and their lags
+    for metric in metrics:
+        if metric in decision_df.columns:
+            feature_cols.append(metric)
+        
+        # Add lags
+        for lag in range(1, 5):
+            lag_col = f"{metric}_lag{lag}"
+            if lag_col in decision_df.columns:
+                feature_cols.append(lag_col)
+    
+    # Add pick number if available
+    if 'pick_number' in decision_df.columns:
+        feature_cols.append('pick_number')
+    
+    decision_df = decision_df[feature_cols].copy()
+    
+    # Remove rows with missing lag data (can't evaluate without history)
+    initial_count = len(decision_df)
+    decision_df = decision_df.dropna(subset=[col for col in feature_cols if '_lag' in col], how='all')
+    final_count = len(decision_df)
+    
+    print(f"After removing seasons with insufficient history: {final_count} ({initial_count - final_count} dropped)")
+    
+    # Show payment statistics
+    if 'got_paid' in decision_df.columns:
+        paid_count = decision_df['got_paid'].sum()
+        paid_pct = paid_count / len(decision_df) * 100 if len(decision_df) > 0 else 0
+        print(f"\nPayment outcome distribution:")
+        print(f"  Got paid: {paid_count} ({paid_pct:.1f}%)")
+        print(f"  Not paid: {len(decision_df) - paid_count} ({100-paid_pct:.1f}%)")
+    
+    # Show sample
+    print("\nSample decision point data:")
+    sample_cols = ['player_name', 'season', 'got_paid'] + [col for col in feature_cols if 'Pass_ANY/A' in col][:4]
+    print(decision_df[sample_cols].head(10).to_string(index=False))
+    
+    return decision_df
+
+def prepare_qb_payment_data(
+    qb_seasons_file='all_seasons_df.csv',
+    pick_numbers_file='first_round_qbs_with_picks.csv',
+    save_output=True,
+    output_file='qb_seasons_payment_labeled.csv'
+):
+    """
+    Master function that runs the full data preparation pipeline.
+    
+    Steps:
+    1. Load QB seasons data
+    2. Load and map contract data (payment years) using existing cached mapping
+    3. Load and map pick numbers
+    4. Label seasons relative to payment
+    5. Create lookback performance features
+    
+    Args:
+        qb_seasons_file (str): Path to QB seasons CSV
+        pick_numbers_file (str): Path to pick numbers CSV
+        save_output (bool): Whether to save the prepared dataset
+        output_file (str): Where to save the output
+    
+    Returns:
+        DataFrame: Fully prepared dataset ready for modeling
+    """
+    print("\n" + "="*80)
+    print("MASTER DATA PREPARATION PIPELINE")
+    print("="*80)
+    
+    # Step 1: Load QB seasons
+    print("\n[1/5] Loading QB seasons data...")
+    if not os.path.exists(qb_seasons_file):
+        print(f"✗ ERROR: {qb_seasons_file} not found")
+        return None
+    
+    qb_seasons = pd.read_csv(qb_seasons_file)
+    print(f"✓ Loaded {len(qb_seasons)} QB seasons")
+    
+    # Step 2: Create payment mapping from existing contract mapping
+    print("\n[2/5] Creating payment year mapping...")
+    
+    # Use the cached contract mapping created by create_contract_player_mapping()
+    if os.path.exists('cache/contract_player_id_mapping.csv'):
+        contracts = pd.read_csv('cache/contract_player_id_mapping.csv')
+        print(f"✓ Loaded {len(contracts)} contracts from cache")
+    else:
+        print(f"✗ ERROR: cache/contract_player_id_mapping.csv not found")
+        print("   Please run create_contract_player_mapping() first")
+        return None
+    
+    payment_mapping = create_payment_year_mapping(contracts)
+    
+    # Step 3: Create pick number mapping
+    print("\n[3/5] Creating pick number mapping...")
+    pick_mapping = create_pick_number_mapping(pick_numbers_file)
+    
+    # Add pick numbers to QB seasons
+    qb_seasons['pick_number'] = qb_seasons['player_id'].map(pick_mapping)
+    print(f"✓ Added pick numbers to {qb_seasons['pick_number'].notna().sum()} seasons")
+    
+    # Step 4: Label seasons relative to payment
+    print("\n[4/5] Labeling seasons relative to payment...")
+    labeled_df = label_seasons_relative_to_payment(qb_seasons, payment_mapping)
+    
+    # Step 5: Create lookback features
+    print("\n[5/5] Creating lookback performance features...")
+    metrics_to_lag = ['Pass_ANY/A', 'Pass_Rate', 'Pass_TD', 'Pass_Yds', 'total_yards', 'Pass_Succ%']
+    final_df = create_lookback_performance_features(labeled_df, metrics=metrics_to_lag)
+    
+    # Save if requested
+    if save_output:
+        final_df.to_csv(output_file, index=False)
+        print(f"\n✓ Saved prepared dataset to: {output_file}")
+        print(f"  Total rows: {len(final_df)}")
+        print(f"  Total columns: {len(final_df.columns)}")
+    
+    print("\n" + "="*80)
+    print("DATA PREPARATION COMPLETE")
+    print("="*80)
+    
+    return final_df
+
+
+
+
+
 if __name__ == "__main__":
     # Uncomment these if you need to regenerate the data
     # PFR.get_player_ids()
@@ -1634,6 +2372,118 @@ if __name__ == "__main__":
     #mapped_contracts = create_contract_player_mapping(force_refresh=True)
     # Create mapping (first time - will process and cache)
     mapped_contracts = create_contract_player_mapping()
-
+    
+    # Option 1: Run the full pipeline with one function
+    print("\n### OPTION 1: Full Pipeline ###")
+    prepared_df = prepare_qb_payment_data(
+        qb_seasons_file='all_seasons_df.csv',
+        contract_file='cache/contract_player_id_mapping.csv',
+        pick_numbers_file='first_round_qbs_with_picks.csv',
+        save_output=True,
+        output_file='qb_seasons_payment_labeled.csv'
+    )
+    
+    if prepared_df is not None:
+        print("\n✓ Pipeline completed successfully!")
+        print(f"  Dataset shape: {prepared_df.shape}")
+        print(f"  QBs who got paid: {prepared_df[prepared_df['got_paid']]['player_id'].nunique()}")
+        print(f"  QBs who didn't get paid: {prepared_df[~prepared_df['got_paid']]['player_id'].nunique()}")
+        
+        # Show some stats
+        print("\nDataset summary:")
+        print(f"  Total seasons: {len(prepared_df)}")
+        print(f"  Unique QBs: {prepared_df['player_id'].nunique()}")
+        print(f"  Year range: {prepared_df['season'].min()}-{prepared_df['season'].max()}")
+        print(f"  QBs with pick numbers: {prepared_df['pick_number'].notna().sum()}")
+        
+        # Show year distribution relative to payment
+        print("\nSeasons by years_to_payment:")
+        year_dist = prepared_df[prepared_df['got_paid']].groupby('years_to_payment').size().sort_index()
+        for year_rel, count in year_dist.items():
+            if pd.notna(year_rel):
+                print(f"  Y{int(year_rel):+d}: {count} seasons")
+    
+    # Option 2: Create decision point datasets for modeling
+    if prepared_df is not None:
+        print("\n" + "="*80)
+        print("CREATING DECISION POINT DATASETS")
+        print("="*80)
+        
+        # Year 3 decision (5th year option) - looking at performance 2 years before payment
+        print("\n### Year 3 Decision Dataset (5th Year Option) ###")
+        year3_df = create_decision_point_dataset(
+            prepared_df, 
+            decision_year_relative=-2,
+            metrics=['Pass_ANY/A', 'Pass_Rate', 'total_yards']
+        )
+        if year3_df is not None and len(year3_df) > 0:
+            year3_df.to_csv('decision_point_year3.csv', index=False)
+            print(f"✓ Saved to decision_point_year3.csv")
+        
+        # Year 4 decision (extension) - looking at performance 1 year before payment
+        print("\n### Year 4 Decision Dataset (Extension) ###")
+        year4_df = create_decision_point_dataset(
+            prepared_df,
+            decision_year_relative=-1,
+            metrics=['Pass_ANY/A', 'Pass_Rate', 'total_yards']
+        )
+        if year4_df is not None and len(year4_df) > 0:
+            year4_df.to_csv('decision_point_year4.csv', index=False)
+            print(f"✓ Saved to decision_point_year4.csv")
+        
+        # Year 5 decision (2nd contract) - looking at performance at payment year
+        print("\n### Year 5 Decision Dataset (2nd Contract) ###")
+        year5_df = create_decision_point_dataset(
+            prepared_df,
+            decision_year_relative=0,
+            metrics=['Pass_ANY/A', 'Pass_Rate', 'total_yards']
+        )
+        if year5_df is not None and len(year5_df) > 0:
+            year5_df.to_csv('decision_point_year5.csv', index=False)
+            print(f"✓ Saved to decision_point_year5.csv")
+    
+    # Option 3: If you want to run step-by-step for debugging
+    # Uncomment the code below to see each step individually
+    
+    """
+    print("\n" + "="*80)
+    print("STEP-BY-STEP EXECUTION (for debugging)")
+    print("="*80)
+    
+    # Load data
+    import pandas as pd
+    qb_seasons = pd.read_csv('all_seasons_df.csv')
+    contracts = pd.read_csv('cache/contract_player_id_mapping.csv')
+    
+    # Create mappings
+    payment_mapping = create_payment_year_mapping(contracts)
+    pick_mapping = create_pick_number_mapping('first_round_qbs_with_picks.csv')
+    
+    # Add pick numbers
+    qb_seasons['pick_number'] = qb_seasons['player_id'].map(pick_mapping)
+    
+    # Label seasons
+    labeled_df = label_seasons_relative_to_payment(qb_seasons, payment_mapping)
+    
+    # Create lookback features
+    final_df = create_lookback_performance_features(
+        labeled_df, 
+        metrics=['Pass_ANY/A', 'Pass_Rate', 'total_yards']
+    )
+    
+    # Save
+    final_df.to_csv('qb_seasons_payment_labeled.csv', index=False)
+    print("\n✓ Step-by-step execution complete!")
+    """
+    
+    print("\n" + "="*80)
+    print("ALL DONE!")
+    print("="*80)
+    print("\nGenerated files:")
+    print("  - qb_seasons_payment_labeled.csv (full dataset)")
+    print("  - decision_point_year3.csv (Year 3 decisions)")
+    print("  - decision_point_year4.csv (Year 4 decisions)")
+    print("  - decision_point_year5.csv (Year 5 decisions)")
+    print("\nYou can now use these for modeling payment probability!")
 
 

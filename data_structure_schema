@@ -30,6 +30,9 @@ player_ids.csv QB id linkage CSV header and row example:
 player_name,player_id,year
 Marshall Faulk,FaulMa00,2000
 
+first round qb data location first_round_qbs_with_picks.csv
+name,draft_year,draft_team,pick_number
+Chad Pennington,2000,NYJ,18
 
 QB data location: QB_Data
 all first round qb seasons are located in: all_seasons_df.csv
