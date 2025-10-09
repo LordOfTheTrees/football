@@ -1967,10 +1967,6 @@ def prepare_qb_payment_data(
     
     return final_df
 
-# ==============================================================================
-# DATA PREPARATION FUNCTIONS FOR PAYMENT ANALYSIS
-# ==============================================================================
-
 def create_payment_year_mapping(contract_df):
     """
     Creates a lightweight mapping of player_id -> payment_year.
@@ -2377,7 +2373,6 @@ if __name__ == "__main__":
     print("\n### OPTION 1: Full Pipeline ###")
     prepared_df = prepare_qb_payment_data(
         qb_seasons_file='all_seasons_df.csv',
-        contract_file='cache/contract_player_id_mapping.csv',
         pick_numbers_file='first_round_qbs_with_picks.csv',
         save_output=True,
         output_file='qb_seasons_payment_labeled.csv'
@@ -2402,88 +2397,5 @@ if __name__ == "__main__":
         for year_rel, count in year_dist.items():
             if pd.notna(year_rel):
                 print(f"  Y{int(year_rel):+d}: {count} seasons")
-    
-    # Option 2: Create decision point datasets for modeling
-    if prepared_df is not None:
-        print("\n" + "="*80)
-        print("CREATING DECISION POINT DATASETS")
-        print("="*80)
-        
-        # Year 3 decision (5th year option) - looking at performance 2 years before payment
-        print("\n### Year 3 Decision Dataset (5th Year Option) ###")
-        year3_df = create_decision_point_dataset(
-            prepared_df, 
-            decision_year_relative=-2,
-            metrics=['Pass_ANY/A', 'Pass_Rate', 'total_yards']
-        )
-        if year3_df is not None and len(year3_df) > 0:
-            year3_df.to_csv('decision_point_year3.csv', index=False)
-            print(f"✓ Saved to decision_point_year3.csv")
-        
-        # Year 4 decision (extension) - looking at performance 1 year before payment
-        print("\n### Year 4 Decision Dataset (Extension) ###")
-        year4_df = create_decision_point_dataset(
-            prepared_df,
-            decision_year_relative=-1,
-            metrics=['Pass_ANY/A', 'Pass_Rate', 'total_yards']
-        )
-        if year4_df is not None and len(year4_df) > 0:
-            year4_df.to_csv('decision_point_year4.csv', index=False)
-            print(f"✓ Saved to decision_point_year4.csv")
-        
-        # Year 5 decision (2nd contract) - looking at performance at payment year
-        print("\n### Year 5 Decision Dataset (2nd Contract) ###")
-        year5_df = create_decision_point_dataset(
-            prepared_df,
-            decision_year_relative=0,
-            metrics=['Pass_ANY/A', 'Pass_Rate', 'total_yards']
-        )
-        if year5_df is not None and len(year5_df) > 0:
-            year5_df.to_csv('decision_point_year5.csv', index=False)
-            print(f"✓ Saved to decision_point_year5.csv")
-    
-    # Option 3: If you want to run step-by-step for debugging
-    # Uncomment the code below to see each step individually
-    
-    """
-    print("\n" + "="*80)
-    print("STEP-BY-STEP EXECUTION (for debugging)")
-    print("="*80)
-    
-    # Load data
-    import pandas as pd
-    qb_seasons = pd.read_csv('all_seasons_df.csv')
-    contracts = pd.read_csv('cache/contract_player_id_mapping.csv')
-    
-    # Create mappings
-    payment_mapping = create_payment_year_mapping(contracts)
-    pick_mapping = create_pick_number_mapping('first_round_qbs_with_picks.csv')
-    
-    # Add pick numbers
-    qb_seasons['pick_number'] = qb_seasons['player_id'].map(pick_mapping)
-    
-    # Label seasons
-    labeled_df = label_seasons_relative_to_payment(qb_seasons, payment_mapping)
-    
-    # Create lookback features
-    final_df = create_lookback_performance_features(
-        labeled_df, 
-        metrics=['Pass_ANY/A', 'Pass_Rate', 'total_yards']
-    )
-    
-    # Save
-    final_df.to_csv('qb_seasons_payment_labeled.csv', index=False)
-    print("\n✓ Step-by-step execution complete!")
-    """
-    
-    print("\n" + "="*80)
-    print("ALL DONE!")
-    print("="*80)
-    print("\nGenerated files:")
-    print("  - qb_seasons_payment_labeled.csv (full dataset)")
-    print("  - decision_point_year3.csv (Year 3 decisions)")
-    print("  - decision_point_year4.csv (Year 4 decisions)")
-    print("  - decision_point_year5.csv (Year 5 decisions)")
-    print("\nYou can now use these for modeling payment probability!")
 
 
