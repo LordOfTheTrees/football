@@ -1,5 +1,148 @@
 to investigate:
 
-standardize the way team names are used (contracts by full names vs trigraphs)
+what is most deterministic on free agency contract for QB w/ drafted team
+    team stats?
+    individual stats?
+    use a logistic regression to predict whether or not they got a second contract with their team
+    do a regression weighting the previous years depending on when they got their contract (yr 3, 4, 5)
 
-making charts for my data analysis using tableau
+What is the most predictive with % of salary cap at signing
+    what is second beyond year of signing? (assuming this is nr 1)
+
+heat map modeling of progression towards payday
+    per year average across all stats for QBs drafted in that slot
+        determine yearly infation coefficitent using regression and do an offset before averaging qb's since 2000
+    cluster analysis to determine starts and draft position (how QBs of various draft slots are treated by teams)
+    plot X-y performance curve WRT most predictive attribute (passing stat/s) as the Y, and years since draft as the X
+
+
+
+
+
+
+From claude's recommended functions to work on in order:
+
+Data Preparation Functions
+
+prepare_qb_payment_data()
+
+Merges QB seasons with contract data
+Identifies which QBs got paid (2nd contract/extension)
+Calculates "years since draft" for each season
+Returns: DataFrame with payment outcomes
+
+
+calculate_years_to_payment(qb_seasons_df, contract_df)
+
+For each QB who got paid, determines signing year
+Calculates lookback windows (t-1, t-2, t-3, t-4 years before signing)
+Returns: DataFrame mapping QB_id → payment_year
+
+
+create_payment_labels(qb_seasons_df, payment_data)
+
+Labels each QB season with payment outcome (paid/not paid)
+Handles censored cases (still on rookie deal, left team without payment)
+Returns: Enhanced DataFrame with binary payment indicator
+
+
+
+Modeling Functions
+
+fit_payment_probability_model(train_df, metric='Pass_ANY/A', years_back=3)
+
+Trains logistic regression: P(get paid) ~ performance in years t-1, t-2, t-3
+Uses specified metric (default Pass_ANY/A)
+Handles different decision points (Year 3 option, Year 4 extension, etc.)
+Returns: Trained model + performance metrics
+
+
+calculate_recency_weights(payment_df)
+
+Empirically determines how teams weight recent vs. older years
+Runs regression with performance at t-1, t-2, t-3 as separate predictors
+Returns: Dict of weights (e.g., {t-1: 0.6, t-2: 0.3, t-3: 0.1})
+
+
+
+Heatmap Generation Functions
+
+generate_heatmap_zones(metric='Pass_ANY/A', years_range=(0, 5), metric_range='auto')
+
+Creates grid of (year, metric_value) combinations
+For each cell, predicts P(payment) using trained model
+Returns: 2D array suitable for heatmap plotting
+
+
+create_qb_trajectory_data(qb_name, qb_id, metric='Pass_ANY/A')
+
+Extracts single QB's year-by-year performance
+Gets payment info (if applicable)
+Returns: DataFrame with (years_since_draft, metric_value, got_paid, payment_year)
+
+
+plot_trajectory_heatmap(qb_name, qb_id, heatmap_data, qb_trajectory, save_path=None)
+
+Plots heatmap background (payment probability zones)
+Overlays individual QB's trajectory line
+Marks payment decision point
+Adds reference lines (draft slot average)
+Returns: matplotlib figure
+
+
+
+Comparison & Analysis Functions
+
+get_draft_slot_average_trajectory(draft_position, metric='Pass_ANY/A')
+
+Calculates average trajectory for QBs drafted at similar position
+Groups by draft slot (e.g., picks 1-5, 6-10, 11-20, 21-32)
+Returns: Average trajectory + confidence intervals
+
+
+compare_qb_to_slot_average(qb_trajectory, slot_average)
+
+Calculates how QB performed vs. their draft slot expectation
+Identifies years above/below average
+Returns: Comparison metrics
+
+
+batch_generate_trajectory_charts(qb_list, output_dir='trajectory_charts/')
+
+Generates heatmap charts for multiple QBs
+Saves as individual files
+Creates comparison summary table
+Returns: Summary DataFrame
+
+
+
+Utility Functions
+
+validate_data_quality(df, required_cols)
+
+Checks for missing data in critical columns
+Reports data availability by year
+Returns: Data quality report
+
+
+normalize_performance_by_era(df, metric, method='year_adjustment')
+
+Applies era adjustment (offensive inflation)
+Uses regression coefficient from earlier analysis
+Returns: DataFrame with adjusted metrics
+
+
+
+Visualization Helper Functions
+
+setup_heatmap_aesthetics()
+
+Returns standardized colormap, font sizes, labels
+Ensures consistent look across all charts
+
+
+add_trajectory_annotations(ax, qb_trajectory, payment_year)
+
+Adds labels for key events (drafted, paid, years)
+Highlights payment decision point
+Returns: modified axis object

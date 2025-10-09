@@ -818,18 +818,13 @@ def regression_with_pc1_factors(train_df=None, test_df=None):
     test_merged['Wins'] = pd.to_numeric(test_merged['W'], errors='coerce')
     test_merged = test_merged.dropna(subset=['Wins'])
     
-    # Define PC1 top factors
+    # Define PC1 chosen factors
     pc1_factors = [
-        'Pass_Yds',
-        'total_yards',
-        'Pass_TD',
-        'Pass_1D',
-        'Pass_AV',
-        'Pass_ANY/A',
-        'Pass_Rate',
-        'Pass_Succ%',
-        'Pass_AY/A',
-        'Pass_NY/A'
+    'total_yards',      # Instead of Pass_Yds - captures dual-threat
+    'Pass_TD',          # Point scoring metric
+    'Pass_ANY/A',       # Best passing efficiency metric (accounts for TDs and INTs)
+    'Pass_Succ%',        # Situational success rate
+    'Rush_Rushing_Succ%', # QB rushing success rate
     ]
     
     print("\n" + "="*80)
@@ -883,9 +878,36 @@ def regression_with_pc1_factors(train_df=None, test_df=None):
     print("\n" + "="*80)
     print("MULTICOLLINEARITY CHECK")
     print("="*80)
-    
+
+    # Build initial training dataset BEFORE multicollinearity check
+    train_features = train_merged[available_factors + ['Wins']].copy()
+    for col in available_factors:
+        train_features[col] = pd.to_numeric(train_features[col], errors='coerce')
+
+    initial_train = len(train_features)
+    train_features = train_features.dropna()
+    final_train = len(train_features)
+
+    print(f"\nTraining set complete cases: {final_train}/{initial_train} ({final_train/initial_train*100:.1f}%)")
+
+    # Build initial test dataset BEFORE multicollinearity check
+    test_features = test_merged[available_factors + ['Wins']].copy()
+    for col in available_factors:
+        test_features[col] = pd.to_numeric(test_features[col], errors='coerce')
+
+    initial_test = len(test_features)
+    test_features = test_features.dropna()
+    final_test = len(test_features)
+
+    print(f"Test set complete cases: {final_test}/{initial_test} ({final_test/initial_test*100:.1f}%)")
+
+    if final_train < 50 or final_test < 10:
+        print("Insufficient data for regression")
+        return None
+
+    # Now check multicollinearity
     correlation_matrix = train_features[available_factors].corr()
-    
+
     high_corr_pairs = []
     for i in range(len(correlation_matrix.columns)):
         for j in range(i+1, len(correlation_matrix.columns)):
@@ -896,7 +918,7 @@ def regression_with_pc1_factors(train_df=None, test_df=None):
                     correlation_matrix.columns[j],
                     corr_val
                 ))
-    
+
     if high_corr_pairs:
         print(f"\nFound {len(high_corr_pairs)} highly correlated pairs (|r| > 0.9):")
         for col1, col2, corr in high_corr_pairs:
@@ -923,6 +945,10 @@ def regression_with_pc1_factors(train_df=None, test_df=None):
         for col in available_factors:
             test_features[col] = pd.to_numeric(test_features[col], errors='coerce')
         test_features = test_features.dropna()
+        
+        print(f"\nAfter removing correlated features:")
+        print(f"Training set: {len(train_features)} complete cases")
+        print(f"Test set: {len(test_features)} complete cases")
     else:
         print("No high multicollinearity detected (all |r| < 0.9)")
     
@@ -1151,7 +1177,428 @@ def regression_with_pc1_factors(train_df=None, test_df=None):
     
     return results
 
+def load_or_create_cache(cache_file, creation_function, *args, force_refresh=False, **kwargs):
+    """
+    Generic caching function to avoid recomputing expensive operations.
+    
+    Args:
+        cache_file (str): Path to cache file (CSV)
+        creation_function (callable): Function to call if cache doesn't exist
+        *args: Positional arguments for creation_function
+        force_refresh (bool): If True, ignore cache and recreate
+        **kwargs: Keyword arguments for creation_function
+    
+    Returns:
+        DataFrame: Cached or newly created data
+    """
+    if os.path.exists(cache_file) and not force_refresh:
+        print(f"Loading cached data from: {cache_file}")
+        return pd.read_csv(cache_file)
+    else:
+        print(f"Cache not found or refresh forced. Creating new data...")
+        df = creation_function(*args, **kwargs)
+        if df is not None and not df.empty:
+            # Create directory if it doesn't exist
+            os.makedirs(os.path.dirname(cache_file) if os.path.dirname(cache_file) else '.', exist_ok=True)
+            df.to_csv(cache_file, index=False)
+            print(f"Data cached to: {cache_file}")
+        return df
 
+def load_contract_data():
+    """
+    Loads and cleans the QB contract data.
+    
+    Returns:
+        DataFrame: Cleaned contract data with standardized column names
+    """
+    print("\n" + "="*80)
+    print("LOADING CONTRACT DATA")
+    print("="*80)
+    
+    try:
+        contracts = pd.read_csv("QB_contract_data.csv")
+        print(f"Loaded {len(contracts)} contract records")
+        
+        # Standardize column names
+        contracts.columns = contracts.columns.str.strip()
+        
+        # Show sample
+        print("\nSample contract data:")
+        display(contracts.head(3)[['Player', 'Team', 'Year', 'Value', 'APY', 'Guaranteed']])
+        
+        # Convert year to int
+        contracts['Year'] = pd.to_numeric(contracts['Year'], errors='coerce')
+        contracts = contracts.dropna(subset=['Year'])
+        contracts['Year'] = contracts['Year'].astype(int)
+        
+        # Convert financial columns to numeric
+        for col in ['Value', 'APY', 'Guaranteed']:
+            if col in contracts.columns:
+                contracts[col] = pd.to_numeric(contracts[col], errors='coerce')
+        
+        print(f"\nContract years range: {contracts['Year'].min()}-{contracts['Year'].max()}")
+        print(f"Unique players: {contracts['Player'].nunique()}")
+        
+        return contracts
+        
+    except FileNotFoundError:
+        print("ERROR: QB_contract_data.csv not found")
+        return None
+
+def load_first_round_qbs():
+    """
+    Loads the first round QB data with player IDs.
+    
+    Returns:
+        DataFrame: First round QBs with player_id, draft_year, draft_team
+    """
+    print("\n" + "="*80)
+    print("LOADING FIRST ROUND QB DATA")
+    print("="*80)
+    
+    try:
+        qbs = pd.read_csv("first_round_qbs.csv")
+        print(f"Loaded {len(qbs)} first round QBs")
+        
+        # Show actual columns
+        print(f"\nActual columns in file: {qbs.columns.tolist()}")
+        
+        # Show sample to see the data
+        print("\nSample data:")
+        display(qbs.head(3))
+        
+        # Based on your CSV_header_info document, the columns should be:
+        # name, draft_year, draft_team
+        # But we need to check if player_id exists
+        
+        # Try to standardize column names
+        if 'name' in qbs.columns and 'player_name' not in qbs.columns:
+            qbs = qbs.rename(columns={'name': 'player_name'})
+            print("\nRenamed 'name' → 'player_name'")
+        
+        # Check for required columns after potential rename
+        required_cols = ['player_name', 'draft_year', 'draft_team']
+        missing_cols = [col for col in required_cols if col not in qbs.columns]
+        
+        if missing_cols:
+            print(f"\n⚠️  Warning: Missing columns: {missing_cols}")
+            print("Available columns:", qbs.columns.tolist())
+        
+        # Check if player_id exists
+        if 'player_id' not in qbs.columns:
+            print("\n⚠️  ERROR: 'player_id' column not found!")
+            print("You need to run PFR_Tools.update_qb_ids() first to add player IDs")
+            print("Or use the file '1st_rd_qb_ids.csv' instead of 'first_round_qbs.csv'")
+            return None
+        
+        return qbs
+        
+    except FileNotFoundError:
+        print("ERROR: first_round_qbs.csv not found")
+        print("Trying alternative file: 1st_rd_qb_ids.csv...")
+        
+        try:
+            qbs = pd.read_csv("1st_rd_qb_ids.csv")
+            print(f"Loaded {len(qbs)} first round QBs from 1st_rd_qb_ids.csv")
+            print(f"Columns: {qbs.columns.tolist()}")
+            display(qbs.head(3))
+            return qbs
+        except FileNotFoundError:
+            print("ERROR: 1st_rd_qb_ids.csv also not found")
+            return None
+
+
+def load_first_round_qbs_with_ids():
+    """
+    Loads the first round QB data with player IDs.
+    Tries multiple possible file locations and names.
+    
+    Returns:
+        DataFrame: First round QBs with player_name, player_id, draft_year, draft_team
+    """
+    print("\n" + "="*80)
+    print("LOADING FIRST ROUND QB DATA WITH PLAYER IDs")
+    print("="*80)
+    
+    # Try different possible files
+    possible_files = [
+        "1st_rd_qb_ids.csv",
+        "first_round_qbs.csv",
+        "QB_Data/1st_rd_qb_ids.csv"
+    ]
+    
+    for filepath in possible_files:
+        if os.path.exists(filepath):
+            print(f"\nFound file: {filepath}")
+            qbs = pd.read_csv(filepath)
+            print(f"Loaded {len(qbs)} records")
+            print(f"Columns: {qbs.columns.tolist()}")
+            
+            # Show sample
+            print("\nSample data:")
+            display(qbs.head(3))
+            
+            # Check for player_id
+            if 'player_id' in qbs.columns:
+                print("\n✓ player_id column found")
+                
+                # Standardize column names if needed
+                if 'name' in qbs.columns and 'player_name' not in qbs.columns:
+                    qbs = qbs.rename(columns={'name': 'player_name'})
+                
+                return qbs
+            else:
+                print(f"⚠️  player_id not found in {filepath}, trying next file...")
+    
+    print("\n✗ ERROR: Could not find file with player_id column")
+    print("\nYou need to:")
+    print("  1. Make sure 1st_rd_qb_ids.csv exists (created by PFR_Tools.update_qb_ids())")
+    print("  2. Or run: PFR.update_qb_ids() to create it")
+    
+    return None
+
+def normalize_player_name(name):
+    """
+    Normalizes player names for exact matching.
+    Handles common variations (Jr., III, periods, extra spaces, etc.)
+    
+    Args:
+        name (str): Player name
+    
+    Returns:
+        str: Normalized name
+    """
+    if pd.isna(name):
+        return ""
+    
+    name = str(name).strip()
+    
+    # Remove periods
+    name = name.replace('.', '')
+    
+    # Remove suffixes
+    suffixes = [' Jr', ' Sr', ' III', ' II', ' IV', ' V']
+    for suffix in suffixes:
+        name = name.replace(suffix, '')
+    
+    # Remove extra whitespace
+    name = ' '.join(name.split())
+    
+    # Lowercase for case-insensitive matching
+    name = name.lower()
+    
+    return name
+
+def map_contract_to_player_ids(contracts_df, qb_ids_df, cache_file='cache/contract_player_id_mapping.csv', force_refresh=False):
+    """
+    Maps contract data to player IDs from the first round QB list.
+    Uses exact string matching after normalization.
+    
+    Args:
+        contracts_df: Contract data with 'Player' column
+        qb_ids_df: QB data with 'player_name' and 'player_id' columns
+        cache_file: Where to cache the mapping
+        force_refresh: Force recreation of mapping
+    
+    Returns:
+        DataFrame: Contract data with added 'player_id' and 'match_type' columns
+    """
+    print("\n" + "="*80)
+    print("MAPPING CONTRACTS TO PLAYER IDs")
+    print("="*80)
+    
+    # Check cache first
+    if os.path.exists(cache_file) and not force_refresh:
+        print(f"Loading cached mapping from: {cache_file}")
+        return pd.read_csv(cache_file)
+    
+    # Normalize names in both datasets
+    contracts_df['Player_normalized'] = contracts_df['Player'].apply(normalize_player_name)
+    qb_ids_df['player_name_normalized'] = qb_ids_df['player_name'].apply(normalize_player_name)
+    
+    # Create lookup dictionary for fast matching
+    name_to_id = dict(zip(qb_ids_df['player_name_normalized'], qb_ids_df['player_id']))
+    name_to_original = dict(zip(qb_ids_df['player_name_normalized'], qb_ids_df['player_name']))
+    
+    print(f"\nAttempting to match {len(contracts_df)} contracts to {len(qb_ids_df)} first round QBs...")
+    
+    # Perform exact matching
+    contracts_df['player_id'] = contracts_df['Player_normalized'].map(name_to_id)
+    contracts_df['matched_name'] = contracts_df['Player_normalized'].map(name_to_original)
+    contracts_df['match_type'] = contracts_df['player_id'].notna().map({True: 'exact', False: 'no_match'})
+    
+    # Print matching statistics
+    print("\n" + "="*80)
+    print("MATCHING RESULTS")
+    print("="*80)
+    
+    matched = contracts_df['player_id'].notna().sum()
+    total = len(contracts_df)
+    
+    print(f"\nMatched: {matched}/{total} ({matched/total*100:.1f}%)")
+    print(f"  Exact matches: {matched}")
+    print(f"  No match: {total - matched}")
+    
+    # Show unmatched contracts
+    unmatched = contracts_df[contracts_df['player_id'].isna()]
+    if len(unmatched) > 0:
+        print(f"\nUnmatched contracts ({len(unmatched)}):")
+        print("(These are likely non-first-round QBs)")
+        for _, row in unmatched.head(10).iterrows():
+            print(f"  - {row['Player']} ({row['Team']}, {row['Year']})")
+        if len(unmatched) > 10:
+            print(f"  ... and {len(unmatched) - 10} more")
+    
+    # Drop temporary normalized column
+    result_df = contracts_df.drop(columns=['Player_normalized'])
+    
+    # Cache the results
+    os.makedirs(os.path.dirname(cache_file) if os.path.dirname(cache_file) else '.', exist_ok=True)
+    result_df.to_csv(cache_file, index=False)
+    print(f"\nMapping cached to: {cache_file}")
+    
+    return result_df
+
+def validate_contract_mapping(mapped_contracts_df):
+    """
+    Validates the contract-to-player-ID mapping and generates a report.
+    
+    Args:
+        mapped_contracts_df: DataFrame with player_id mapping
+    
+    Returns:
+        dict: Validation report with statistics and issues
+    """
+    print("\n" + "="*80)
+    print("VALIDATING CONTRACT MAPPING")
+    print("="*80)
+    
+    report = {
+        'total_contracts': len(mapped_contracts_df),
+        'mapped_contracts': mapped_contracts_df['player_id'].notna().sum(),
+        'unmapped_contracts': mapped_contracts_df['player_id'].isna().sum(),
+        'unique_players': mapped_contracts_df['player_id'].nunique(),
+        'issues': []
+    }
+    
+    # Filter to only mapped contracts for validation
+    mapped_only = mapped_contracts_df[mapped_contracts_df['player_id'].notna()].copy()
+    
+    if len(mapped_only) == 0:
+        print("⚠️  Warning: No contracts mapped to player IDs")
+        return report
+    
+    # Check for duplicate contracts (same player, year)
+    duplicates = mapped_only.groupby(['player_id', 'Year']).size()
+    duplicates = duplicates[duplicates > 1]
+    
+    if len(duplicates) > 0:
+        report['issues'].append(f"Found {len(duplicates)} player-years with multiple contracts")
+        print(f"⚠️  Warning: {len(duplicates)} player-years have multiple contracts")
+        print("   (This might be extensions + restructures in same year)")
+        
+        # Show examples
+        for (player_id, year), count in duplicates.head(3).items():
+            examples = mapped_only[(mapped_only['player_id'] == player_id) & (mapped_only['Year'] == year)]
+            player_name = examples.iloc[0]['matched_name']
+            print(f"   Example: {player_name} in {year} has {count} contracts")
+    
+    print(f"\n✓ Validation complete")
+    print(f"  Total contracts: {report['total_contracts']}")
+    print(f"  Mapped: {report['mapped_contracts']} ({report['mapped_contracts']/report['total_contracts']*100:.1f}%)")
+    print(f"  Unique players: {report['unique_players']}")
+    
+    if len(report['issues']) == 0:
+        print("  No issues found")
+    
+    return report
+
+def test_name_mapping():
+    """
+    Quick test of the name normalization functionality.
+    """
+    print("\n" + "="*80)
+    print("TESTING NAME NORMALIZATION")
+    print("="*80)
+    
+    # Test normalization
+    test_names = [
+        ("Patrick Mahomes II", "patrick mahomes"),
+        ("Baker Mayfield Jr.", "baker mayfield"),
+        ("Joe Burrow", "joe burrow"),
+        ("LAMAR JACKSON", "lamar jackson"),
+        ("Josh Allen", "josh allen"),
+        ("Tom   Brady", "tom brady"),  # Extra spaces
+        ("Peyton Manning Jr", "peyton manning"),
+    ]
+    
+    print("\nName normalization test:")
+    all_pass = True
+    for original, expected in test_names:
+        normalized = normalize_player_name(original)
+        passed = normalized == expected
+        status = "✓" if passed else "✗"
+        print(f"  {status} '{original}' → '{normalized}' (expected: '{expected}')")
+        if not passed:
+            all_pass = False
+    
+    if all_pass:
+        print("\n✓ All normalization tests passed!")
+    else:
+        print("\n✗ Some normalization tests failed")
+    
+    return all_pass
+
+def create_contract_player_mapping(force_refresh=False):
+    """
+    Main pipeline function to create contract-to-player-ID mapping.
+    Uses caching to avoid recomputation.
+    
+    Args:
+        force_refresh (bool): Force recreation of all mappings
+    
+    Returns:
+        DataFrame: Contracts with player_id mapping
+    """
+    print("\n" + "="*80)
+    print("CONTRACT-TO-PLAYER MAPPING PIPELINE")
+    print("="*80)
+    
+    # Create cache directory
+    os.makedirs('cache', exist_ok=True)
+    
+    # Load base data
+    contracts = load_contract_data()
+    if contracts is None:
+        return None
+    
+    qb_ids = load_first_round_qbs()
+    if qb_ids is None:
+        return None
+    
+    # Perform mapping (with caching)
+    mapped_contracts = map_contract_to_player_ids(
+        contracts, 
+        qb_ids, 
+        cache_file='cache/contract_player_id_mapping.csv',
+        force_refresh=force_refresh
+    )
+    
+    # Validate
+    report = validate_contract_mapping(mapped_contracts)
+    
+    # Save validation report
+    with open('cache/contract_mapping_report.txt', 'w') as f:
+        f.write("CONTRACT MAPPING VALIDATION REPORT\n")
+        f.write("="*80 + "\n\n")
+        for key, value in report.items():
+            f.write(f"{key}: {value}\n")
+    
+    print("\n✓ Pipeline complete!")
+    print(f"  Results saved to: cache/contract_player_id_mapping.csv")
+    print(f"  Report saved to: cache/contract_mapping_report.txt")
+    
+    return mapped_contracts
 
 if __name__ == "__main__":
     # Uncomment these if you need to regenerate the data
@@ -1176,5 +1623,17 @@ if __name__ == "__main__":
 
     # Access the response
     #print(response.content[0].text)
+    
+    #uncomment these to do the regression analysis again
     train_df, test_df = create_train_test_split(test_size=0.2, split_by='temporal')
-    regression_with_pc1_factors(train_df, test_df)
+    #regression_with_pc1_factors(train_df, test_df)
+
+    # Test QB name normalization
+    #test_name_mapping()
+    # Force refresh if source data changes
+    #mapped_contracts = create_contract_player_mapping(force_refresh=True)
+    # Create mapping (first time - will process and cache)
+    mapped_contracts = create_contract_player_mapping()
+
+
+

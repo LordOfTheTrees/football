@@ -26,6 +26,11 @@ season_records.csv headers & example row (ranked by W-L%):
 Rk,Season,Team,W,G,W,L,T,W-L%,Pts,PtsO,PtDif
 1,2007,NWE,16,16,16,0,0,1.000,589,274,315
 
+player_ids.csv QB id linkage CSV header and row example:
+player_name,player_id,year
+Marshall Faulk,FaulMa00,2000
+
+
 QB data location: QB_Data
 all first round qb seasons are located in: all_seasons_df.csv
 best seasons (using total combined rush and pass yds) for each first round qb are located in: best_seasons_df.csv
