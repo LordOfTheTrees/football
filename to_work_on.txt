@@ -19,8 +19,14 @@ heat map modeling of progression towards payday
 
 
 
+functions to work on:
 
-From claude's recommended functions to work on in order:
+
+normalize_performance_by_era(df, metric, method='year_adjustment')
+
+Applies era adjustment (offensive inflation)
+Uses regression coefficient from earlier analysis
+Returns: DataFrame with adjusted metrics
 
 Data Preparation Functions
 
@@ -50,14 +56,6 @@ Creates grid of (year, metric_value) combinations
 For each cell, predicts P(payment) using trained model
 Returns: 2D array suitable for heatmap plotting
 
-
-create_qb_trajectory_data(qb_name, qb_id, metric='Pass_ANY/A')
-
-Extracts single QB's year-by-year performance
-Gets payment info (if applicable)
-Returns: DataFrame with (years_since_draft, metric_value, got_paid, payment_year)
-
-
 plot_trajectory_heatmap(qb_name, qb_id, heatmap_data, qb_trajectory, save_path=None)
 
 Plots heatmap background (payment probability zones)
@@ -67,6 +65,7 @@ Adds reference lines (draft slot average)
 Returns: matplotlib figure
 
 
+//////////////////////////////////////////later//////////////////////////////////
 
 Comparison & Analysis Functions
 
@@ -92,21 +91,6 @@ Creates comparison summary table
 Returns: Summary DataFrame
 
 
-
-Utility Functions
-
-validate_data_quality(df, required_cols)
-
-Checks for missing data in critical columns
-Reports data availability by year
-Returns: Data quality report
-
-
-normalize_performance_by_era(df, metric, method='year_adjustment')
-
-Applies era adjustment (offensive inflation)
-Uses regression coefficient from earlier analysis
-Returns: DataFrame with adjusted metrics
 
 
 

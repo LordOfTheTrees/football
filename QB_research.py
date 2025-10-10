@@ -2068,27 +2068,28 @@ def create_contract_player_mapping(force_refresh=False):
 
 def create_payment_year_mapping(contract_df):
     """
-    Creates a lightweight mapping of player_id -> payment_year.
+    Creates mapping of player_id -> payment_year.
     
-    This identifies when each QB got paid (2nd contract/extension) and returns
-    a simple dictionary for runtime lookup.
+    Strategy: For each QB, find FIRST contract that occurs in Year 3+ 
+    (payment_year >= draft_year + 2) WITH THEIR ORIGINAL DRAFT TEAM ONLY.
+    Excludes contracts signed with other teams.
     
     Args:
-        contract_df (DataFrame): Contract data with player_id and Year columns
+        contract_df (DataFrame): Contract data with player_id, Year, and Team columns
     
     Returns:
-        dict: {player_id: payment_year} for QBs who got paid
+        dict: {player_id: payment_year} for QBs who got 2nd contract with draft team
     """
     print("\n" + "="*80)
-    print("CREATING PAYMENT YEAR MAPPING")
+    print("CREATING PAYMENT YEAR MAPPING (DRAFT TEAM ONLY)")
     print("="*80)
     
     # Validate required columns
-    required_cols = ['player_id', 'Year']
+    required_cols = ['player_id', 'Year', 'Team']
     if not validate_columns(contract_df, required_cols, "contract data"):
         return {}
     
-    # Filter to only contracts with player_id (matched to players)
+    # Filter to only contracts with player_id
     paid_contracts = contract_df[contract_df['player_id'].notna()].copy()
     
     print(f"Total contracts: {len(contract_df)}")
@@ -2096,43 +2097,167 @@ def create_payment_year_mapping(contract_df):
     
     if len(paid_contracts) == 0:
         print("⚠️  WARNING: No contracts have player_id mapped!")
-        print("This means no players can be marked as 'got_paid'")
         return {}
     
     # Convert Year to numeric
     paid_contracts['Year'] = pd.to_numeric(paid_contracts['Year'], errors='coerce')
     paid_contracts = paid_contracts.dropna(subset=['Year'])
+    paid_contracts['Year'] = paid_contracts['Year'].astype(int)
     
-    print(f"Contracts with valid year: {len(paid_contracts)}")
+    # Load draft years and draft teams
+    if os.path.exists('all_seasons_df.csv'):
+        qb_seasons = pd.read_csv('all_seasons_df.csv')
+        qb_seasons['draft_year'] = pd.to_numeric(qb_seasons['draft_year'], errors='coerce')
+        draft_info = qb_seasons.groupby('player_id').agg({
+            'draft_year': 'first',
+            'draft_team': 'first'
+        }).to_dict('index')
+        print(f"✓ Loaded draft years and teams for {len(draft_info)} players")
+    else:
+        print("✗ ERROR: Cannot load draft years from all_seasons_df.csv")
+        return {}
     
-    # Group by player and get the first payment year
-    # (This is their 2nd contract / first big payday)
+    # Add draft year and draft team to contracts
+    paid_contracts['draft_year'] = paid_contracts['player_id'].map(lambda x: draft_info.get(x, {}).get('draft_year'))
+    paid_contracts['draft_team'] = paid_contracts['player_id'].map(lambda x: draft_info.get(x, {}).get('draft_team'))
+    paid_contracts = paid_contracts.dropna(subset=['draft_year', 'draft_team'])
+    
+    print(f"Contracts with valid year, draft_year, and draft_team: {len(paid_contracts)}")
+    
+    # Normalize team names for matching (handle abbreviation differences)
+    # The contract Team might be full name, draft_team is 3-letter code
+    # Create a mapping dict for common variations
+    team_mapping = {
+        'Cardinals': 'ARI', 'Falcons': 'ATL', 'Ravens': 'BAL', 'Bills': 'BUF',
+        'Panthers': 'CAR', 'Bears': 'CHI', 'Bengals': 'CIN', 'Browns': 'CLE',
+        'Cowboys': 'DAL', 'Broncos': 'DEN', 'Lions': 'DET', 'Packers': 'GNB',
+        'Texans': 'HOU', 'Colts': 'IND', 'Jaguars': 'JAX', 'Chiefs': 'KAN',
+        'Chargers': 'LAC', 'Rams': 'LAR', 'Raiders': 'LVR', 'Dolphins': 'MIA',
+        'Vikings': 'MIN', 'Saints': 'NOR', 'Patriots': 'NWE', 'Giants': 'NYG',
+        'Jets': 'NYJ', 'Eagles': 'PHI', 'Steelers': 'PIT', 'Seahawks': 'SEA',
+        '49ers': 'SFO', 'Buccaneers': 'TAM', 'Titans': 'TEN', 'Commanders': 'WAS',
+        'Football Team': 'WAS', 'Redskins': 'WAS'
+    }
+    
+    paid_contracts['team_normalized'] = paid_contracts['Team'].map(team_mapping).fillna(paid_contracts['Team'])
+    
+    # For each player, find FIRST contract in Year 3+ WITH DRAFT TEAM
     payment_mapping = {}
+    excluded_other_team = 0
     
     for player_id, group in paid_contracts.groupby('player_id'):
-        # Get the earliest contract year (their first big payday)
-        first_payment_year = group['Year'].min()
-        payment_mapping[player_id] = int(first_payment_year)
+        draft_year = group.iloc[0]['draft_year']
+        draft_team = group.iloc[0]['draft_team']
+        
+        # Filter to:
+        # 1. Contracts in Year 3+ (Year >= draft + 2)
+        # 2. Contracts with DRAFT TEAM only
+        eligible_contracts = group[
+            (group['Year'] >= draft_year + 2) & 
+            (group['team_normalized'] == draft_team)
+        ].sort_values('Year')
+        
+        if len(eligible_contracts) > 0:
+            # Take the FIRST contract in Year 3+ with draft team
+            payment_year = eligible_contracts.iloc[0]['Year']
+            payment_mapping[player_id] = int(payment_year)
+        else:
+            # Check if they had contracts with OTHER teams
+            other_team_contracts = group[
+                (group['Year'] >= draft_year + 2) & 
+                (group['team_normalized'] != draft_team)
+            ]
+            if len(other_team_contracts) > 0:
+                excluded_other_team += 1
     
-    print(f"Created payment mapping for {len(payment_mapping)} players")
+    print(f"\nCreated payment mapping for {len(payment_mapping)} players")
+    print(f"Excluded {excluded_other_team} players who signed with different team")
+    total_excluded = len(paid_contracts.groupby('player_id')) - len(payment_mapping) - excluded_other_team
+    print(f"Excluded {total_excluded} players with no contracts in Year 3+")
     
-    # Show some examples
+    # Show examples
     if payment_mapping:
-        print("\nExample mappings:")
-        examples_shown = 0
-        for player_id, year in payment_mapping.items():
-            # Try to get player name if available
+        print("\nExample mappings (draft team contracts only):")
+        examples = sorted(payment_mapping.items(), key=lambda x: x[1], reverse=True)[:10]
+        for player_id, year in examples:
             player_rows = paid_contracts[paid_contracts['player_id'] == player_id]
             if len(player_rows) > 0:
                 player_name = player_rows.iloc[0].get('Player', player_rows.iloc[0].get('matched_name', 'Unknown'))
-                print(f"  {player_name} ({player_id}): Paid in {year}")
-                examples_shown += 1
-                if examples_shown >= 5:
-                    break
-    else:
-        print("⚠️  WARNING: Payment mapping is empty!")
+                draft_year = int(player_rows.iloc[0]['draft_year'])
+                draft_team = player_rows.iloc[0]['draft_team']
+                years_later = year - draft_year
+                print(f"  {player_name} ({draft_team}): Drafted {draft_year}, Paid (Y{years_later}) = {year}")
     
     return payment_mapping
+
+def validate_payment_data(df):
+    """Validates the payment-labeled dataset."""
+    print("\n" + "="*80)
+    print("PAYMENT DATA VALIDATION REPORT")
+    print("="*80)
+    
+    report = {
+        'total_seasons': len(df),
+        'unique_players': df['player_id'].nunique(),
+        'qbs_who_got_paid': len(df[df['got_paid'] == True]['player_id'].unique()),
+        'qbs_who_did_not_get_paid': len(df[df['got_paid'] == False]['player_id'].unique()),
+        'issues': []
+    }
+    
+    print(f"\n📊 BASIC STATISTICS")
+    print(f"   Total seasons: {report['total_seasons']:,}")
+    print(f"   Unique players: {report['unique_players']}")
+    print(f"   QBs who got paid: {report['qbs_who_got_paid']}")
+    print(f"   QBs who did not get paid: {report['qbs_who_did_not_get_paid']}")
+    
+    paid_seasons = df[df['got_paid'] == True]
+    if len(paid_seasons) > 0:
+        print(f"\n💰 PAYMENT DISTRIBUTION")
+        print(f"   Seasons from paid QBs: {len(paid_seasons):,}")
+        print(f"   Payment years range: {int(paid_seasons['payment_year'].min())}-{int(paid_seasons['payment_year'].max())}")
+        
+        print(f"\n📅 YEARS RELATIVE TO PAYMENT")
+        year_dist = paid_seasons['years_to_payment'].value_counts().sort_index()
+        for year, count in year_dist.items():
+            if pd.notna(year):
+                print(f"   Y{int(year):+d}: {count:>4} seasons")
+    
+    print(f"\n🔍 LOOKBACK FEATURES")
+    lag_cols = [col for col in df.columns if '_lag' in col]
+    if lag_cols:
+        for col in lag_cols[:6]:
+            non_null = df[col].notna().sum()
+            pct = non_null / len(df) * 100
+            print(f"   {col}: {non_null:>5} ({pct:>5.1f}%)")
+        if len(lag_cols) > 6:
+            print(f"   ... and {len(lag_cols)-6} more")
+    else:
+        report['issues'].append("No lag features found!")
+    
+    print(f"\n👥 SAMPLE QBs WHO GOT PAID")
+    paid_qbs = df[df['got_paid'] == True].groupby('player_id').agg({
+        'player_name': 'first',
+        'payment_year': 'first',
+        'draft_year': 'first',
+        'pick_number': 'first'
+    }).dropna(subset=['draft_year']).sort_values('payment_year', ascending=False).head(10)
+    
+    for idx, row in paid_qbs.iterrows():
+        years_to_pay = int(row['payment_year'] - row['draft_year'])
+        print(f"   {row['player_name']}: Drafted {int(row['draft_year'])} (#{int(row['pick_number'])}), Paid {int(row['payment_year'])} ({years_to_pay} yrs)")
+    
+    print(f"\n👥 SAMPLE QBs WHO DID NOT GET PAID")
+    unpaid_qbs = df[df['got_paid'] == False].groupby('player_id').agg({
+        'player_name': 'first',
+        'draft_year': 'first',
+        'pick_number': 'first',
+        'season': 'max'
+    }).dropna(subset=['draft_year']).sort_values('draft_year', ascending=False).head(10)
+    
+    for idx, row in unpaid_qbs.iterrows():
+        print(f"   {row['player_name']}: Drafted {int(row['draft_year'])} (#{int(row['pick_number'])}), Last season {int(row['season'])}")
+    
+    return report
 
 def create_pick_number_mapping(pick_numbers_file='first_round_qbs_with_picks.csv'):
     """
@@ -2156,6 +2281,40 @@ def create_pick_number_mapping(pick_numbers_file='first_round_qbs_with_picks.csv
     print(f"Loaded {len(df)} QBs with pick numbers")
     print(f"Columns: {df.columns.tolist()}")
     
+    # Handle column name variations
+    if 'player_id' not in df.columns:
+        if 'name' in df.columns:
+            # Need to map name -> player_id first
+            print("⚠️  'player_id' not found, need to map names to IDs...")
+            
+            # Load player_ids.csv to get the mapping
+            player_ids = load_csv_safe("player_ids.csv", "player IDs")
+            if player_ids is None:
+                print("✗ ERROR: Cannot create pick mapping without player_ids.csv")
+                return {}
+            
+            # Create name -> player_id mapping
+            player_ids['player_name_normalized'] = player_ids['player_name'].apply(normalize_player_name)
+            df['name_normalized'] = df['name'].apply(normalize_player_name)
+            
+            # Merge to get player_ids
+            df = df.merge(
+                player_ids[['player_name_normalized', 'player_id']].drop_duplicates(),
+                left_on='name_normalized',
+                right_on='player_name_normalized',
+                how='left'
+            )
+            
+            missing = df['player_id'].isna().sum()
+            if missing > 0:
+                print(f"⚠️  Warning: {missing} QBs couldn't be matched to player_id")
+                print("Missing QBs:")
+                for name in df[df['player_id'].isna()]['name'].head(10):
+                    print(f"  - {name}")
+            
+            df = df[df['player_id'].notna()]  # Keep only matched
+            print(f"✓ Matched {len(df)} QBs to player_ids")
+    
     # Create mapping
     pick_mapping = dict(zip(df['player_id'], df['pick_number']))
     
@@ -2165,7 +2324,11 @@ def create_pick_number_mapping(pick_numbers_file='first_round_qbs_with_picks.csv
     if pick_mapping:
         print("\nExample mappings:")
         for i, (player_id, pick) in enumerate(list(pick_mapping.items())[:5]):
-            player_name = df[df['player_id'] == player_id].iloc[0]['player_name']
+            # Try to get player name
+            if 'name' in df.columns:
+                player_name = df[df['player_id'] == player_id].iloc[0]['name']
+            else:
+                player_name = "Unknown"
             print(f"  {player_name} ({player_id}): Pick #{pick}")
     
     return pick_mapping
@@ -2214,6 +2377,12 @@ def label_seasons_relative_to_payment(qb_seasons_df, payment_mapping):
     # Add payment year from mapping
     df['payment_year'] = df['player_id'].map(payment_mapping)
     
+    # Filter out invalid payment years (0 or negative)
+    invalid_payments = df[(df['payment_year'].notna()) & (df['payment_year'] <= 0)]
+    if len(invalid_payments) > 0:
+        print(f"⚠️  Filtering out {len(invalid_payments)} records with invalid payment_year <= 0")
+        df.loc[invalid_payments.index, 'payment_year'] = np.nan
+    
     # Calculate years relative to payment
     # Negative = before payment, 0 = payment year, positive = after payment
     df['years_to_payment'] = df['season'] - df['payment_year']
@@ -2238,9 +2407,11 @@ def label_seasons_relative_to_payment(qb_seasons_df, payment_mapping):
     
     # Show distribution of years_to_payment
     print("\nDistribution of years relative to payment:")
-    for year_rel in sorted(df[df['got_paid']]['years_to_payment'].unique()):
-        count = (df['years_to_payment'] == year_rel).sum()
-        print(f"  Y{year_rel:+d}: {count} seasons")
+    paid_df = df[df['got_paid']].copy()
+    if len(paid_df) > 0:
+        for year_rel in sorted(paid_df['years_to_payment'].dropna().unique()):
+            count = (paid_df['years_to_payment'] == year_rel).sum()
+            print(f"  Y{int(year_rel):+d}: {count} seasons")
     
     # Show examples
     print("\nExample labeled seasons:")
@@ -2425,7 +2596,6 @@ def prepare_qb_payment_data(
     if qb_seasons is None:
         return None
 
-    # ADD THIS VALIDATION
     required_cols = ['season', 'player_id', 'Team']
     if not validate_columns(qb_seasons, required_cols, "QB seasons"):
         return None
@@ -2445,51 +2615,182 @@ def prepare_qb_payment_data(
         
         # Auto-create the mapping
         mapped_contracts = create_contract_player_mapping(force_refresh=False)
-        
-        # Optional: Filter to just first-round QBs
-        #first_round_contracts = filter_contracts_to_first_round_qbs(mapped_contracts)
 
         if mapped_contracts is None:
             print("✗ ERROR: Failed to create contract mapping")
-            print("   Make sure QB_contract_data.csv and first_round_qbs files exist")
+            print("   Make sure QB_contract_data.csv and player_ids.csv exist")
             return None
         
         contracts = mapped_contracts
         print(f"✓ Created mapping for {len(contracts)} contracts")
-        
-        payment_mapping = create_payment_year_mapping(contracts)
-        
-        # Step 3: Create pick number mapping
-        print("\n[3/5] Creating pick number mapping...")
-        pick_mapping = create_pick_number_mapping(pick_numbers_file)
-        
-        # Add pick numbers to QB seasons
-        qb_seasons['pick_number'] = qb_seasons['player_id'].map(pick_mapping)
-        print(f"✓ Added pick numbers to {qb_seasons['pick_number'].notna().sum()} seasons")
-        
-        # Step 4: Label seasons relative to payment
-        print("\n[4/5] Labeling seasons relative to payment...")
-        labeled_df = label_seasons_relative_to_payment(qb_seasons, payment_mapping)
-        
-        # Step 5: Create lookback features
-        print("\n[5/5] Creating lookback performance features...")
-        metrics_to_lag = ['Pass_ANY/A', 'Pass_Rate', 'Pass_TD', 'Pass_Yds', 'total_yards', 'Pass_Succ%']
-        final_df = create_lookback_performance_features(labeled_df, metrics=metrics_to_lag)
-        
-        # Save if requested
-        if save_output:
-            final_df.to_csv(output_file, index=False)
-            print(f"\n✓ Saved prepared dataset to: {output_file}")
-            print(f"  Total rows: {len(final_df)}")
-            print(f"  Total columns: {len(final_df.columns)}")
-        
-        print("\n" + "="*80)
-        print("DATA PREPARATION COMPLETE")
-        print("="*80)
-        
-        return final_df
+    
+    payment_mapping = create_payment_year_mapping(contracts)
+    
+    # Step 3: Create pick number mapping
+    print("\n[3/5] Creating pick number mapping...")
+    pick_mapping = create_pick_number_mapping(pick_numbers_file)
+    
+    # Add pick numbers to QB seasons
+    qb_seasons['pick_number'] = qb_seasons['player_id'].map(pick_mapping)
+    print(f"✓ Added pick numbers to {qb_seasons['pick_number'].notna().sum()} seasons")
+    
+    # Step 4: Label seasons relative to payment
+    print("\n[4/5] Labeling seasons relative to payment...")
+    labeled_df = label_seasons_relative_to_payment(qb_seasons, payment_mapping)
+    
+    if labeled_df is None:
+        print("✗ ERROR: Failed to label seasons")
+        return None
+    
+    # Step 5: Create lookback features
+    print("\n[5/5] Creating lookback performance features...")
+    metrics_to_lag = ['Pass_ANY/A', 'Pass_Rate', 'Pass_TD', 'Pass_Yds', 'total_yards', 'Pass_Succ%']
+    final_df = create_lookback_performance_features(labeled_df, metrics=metrics_to_lag)
+    
+    if final_df is None:
+        print("✗ ERROR: Failed to create lookback features")
+        return None
+    
+    # Save if requested
+    if save_output:
+        final_df.to_csv(output_file, index=False)
+        print(f"\n✓ Saved prepared dataset to: {output_file}")
+        print(f"  Total rows: {len(final_df)}")
+        print(f"  Total columns: {len(final_df.columns)}")
+    
+    print("\n" + "="*80)
+    print("DATA PREPARATION COMPLETE")
+    print("="*80)
+    
+    return final_df
 
+def validate_payment_data(df):
+    """Validates the payment-labeled dataset."""
+    print("\n" + "="*80)
+    print("PAYMENT DATA VALIDATION REPORT")
+    print("="*80)
+    
+    report = {
+        'total_seasons': len(df),
+        'unique_players': df['player_id'].nunique(),
+        'qbs_who_got_paid': len(df[df['got_paid'] == True]['player_id'].unique()),
+        'qbs_who_did_not_get_paid': len(df[df['got_paid'] == False]['player_id'].unique()),
+        'issues': []
+    }
+    
+    print(f"\n📊 BASIC STATISTICS")
+    print(f"   Total seasons: {report['total_seasons']:,}")
+    print(f"   Unique players: {report['unique_players']}")
+    print(f"   QBs who got paid: {report['qbs_who_got_paid']}")
+    print(f"   QBs who did not get paid: {report['qbs_who_did_not_get_paid']}")
+    
+    paid_seasons = df[df['got_paid'] == True]
+    if len(paid_seasons) > 0:
+        print(f"\n💰 PAYMENT DISTRIBUTION")
+        print(f"   Seasons from paid QBs: {len(paid_seasons):,}")
+        print(f"   Payment years range: {int(paid_seasons['payment_year'].min())}-{int(paid_seasons['payment_year'].max())}")
+        
+        print(f"\n📅 YEARS RELATIVE TO PAYMENT")
+        year_dist = paid_seasons['years_to_payment'].value_counts().sort_index()
+        for year, count in year_dist.items():
+            if pd.notna(year):
+                print(f"   Y{int(year):+d}: {count:>4} seasons")
+    
+    print(f"\n🔍 LOOKBACK FEATURES")
+    lag_cols = [col for col in df.columns if '_lag' in col]
+    if lag_cols:
+        for col in lag_cols[:6]:
+            non_null = df[col].notna().sum()
+            pct = non_null / len(df) * 100
+            print(f"   {col}: {non_null:>5} ({pct:>5.1f}%)")
+        if len(lag_cols) > 6:
+            print(f"   ... and {len(lag_cols)-6} more")
+    else:
+        report['issues'].append("No lag features found!")
+    
+    print(f"\n👥 SAMPLE QBs WHO GOT PAID")
+    paid_qbs = df[df['got_paid'] == True].groupby('player_id').agg({
+        'player_name': 'first',
+        'payment_year': 'first',
+        'draft_year': 'first',
+        'pick_number': 'first'
+    }).sort_values('payment_year', ascending=False).head(10)
+    
+    for idx, row in paid_qbs.iterrows():
+        years_to_pay = int(row['payment_year'] - row['draft_year'])
+        print(f"   {row['player_name']}: Drafted {int(row['draft_year'])} (#{int(row['pick_number'])}), Paid {int(row['payment_year'])} ({years_to_pay} yrs)")
+    
+    print(f"\n👥 SAMPLE QBs WHO DID NOT GET PAID")
+    unpaid_qbs = df[df['got_paid'] == False].groupby('player_id').agg({
+        'player_name': 'first',
+        'draft_year': 'first',
+        'pick_number': 'first',
+        'season': 'max'
+    }).sort_values('draft_year', ascending=False).head(10)
+    
+    for idx, row in unpaid_qbs.iterrows():
+        print(f"   {row['player_name']}: Drafted {int(row['draft_year'])} (#{int(row['pick_number'])}), Last season {int(row['season'])}")
+    
+    return report
 
+def plot_sample_trajectories(df, qb_names=None, metric='Pass_ANY/A', save_path='sample_trajectories.png'):
+    """Plots trajectory charts for sample QBs."""
+    print("\n" + "="*80)
+    print("GENERATING SAMPLE TRAJECTORY PLOTS")
+    print("="*80)
+    
+    if qb_names is None:
+        paid_qbs = df[df['got_paid'] == True]['player_name'].unique()
+        unpaid_qbs = df[df['got_paid'] == False]['player_name'].unique()
+        
+        sample_paid = np.random.choice(paid_qbs, size=min(3, len(paid_qbs)), replace=False)
+        sample_unpaid = np.random.choice(unpaid_qbs, size=min(2, len(unpaid_qbs)), replace=False)
+        
+        qb_names = list(sample_paid) + list(sample_unpaid)
+    
+    print(f"Plotting {len(qb_names)} QBs: {', '.join(qb_names)}")
+    
+    fig, axes = plt.subplots(len(qb_names), 1, figsize=(12, 4*len(qb_names)))
+    if len(qb_names) == 1:
+        axes = [axes]
+    
+    for ax, qb_name in zip(axes, qb_names):
+        qb_data = df[df['player_name'] == qb_name].copy()
+        qb_data = qb_data.sort_values('season')
+        
+        if len(qb_data) == 0:
+            continue
+        
+        draft_year = qb_data['draft_year'].iloc[0]
+        qb_data['years_since_draft'] = qb_data['season'] - draft_year
+        metric_values = pd.to_numeric(qb_data[metric], errors='coerce')
+        
+        ax.plot(qb_data['years_since_draft'], metric_values, 
+                'o-', linewidth=2, markersize=8, label=metric)
+        
+        payment_year = qb_data['payment_year'].iloc[0]
+        if pd.notna(payment_year):
+            payment_year_rel = int(payment_year - draft_year)
+            ax.axvline(x=payment_year_rel, color='green', linestyle='--', 
+                      linewidth=2, alpha=0.7, label=f'Paid ({int(payment_year)})')
+        
+        pick_num = qb_data['pick_number'].iloc[0]
+        got_paid = qb_data['got_paid'].iloc[0]
+        status = "✓ Got Paid" if got_paid else "✗ Not Paid"
+        
+        ax.set_xlabel('Years Since Draft', fontsize=12)
+        ax.set_ylabel(metric, fontsize=12)
+        ax.set_title(f'{qb_name} - Pick #{int(pick_num)} - Drafted {int(draft_year)} - {status}', 
+                    fontsize=14, fontweight='bold')
+        ax.grid(True, alpha=0.3)
+        ax.legend()
+    
+    plt.tight_layout()
+    plt.savefig(save_path, dpi=300, bbox_inches='tight')
+    print(f"\n✓ Saved to: {save_path}")
+    plt.show()
+    
+    return fig
 
 
 
@@ -2551,9 +2852,9 @@ if __name__ == "__main__":
     payment_mapping = create_payment_year_mapping(contracts)
     print(f"\nPayment mapping created: {len(payment_mapping)} players")
     
-    # Show a sample
-    if payment_mapping:
-        print("\nFirst 10 mappings:")
-        for i, (player_id, year) in enumerate(list(payment_mapping.items())[:10]):
-            print(f"  {player_id}: {year}")
-
+    print("Starting payment data preparation pipeline...")
+    prepared_df = prepare_qb_payment_data()
+    
+    if prepared_df is not None:
+        report = validate_payment_data(prepared_df)
+        plot_sample_trajectories(prepared_df)
