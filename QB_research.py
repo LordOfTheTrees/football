@@ -20,12 +20,210 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 from scipy.stats import f_oneway
+from sklearn.linear_model import Ridge, RidgeCV
+from sklearn.model_selection import cross_val_score
+from sklearn.preprocessing import StandardScaler
+
+def load_csv_safe(filepath, description="file"):
+    """
+    Safely load a CSV file with consistent error handling.
+    
+    Args:
+        filepath (str): Path to CSV file
+        description (str): Human-readable description for error messages
+    
+    Returns:
+        DataFrame or None: Loaded dataframe, or None if file not found/invalid
+    """
+    if not os.path.exists(filepath):
+        print(f"✗ ERROR: {description} not found at: {filepath}")
+        return None
+    
+    try:
+        df = pd.read_csv(filepath)
+        print(f"✓ Loaded {len(df)} records from {description}")
+        return df
+    except Exception as e:
+        print(f"✗ ERROR: Failed to read {description}: {e}")
+        return None
+
+def validate_columns(df, required_cols, df_name="dataframe"):
+    """
+    Validates that required columns exist in a dataframe.
+    
+    Args:
+        df (DataFrame): Dataframe to validate
+        required_cols (list): List of required column names
+        df_name (str): Human-readable name for error messages
+    
+    Returns:
+        bool: True if all columns exist, False otherwise
+    """
+    missing = [col for col in required_cols if col not in df.columns]
+    
+    if missing:
+        print(f"✗ ERROR: Missing required columns in {df_name}:")
+        for col in missing:
+            print(f"  - {col}")
+        print(f"\nAvailable columns: {df.columns.tolist()}")
+        return False
+    
+    return True
+
+def validate_payment_years(df, draft_year_col='draft_year', payment_year_col='payment_year', 
+                           years_to_payment_col='years_to_payment', max_years=12):
+    """
+    Validates that payment years make logical sense.
+    
+    Args:
+        df (DataFrame): Dataframe with payment data
+        draft_year_col (str): Column name for draft year
+        payment_year_col (str): Column name for payment year
+        years_to_payment_col (str): Column name for years to payment
+        max_years (int): Maximum reasonable years between draft and payment
+    
+    Returns:
+        DataFrame: Filtered dataframe with invalid records removed
+    """
+    print("\n" + "="*80)
+    print("VALIDATING PAYMENT YEARS")
+    print("="*80)
+    
+    initial_count = len(df)
+    paid_df = df[df[payment_year_col].notna()].copy()
+    
+    if len(paid_df) == 0:
+        print("No payment data to validate")
+        return df
+    
+    print(f"\nValidating {len(paid_df)} seasons with payment data...")
+    
+    # Check 1: Payment year should be after draft year
+    invalid_order = paid_df[paid_df[payment_year_col] < paid_df[draft_year_col]]
+    if len(invalid_order) > 0:
+        print(f"\n⚠️  Found {len(invalid_order)} records where payment year < draft year:")
+        for idx, row in invalid_order.head(5).iterrows():
+            print(f"  - Player {row.get('player_name', row.get('player_id', 'Unknown'))}: "
+                  f"Drafted {row[draft_year_col]}, Paid {row[payment_year_col]}")
+        if len(invalid_order) > 5:
+            print(f"  ... and {len(invalid_order) - 5} more")
+    
+    # Check 2: Payment shouldn't be too many years after draft (rookie deals are 4-5 years)
+    too_late = paid_df[paid_df[years_to_payment_col].abs() > max_years]
+    if len(too_late) > 0:
+        print(f"\n⚠️  Found {len(too_late)} records where payment is >{max_years} years from draft:")
+        for idx, row in too_late.head(5).iterrows():
+            print(f"  - Player {row.get('player_name', row.get('player_id', 'Unknown'))}: "
+                  f"Years to payment = {row[years_to_payment_col]}")
+        if len(too_late) > 5:
+            print(f"  ... and {len(too_late) - 5} more")
+    
+    # Check 3: Payment year shouldn't be in the future
+    current_year = 2025  # Update this as needed
+    future_payments = paid_df[paid_df[payment_year_col] > current_year]
+    if len(future_payments) > 0:
+        print(f"\n⚠️  Found {len(future_payments)} records with future payment years:")
+        for idx, row in future_payments.head(5).iterrows():
+            print(f"  - Player {row.get('player_name', row.get('player_id', 'Unknown'))}: "
+                  f"Payment year = {row[payment_year_col]}")
+    
+    # Summary
+    total_issues = len(invalid_order) + len(too_late) + len(future_payments)
+    
+    if total_issues == 0:
+        print("\n✓ All payment years look valid")
+    else:
+        print(f"\n⚠️  Total validation issues: {total_issues}")
+        print("These records will be kept but may need investigation")
+    
+    return df  # Return original df - just warning, not filtering
+
+def debug_name_matching(player_name, contracts_df, player_ids_df):
+    """
+    Debug why a specific player isn't matching.
+    
+    Args:
+        player_name (str): Name to search for (e.g., "Jalen Hurts")
+        contracts_df: Contract dataframe
+        player_ids_df: Player IDs dataframe
+    """
+    print("\n" + "="*80)
+    print(f"DEBUGGING: {player_name}")
+    print("="*80)
+    
+    # Check contracts
+    contract_matches = contracts_df[contracts_df['Player'].str.contains(player_name, case=False, na=False)]
+    print(f"\nIn contracts ({len(contract_matches)} matches):")
+    if len(contract_matches) > 0:
+        for _, row in contract_matches.iterrows():
+            print(f"  Raw: '{row['Player']}'")
+            print(f"  Normalized: '{normalize_player_name(row['Player'])}'")
+    else:
+        print("  Not found")
+    
+    # Check player_ids
+    player_id_matches = player_ids_df[player_ids_df['player_name'].str.contains(player_name, case=False, na=False)]
+    print(f"\nIn player_ids ({len(player_id_matches)} matches):")
+    if len(player_id_matches) > 0:
+        for _, row in player_id_matches.iterrows():
+            print(f"  Raw: '{row['player_name']}'")
+            print(f"  Normalized: '{normalize_player_name(row['player_name'])}'")
+            print(f"  ID: {row['player_id']}")
+    else:
+        print("  Not found")
+    
+    # Check if normalized versions match
+    if len(contract_matches) > 0 and len(player_id_matches) > 0:
+        contract_norm = normalize_player_name(contract_matches.iloc[0]['Player'])
+        player_id_norm = normalize_player_name(player_id_matches.iloc[0]['player_name'])
+        
+        print(f"\nNormalized comparison:")
+        print(f"  Contract: '{contract_norm}'")
+        print(f"  Player ID: '{player_id_norm}'")
+        print(f"  Match: {contract_norm == player_id_norm}")
+
+def filter_contracts_to_first_round_qbs(mapped_contracts_df, first_round_qbs_file='first_round_qbs_with_picks.csv'):
+    """
+    Filters the full contract mapping to only first-round QBs.
+    
+    Args:
+        mapped_contracts_df: Full contract data with player_ids
+        first_round_qbs_file: CSV with first-round QB list
+    
+    Returns:
+        DataFrame: Contracts filtered to only first-round QBs
+    """
+    print("\n" + "="*80)
+    print("FILTERING TO FIRST-ROUND QBs")
+    print("="*80)
+    
+    # Load first-round QB list
+    first_round = load_csv_safe(first_round_qbs_file, "first-round QBs")
+    if first_round is None:
+        return None
+    
+    if 'player_id' not in first_round.columns:
+        print("✗ ERROR: first-round QB file missing player_id column")
+        return None
+    
+    first_round_ids = set(first_round['player_id'].unique())
+    print(f"First-round QBs: {len(first_round_ids)} players")
+    
+    # Filter
+    filtered = mapped_contracts_df[mapped_contracts_df['player_id'].isin(first_round_ids)].copy()
+    
+    print(f"\nFiltered contracts:")
+    print(f"  Before: {len(mapped_contracts_df)} contracts")
+    print(f"  After: {len(filtered)} contracts ({len(filtered)/len(mapped_contracts_df)*100:.1f}%)")
+    print(f"  Unique first-round QBs with contracts: {filtered['player_id'].nunique()}")
+    
+    return filtered
 
 def bestqbseasons():
     try:
         if os.path.exists("best_seasons_df.csv"):
             print("starting best QB seasons pull")
-            df_QB_best_seasons = pd.read_csv("best_seasons_df.csv")
+            df_QB_best_seasons = load_csv_safe("best_seasons_df.csv")
             #print( df_QB_best_seasons.shape, "columns: ", df_QB_best_seasons.columns)
             df_QB_best_seasons.sort_values(by=['total_yards'], ascending=[False], inplace=True)
             display(df_QB_best_seasons.head(5)[['player_name', 'draft_team', 'season', 'total_yards', 'AdvPass_Air Yards_IAY/PA', 'Pass_Cmp%', 'Pass_Rate', 'Pass_Yds', 'Rush_Rushing_Yds', 'Rush_Rushing_TD']])
@@ -36,7 +234,7 @@ def best_season_averages():
     try:
         if os.path.exists("season_averages.csv"):
             print(f"\nstarting best season averages pull")
-            df_season_averages = pd.read_csv("season_averages.csv")
+            df_season_averages = load_csv_safe("season_averages.csv")
             #print( df_season_averages.shape, "columns: ", df_season_averages.columns)
             #Year,Teams,PF,Total_Yards,Plays,Y/P,TO,FL,1stD,Pass_Cmp,Pass_Att,Pass_Yds,Pass_TD,Int,NY/A,Pass_1stD,Rush_Att,Rush_Yds,Rush_TD,Rush_Y/A,Rush_1stD,Penalties,Pen_Yds,1stPy,Drives,Drive_Sc%,Drive_TO%,Drive_Plays,Drive_Yds,Drive_Pts
             df_season_averages.sort_values(by=['Total_Yards'], ascending=[False], inplace=True)
@@ -48,7 +246,7 @@ def most_expensive_qb_contracts():
     try:
         if os.path.exists("QB_contract_data.csv"):
             print(f"\nstarting most expensive QB contract data pull (apy as % of cap at signing)")
-            df_QB_contract_data = pd.read_csv("QB_contract_data.csv")
+            df_QB_contract_data = load_csv_safe("QB_contract_data.csv")
             #print( df_QB_contract_data.shape, "columns: ", df_QB_contract_data.columns)
             #Player,Team,Year,Years,,Value,APY,Guaranteed,,APY as % Of,,Inflated,Inflated,Inflated
             #df_QB_contract_data = df_QB_contract_data[df_QB_contract_data['Year'] == '2024'] # take only the 2024 year
@@ -63,7 +261,7 @@ def best_season_records():
     try:
         if os.path.exists("season_records.csv"):
             print(f"\nstarting best season records pull")
-            df_season_records = pd.read_csv("season_records.csv")
+            df_season_records = load_csv_safe("season_records.csv")
             #print( df_season_records.shape, "columns: ", df_season_records.columns)
             #Rk,Season,Team,W,G,W,L,T,W-L%,Pts,PtsO,PtDif
             df_season_records.sort_values(by=['W-L%'], ascending=[False], inplace=True)
@@ -85,11 +283,19 @@ def analyze_qb_stat_correlations_with_wins():
     print("\n=== Analyzing QB Stats vs Team Win Percentage ===")
     
     # Load the data
-    try:
-        qb_seasons = pd.read_csv("all_seasons_df.csv")
-        season_records = pd.read_csv("season_records.csv")
-    except FileNotFoundError as e:
-        print(f"Required file not found: {e}")
+    qb_seasons = load_csv_safe("all_seasons_df.csv", "QB seasons data")
+    season_records = load_csv_safe("season_records.csv", "season records")
+
+    if qb_seasons is None or season_records is None:
+        return None
+    
+    # Validate required columns
+    required_qb_cols = ['season', 'Team', 'GS', 'player_id']
+    required_season_cols = ['Season', 'Team', 'W', 'W-L%']
+
+    if not validate_columns(qb_seasons, required_qb_cols, "QB seasons"):
+        return None
+    if not validate_columns(season_records, required_season_cols, "season records"):
         return None
     
     # Clean QB data - remove invalid team entries
@@ -106,21 +312,9 @@ def analyze_qb_stat_correlations_with_wins():
     season_records = season_records.dropna(subset=['Season'])
     season_records['Season'] = season_records['Season'].astype(int)
     
-    # Create comprehensive team mapping (PFR uses different codes in different places)
-    team_mapping = {
-        # Map season_records codes TO QB data codes
-        'NWE': 'NWE', 'NYJ': 'NYJ', 'MIA': 'MIA', 'BUF': 'BUF',
-        'PIT': 'PIT', 'BAL': 'RAV', 'CLE': 'CLE', 'CIN': 'CIN',
-        'IND': 'CLT', 'HOU': 'HTX', 'TEN': 'OTI', 'JAX': 'JAX',
-        'KAN': 'KAN', 'DEN': 'DEN', 'LAC': 'SDG', 'OAK': 'RAI', 'LVR': 'RAI',
-        'PHI': 'PHI', 'DAL': 'DAL', 'NYG': 'NYG', 'WAS': 'WAS',
-        'GNB': 'GNB', 'MIN': 'MIN', 'CHI': 'CHI', 'DET': 'DET',
-        'TAM': 'TAM', 'NOR': 'NOR', 'ATL': 'ATL', 'CAR': 'CAR',
-        'SEA': 'SEA', 'SFO': 'SFO', 'LAR': 'RAM', 'ARI': 'CRD',
-        'STL': 'STL', 'RAM': 'RAM',
-    }
+    # Check team code overlap between datasets
+    print("\nChecking team code compatibility...")  
     
-    # Actually, let's check what team codes each dataset is using
     print(f"QB seasons: {len(qb_seasons)} records")
     print(f"Season records: {len(season_records)} records")
     print(f"\nUnique QB teams ({len(qb_seasons['Team'].unique())}): {sorted(qb_seasons['Team'].unique())}")
@@ -137,10 +331,9 @@ def analyze_qb_stat_correlations_with_wins():
     print(f"\nTeams only in QB data ({len(qb_only)}): {sorted(qb_only)}")
     print(f"\nTeams only in season records ({len(record_only)}): {sorted(record_only)}")
     
-    # Build mapping based on what we see
-    # For now, let's try matching on the overlapping teams first
-    
-    # Merge QB data with season records on overlapping teams
+    # Merge QB data with season records
+    # Note: Only teams with matching codes will merge successfully
+    # Based on diagnostics above, most teams should match
     merged_df = pd.merge(
         qb_seasons,
         season_records,
@@ -152,8 +345,13 @@ def analyze_qb_stat_correlations_with_wins():
     print(f"\nSuccessfully merged {len(merged_df)} QB season-team records")
     
     if merged_df.empty or len(merged_df) < 50:
-        print("\nInsufficient matching records. Will need to create team mapping.")
-        print("Please review the team codes above and update the mapping.")
+        print("\n✗ ERROR: Insufficient matching records after merge")
+        print(f"Only {len(merged_df)} records matched between datasets")
+        print("This likely means team codes don't align between QB seasons and season records")
+        print("\nTo fix:")
+        print("  1. Check the team code diagnostics above")
+        print("  2. Create a mapping dict if codes differ (e.g., 'RAV' → 'BAL')")
+        print("  3. Apply mapping before merge")
         return None
     
     # Filter to QBs who actually played significant snaps (at least 8 games started)
@@ -319,14 +517,20 @@ def pca_factor_analysis_qb_stats():
     print("PRINCIPAL COMPONENT ANALYSIS: QB Stats Factor Structure")
     print("="*80)
     
-    # Load the data
-    try:
-        qb_seasons = pd.read_csv("all_seasons_df.csv")
-        season_records = pd.read_csv("season_records.csv")
-    except FileNotFoundError as e:
-        print(f"Required file not found: {e}")
+    qb_seasons = load_csv_safe("all_seasons_df.csv", "QB seasons data")
+    season_records = load_csv_safe("season_records.csv", "season records")
+
+    if qb_seasons is None or season_records is None:
         return None
-    
+
+    required_qb_cols = ['season', 'Team', 'GS']
+    required_season_cols = ['Season', 'Team', 'W']
+
+    if not validate_columns(qb_seasons, required_qb_cols, "QB seasons"):
+        return None
+    if not validate_columns(season_records, required_season_cols, "season records"):
+        return None
+
     # Clean QB data
     qb_seasons = qb_seasons[qb_seasons['Team'].str.len() == 3]
     qb_seasons = qb_seasons[~qb_seasons['Team'].str.contains('Did not', na=False)]
@@ -631,7 +835,7 @@ def create_train_test_split(test_size=0.2, random_state=42, split_by='random'):
     
     # Load the data
     try:
-        all_seasons = pd.read_csv("all_seasons_df.csv")
+        all_seasons = load_csv_safe("all_seasons_df.csv")
     except FileNotFoundError as e:
         print(f"Required file not found: {e}")
         return None, None
@@ -713,8 +917,8 @@ def load_train_test_split():
         tuple: (train_df, test_df)
     """
     try:
-        train_df = pd.read_csv("all_seasons_df_train.csv")
-        test_df = pd.read_csv("all_seasons_df_test.csv")
+        train_df = load_csv_safe("all_seasons_df_train.csv")
+        test_df = load_csv_safe("all_seasons_df_test.csv")
         
         print(f"Loaded train set: {len(train_df)} records")
         print(f"Loaded test set: {len(test_df)} records")
@@ -753,7 +957,7 @@ def regression_with_pc1_factors(train_df=None, test_df=None):
     
     # Load season records for both train and test
     try:
-        season_records = pd.read_csv("season_records.csv")
+        season_records = load_csv_safe("season_records.csv")
     except FileNotFoundError as e:
         print(f"Required file not found: {e}")
         return None
@@ -783,6 +987,9 @@ def regression_with_pc1_factors(train_df=None, test_df=None):
     
     print(f"Training set: {len(train_merged)} QB season-team records")
     
+    if not validate_columns(train_merged, ['GS', 'W'], "merged training data"):
+        return None
+
     # Filter to significant playing time
     train_merged['GS_numeric'] = pd.to_numeric(train_merged['GS'], errors='coerce')
     train_merged = train_merged[train_merged['GS_numeric'] >= 8]
@@ -820,11 +1027,11 @@ def regression_with_pc1_factors(train_df=None, test_df=None):
     
     # Define PC1 chosen factors
     pc1_factors = [
-    'total_yards',      # Instead of Pass_Yds - captures dual-threat
-    'Pass_TD',          # Point scoring metric
-    'Pass_ANY/A',       # Best passing efficiency metric (accounts for TDs and INTs)
-    'Pass_Succ%',        # Situational success rate
-    'Rush_Rushing_Succ%', # QB rushing success rate
+        'total_yards',      # Instead of Pass_Yds - captures dual-threat
+        'Pass_TD',          # Point scoring metric
+        'Pass_ANY/A',       # Best passing efficiency metric (accounts for TDs and INTs)
+        'Pass_Succ%',       # Situational success rate
+        'Rush_Rushing_Succ%', # QB rushing success rate
     ]
     
     print("\n" + "="*80)
@@ -846,7 +1053,7 @@ def regression_with_pc1_factors(train_df=None, test_df=None):
     
     print(f"\nProceeding with {len(available_factors)} available factors")
     
-    # Build training dataset
+    # Build training dataset ONCE - before multicollinearity check
     train_features = train_merged[available_factors + ['Wins']].copy()
     for col in available_factors:
         train_features[col] = pd.to_numeric(train_features[col], errors='coerce')
@@ -857,7 +1064,7 @@ def regression_with_pc1_factors(train_df=None, test_df=None):
     
     print(f"\nTraining set complete cases: {final_train}/{initial_train} ({final_train/initial_train*100:.1f}%)")
     
-    # Build test dataset
+    # Build test dataset ONCE - before multicollinearity check
     test_features = test_merged[available_factors + ['Wins']].copy()
     for col in available_factors:
         test_features[col] = pd.to_numeric(test_features[col], errors='coerce')
@@ -873,41 +1080,14 @@ def regression_with_pc1_factors(train_df=None, test_df=None):
         return None
     
     # =========================================================================
-    # MULTICOLLINEARITY CHECK (on training data)
+    # MULTICOLLINEARITY CHECK (on the already-built training data)
     # =========================================================================
     print("\n" + "="*80)
     print("MULTICOLLINEARITY CHECK")
     print("="*80)
-
-    # Build initial training dataset BEFORE multicollinearity check
-    train_features = train_merged[available_factors + ['Wins']].copy()
-    for col in available_factors:
-        train_features[col] = pd.to_numeric(train_features[col], errors='coerce')
-
-    initial_train = len(train_features)
-    train_features = train_features.dropna()
-    final_train = len(train_features)
-
-    print(f"\nTraining set complete cases: {final_train}/{initial_train} ({final_train/initial_train*100:.1f}%)")
-
-    # Build initial test dataset BEFORE multicollinearity check
-    test_features = test_merged[available_factors + ['Wins']].copy()
-    for col in available_factors:
-        test_features[col] = pd.to_numeric(test_features[col], errors='coerce')
-
-    initial_test = len(test_features)
-    test_features = test_features.dropna()
-    final_test = len(test_features)
-
-    print(f"Test set complete cases: {final_test}/{initial_test} ({final_test/initial_test*100:.1f}%)")
-
-    if final_train < 50 or final_test < 10:
-        print("Insufficient data for regression")
-        return None
-
-    # Now check multicollinearity
+    
     correlation_matrix = train_features[available_factors].corr()
-
+    
     high_corr_pairs = []
     for i in range(len(correlation_matrix.columns)):
         for j in range(i+1, len(correlation_matrix.columns)):
@@ -918,7 +1098,7 @@ def regression_with_pc1_factors(train_df=None, test_df=None):
                     correlation_matrix.columns[j],
                     corr_val
                 ))
-
+    
     if high_corr_pairs:
         print(f"\nFound {len(high_corr_pairs)} highly correlated pairs (|r| > 0.9):")
         for col1, col2, corr in high_corr_pairs:
@@ -927,31 +1107,29 @@ def regression_with_pc1_factors(train_df=None, test_df=None):
         print("\nRemoving redundant variables...")
         cols_to_remove = set()
         for col1, col2, _ in high_corr_pairs:
+            # Always remove the second variable in each pair
             if col2 not in cols_to_remove:
                 cols_to_remove.add(col2)
         
+        # Update available_factors list
         available_factors = [col for col in available_factors if col not in cols_to_remove]
+        
         print(f"\nReduced to {len(available_factors)} factors:")
         for factor in available_factors:
             print(f"  - {factor}")
         
-        # Rebuild datasets with reduced features
-        train_features = train_merged[available_factors + ['Wins']].copy()
-        for col in available_factors:
-            train_features[col] = pd.to_numeric(train_features[col], errors='coerce')
-        train_features = train_features.dropna()
-        
-        test_features = test_merged[available_factors + ['Wins']].copy()
-        for col in available_factors:
-            test_features[col] = pd.to_numeric(test_features[col], errors='coerce')
-        test_features = test_features.dropna()
+        # Rebuild ONLY the feature matrices (not the full merged datasets)
+        train_features = train_features[available_factors + ['Wins']].copy()
+        test_features = test_features[available_factors + ['Wins']].copy()
         
         print(f"\nAfter removing correlated features:")
-        print(f"Training set: {len(train_features)} complete cases")
-        print(f"Test set: {len(test_features)} complete cases")
+        print(f"  Training set: {len(train_features)} complete cases")
+        print(f"  Test set: {len(test_features)} complete cases")
     else:
         print("No high multicollinearity detected (all |r| < 0.9)")
-    
+
+
+
     # =========================================================================
     # TRAIN MODEL
     # =========================================================================
@@ -1177,6 +1355,335 @@ def regression_with_pc1_factors(train_df=None, test_df=None):
     
     return results
 
+def ridge_regression_with_cv(train_df=None, test_df=None, alpha_range=None, use_extended_features=True):
+    """
+    Performs Ridge regression with 5-fold cross-validation.
+    
+    Args:
+        train_df: Training data
+        test_df: Test data
+        alpha_range: List of alpha values to test
+        use_extended_features: If True, uses top PC1 factors; if False, uses original 5
+    
+    Returns:
+        dict: Results including best model, coefficients, and CV scores
+    """
+    # .
+   
+    print("\n" + "="*80)
+    print("RIDGE REGRESSION WITH 5-FOLD CROSS-VALIDATION")
+    print("="*80)
+    
+    # Load train/test data if not provided
+    if train_df is None or test_df is None:
+        print("\nLoading train/test split from files...")
+        train_df, test_df = load_train_test_split()
+        if train_df is None or test_df is None:
+            print("Error: Could not load train/test data")
+            return None
+    
+    # Load season records
+    season_records = load_csv_safe("season_records.csv", "season records")
+    if season_records is None:
+        return None
+    
+    required_cols = ['Season', 'Team', 'W', 'W-L%']
+    if not validate_columns(season_records, required_cols, "season records"):
+        return None
+    
+    # Convert Season column to int
+    season_records['Season'] = pd.to_numeric(season_records['Season'], errors='coerce')
+    season_records = season_records.dropna(subset=['Season'])
+    season_records['Season'] = season_records['Season'].astype(int)
+    
+    # Process training data
+    print("\n" + "="*80)
+    print("PROCESSING TRAINING DATA")
+    print("="*80)
+    
+    train_df['season'] = pd.to_numeric(train_df['season'], errors='coerce')
+    train_df = train_df.dropna(subset=['season'])
+    train_df['season'] = train_df['season'].astype(int)
+    
+    train_merged = pd.merge(
+        train_df,
+        season_records,
+        left_on=['season', 'Team'],
+        right_on=['Season', 'Team'],
+        how='inner'
+    )
+    
+    print(f"Training set: {len(train_merged)} QB season-team records")
+    
+    train_merged['GS_numeric'] = pd.to_numeric(train_merged['GS'], errors='coerce')
+    train_merged = train_merged[train_merged['GS_numeric'] >= 8]
+    print(f"After filtering (8+ GS): {len(train_merged)} records")
+    
+    train_merged['Wins'] = pd.to_numeric(train_merged['W'], errors='coerce')
+    train_merged = train_merged.dropna(subset=['Wins'])
+    
+    # Process test data
+    print("\n" + "="*80)
+    print("PROCESSING TEST DATA")
+    print("="*80)
+    
+    test_df['season'] = pd.to_numeric(test_df['season'], errors='coerce')
+    test_df = test_df.dropna(subset=['season'])
+    test_df['season'] = test_df['season'].astype(int)
+    
+    test_merged = pd.merge(
+        test_df,
+        season_records,
+        left_on=['season', 'Team'],
+        right_on=['Season', 'Team'],
+        how='inner'
+    )
+    
+    print(f"Test set: {len(test_merged)} QB season-team records")
+    
+    test_merged['GS_numeric'] = pd.to_numeric(test_merged['GS'], errors='coerce')
+    test_merged = test_merged[test_merged['GS_numeric'] >= 8]
+    print(f"After filtering (8+ GS): {len(test_merged)} records")
+    
+    test_merged['Wins'] = pd.to_numeric(test_merged['W'], errors='coerce')
+    test_merged = test_merged.dropna(subset=['Wins'])
+    
+    if use_extended_features:
+        print("\nUsing EXTENDED feature set (top PC1 loadings)")
+        performance_factors = [
+            # Core efficiency
+            'Pass_TD',              
+            'Pass_ANY/A',           
+            'Rush_Rushing_Succ%',   
+            'Pass_Int%',            
+            'Pass_Sk%',
+            
+            # Volume
+            'total_yards',          
+            
+            # Clutch
+            'Pass_4QC',             
+            'Pass_GWD',             
+            
+            # Dual-threat
+            'Rush_Rushing_TD',      
+            'Rush_Rushing_Yds',     
+        ]
+    else:
+        print("\nUsing ORIGINAL feature set (manual selection)")
+        performance_factors = [
+            'Pass_TD',              # Scoring ability
+            'Pass_ANY/A',           # Best efficiency metric
+            'Rush_Rushing_Succ%',   # Dual-threat efficiency
+            'Pass_Int%',            # Turnover avoidance
+            'Pass_Sk%',             # Pressure handling
+        ]
+    
+    print("\n" + "="*80)
+    print("FEATURE SELECTION")
+    print("="*80)
+    
+    print(f"\nUsing {len(performance_factors)} performance factors:")
+    for factor in performance_factors:
+        print(f"  - {factor}")
+    
+    # Check which factors are available
+    available_factors = [f for f in performance_factors if f in train_merged.columns]
+    missing_factors = [f for f in performance_factors if f not in train_merged.columns]
+    
+    if missing_factors:
+        print(f"\nWarning: {len(missing_factors)} factors not found:")
+        for factor in missing_factors:
+            print(f"  - {factor}")
+    
+    print(f"\nProceeding with {len(available_factors)} available factors")
+    
+    # Build datasets
+    train_features = train_merged[available_factors + ['Wins']].copy()
+    for col in available_factors:
+        train_features[col] = pd.to_numeric(train_features[col], errors='coerce')
+    train_features = train_features.dropna()
+    
+    test_features = test_merged[available_factors + ['Wins']].copy()
+    for col in available_factors:
+        test_features[col] = pd.to_numeric(test_features[col], errors='coerce')
+    test_features = test_features.dropna()
+    
+    print(f"\nTraining set complete cases: {len(train_features)}")
+    print(f"Test set complete cases: {len(test_features)}")
+    
+    if len(train_features) < 50 or len(test_features) < 10:
+        print("Insufficient data for regression")
+        return None
+    
+    # Prepare data
+    X_train = train_features[available_factors].values
+    y_train = train_features['Wins'].values
+    
+    X_test = test_features[available_factors].values
+    y_test = test_features['Wins'].values
+    
+    # Standardize features (CRITICAL for Ridge regression)
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+    
+    # =========================================================================
+    # RIDGE REGRESSION WITH CROSS-VALIDATION
+    # =========================================================================
+    print("\n" + "="*80)
+    print("CROSS-VALIDATION TO SELECT OPTIMAL ALPHA")
+    print("="*80)
+    
+    # Define alpha range to test
+    if alpha_range is None:
+        alpha_range = [0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
+    
+    print(f"\nTesting {len(alpha_range)} alpha values with 5-fold CV:")
+    print(f"Alpha range: {alpha_range}")
+    
+    # Use RidgeCV to automatically find best alpha
+    ridge_cv = RidgeCV(alphas=alpha_range, cv=5, scoring='r2')
+    ridge_cv.fit(X_train_scaled, y_train)
+    
+    best_alpha = ridge_cv.alpha_
+    print(f"\nBest alpha (regularization strength): {best_alpha}")
+    
+    # =========================================================================
+    # CROSS-VALIDATION SCORES
+    # =========================================================================
+    print("\n" + "="*80)
+    print("5-FOLD CROSS-VALIDATION PERFORMANCE")
+    print("="*80)
+    
+    # Fit final model with best alpha
+    ridge_model = Ridge(alpha=best_alpha)
+    
+    # Get CV scores
+    cv_r2_scores = cross_val_score(ridge_model, X_train_scaled, y_train, cv=5, scoring='r2')
+    cv_rmse_scores = -cross_val_score(ridge_model, X_train_scaled, y_train, cv=5, 
+                                       scoring='neg_root_mean_squared_error')
+    
+    print(f"\nCross-Validation R² Scores (5 folds):")
+    for i, score in enumerate(cv_r2_scores, 1):
+        print(f"  Fold {i}: {score:.4f}")
+    print(f"\nMean CV R²: {cv_r2_scores.mean():.4f} (+/- {cv_r2_scores.std() * 2:.4f})")
+    
+    print(f"\nCross-Validation RMSE Scores (5 folds):")
+    for i, score in enumerate(cv_rmse_scores, 1):
+        print(f"  Fold {i}: {score:.3f} wins")
+    print(f"\nMean CV RMSE: {cv_rmse_scores.mean():.3f} (+/- {cv_rmse_scores.std() * 2:.3f}) wins")
+    
+    # =========================================================================
+    # TRAIN FINAL MODEL
+    # =========================================================================
+    ridge_model.fit(X_train_scaled, y_train)
+    
+    # Training performance
+    y_train_pred = ridge_model.predict(X_train_scaled)
+    train_r2 = ridge_model.score(X_train_scaled, y_train)
+    train_rmse = np.sqrt(np.mean((y_train - y_train_pred)**2))
+    
+    print("\n" + "="*80)
+    print("TRAINING SET PERFORMANCE")
+    print("="*80)
+    print(f"\n  R² = {train_r2:.4f}")
+    print(f"  RMSE = {train_rmse:.3f} wins")
+    
+    # Test performance
+    y_test_pred = ridge_model.predict(X_test_scaled)
+    test_r2 = ridge_model.score(X_test_scaled, y_test)
+    test_rmse = np.sqrt(np.mean((y_test - y_test_pred)**2))
+    
+    print("\n" + "="*80)
+    print("TEST SET PERFORMANCE (HELD-OUT DATA)")
+    print("="*80)
+    print(f"\n  R² = {test_r2:.4f}")
+    print(f"  RMSE = {test_rmse:.3f} wins")
+    
+    r2_drop = train_r2 - test_r2
+    print(f"\n  R² drop (train→test) = {r2_drop:.4f}")
+    
+    if r2_drop > 0.1:
+        print("  ⚠️  Warning: Significant performance drop suggests overfitting")
+    else:
+        print("  ✓ Model generalizes well")
+    
+    # =========================================================================
+    # VARIABLE IMPORTANCE (STANDARDIZED COEFFICIENTS)
+    # =========================================================================
+    print("\n" + "="*80)
+    print("VARIABLE IMPORTANCE (Ridge Regression)")
+    print("="*80)
+    
+    # Ridge coefficients are already on standardized scale
+    importance_df = pd.DataFrame({
+        'Variable': available_factors,
+        'Ridge_Coefficient': ridge_model.coef_,
+        'Abs_Coefficient': np.abs(ridge_model.coef_)
+    })
+    
+    importance_df = importance_df.sort_values('Abs_Coefficient', ascending=False)
+    
+    print("\nRidge Regression Coefficients (standardized):")
+    print("  Interpretation: Effect on wins for 1 std dev change in predictor")
+    print("  (controlling for other variables)")
+    display(importance_df)
+    
+    # =========================================================================
+    # COMPARISON WITH OLS RESULTS
+    # =========================================================================
+    print("\n" + "="*80)
+    print("COMPARISON: Ridge vs OLS")
+    print("="*80)
+    
+    # Load OLS results if available
+    if os.path.exists('pc1_regression_variable_importance.csv'):
+        ols_importance = pd.read_csv('pc1_regression_variable_importance.csv')
+        
+        comparison_df = importance_df.merge(
+            ols_importance[['Variable', 'Std_Coefficient']], 
+            on='Variable',
+            how='left'
+        )
+        comparison_df = comparison_df.rename(columns={'Std_Coefficient': 'OLS_Std_Coefficient'})
+        comparison_df['Difference'] = comparison_df['Ridge_Coefficient'] - comparison_df['OLS_Std_Coefficient']
+        comparison_df['Shrinkage_%'] = (1 - np.abs(comparison_df['Ridge_Coefficient']) / 
+                                         np.abs(comparison_df['OLS_Std_Coefficient'])) * 100
+        
+        print("\nCoefficient Comparison:")
+        print("(Ridge applies shrinkage - coefficients pulled toward zero)")
+        display(comparison_df[['Variable', 'OLS_Std_Coefficient', 'Ridge_Coefficient', 'Shrinkage_%']])
+        
+        print("\nKey Insights:")
+        print("  - Variables with large shrinkage may be less stable/reliable")
+        print("  - Variables that maintain magnitude are more robust predictors")
+        print(f"  - Mean shrinkage: {comparison_df['Shrinkage_%'].mean():.1f}%")
+    
+    # =========================================================================
+    # SAVE RESULTS
+    # =========================================================================
+    results = {
+        'model': ridge_model,
+        'scaler': scaler,
+        'best_alpha': best_alpha,
+        'features': available_factors,
+        'cv_r2_mean': cv_r2_scores.mean(),
+        'cv_r2_std': cv_r2_scores.std(),
+        'cv_rmse_mean': cv_rmse_scores.mean(),
+        'cv_rmse_std': cv_rmse_scores.std(),
+        'train_r2': train_r2,
+        'test_r2': test_r2,
+        'train_rmse': train_rmse,
+        'test_rmse': test_rmse,
+        'variable_importance': importance_df
+    }
+    
+    importance_df.to_csv('ridge_regression_variable_importance.csv', index=False)
+    print("\n✓ Results saved to: ridge_regression_variable_importance.csv")
+    
+    return results
+
 def load_or_create_cache(cache_file, creation_function, *args, force_refresh=False, **kwargs):
     """
     Generic caching function to avoid recomputing expensive operations.
@@ -1193,7 +1700,7 @@ def load_or_create_cache(cache_file, creation_function, *args, force_refresh=Fal
     """
     if os.path.exists(cache_file) and not force_refresh:
         print(f"Loading cached data from: {cache_file}")
-        return pd.read_csv(cache_file)
+        return load_csv_safe(cache_file)
     else:
         print(f"Cache not found or refresh forced. Creating new data...")
         df = creation_function(*args, **kwargs)
@@ -1216,7 +1723,7 @@ def load_contract_data():
     print("="*80)
     
     try:
-        contracts = pd.read_csv("QB_contract_data.csv")
+        contracts = load_csv_safe("QB_contract_data.csv")
         print(f"Loaded {len(contracts)} contract records")
         
         # Standardize column names
@@ -1245,68 +1752,6 @@ def load_contract_data():
         print("ERROR: QB_contract_data.csv not found")
         return None
 
-def load_first_round_qbs():
-    """
-    Loads the first round QB data with player IDs.
-    
-    Returns:
-        DataFrame: First round QBs with player_id, draft_year, draft_team
-    """
-    print("\n" + "="*80)
-    print("LOADING FIRST ROUND QB DATA")
-    print("="*80)
-    
-    try:
-        qbs = pd.read_csv("first_round_qbs.csv")
-        print(f"Loaded {len(qbs)} first round QBs")
-        
-        # Show actual columns
-        print(f"\nActual columns in file: {qbs.columns.tolist()}")
-        
-        # Show sample to see the data
-        print("\nSample data:")
-        display(qbs.head(3))
-        
-        # Based on your CSV_header_info document, the columns should be:
-        # name, draft_year, draft_team
-        # But we need to check if player_id exists
-        
-        # Try to standardize column names
-        if 'name' in qbs.columns and 'player_name' not in qbs.columns:
-            qbs = qbs.rename(columns={'name': 'player_name'})
-            print("\nRenamed 'name' → 'player_name'")
-        
-        # Check for required columns after potential rename
-        required_cols = ['player_name', 'draft_year', 'draft_team']
-        missing_cols = [col for col in required_cols if col not in qbs.columns]
-        
-        if missing_cols:
-            print(f"\n⚠️  Warning: Missing columns: {missing_cols}")
-            print("Available columns:", qbs.columns.tolist())
-        
-        # Check if player_id exists
-        if 'player_id' not in qbs.columns:
-            print("\n⚠️  ERROR: 'player_id' column not found!")
-            print("You need to run PFR_Tools.update_qb_ids() first to add player IDs")
-            print("Or use the file '1st_rd_qb_ids.csv' instead of 'first_round_qbs.csv'")
-            return None
-        
-        return qbs
-        
-    except FileNotFoundError:
-        print("ERROR: first_round_qbs.csv not found")
-        print("Trying alternative file: 1st_rd_qb_ids.csv...")
-        
-        try:
-            qbs = pd.read_csv("1st_rd_qb_ids.csv")
-            print(f"Loaded {len(qbs)} first round QBs from 1st_rd_qb_ids.csv")
-            print(f"Columns: {qbs.columns.tolist()}")
-            display(qbs.head(3))
-            return qbs
-        except FileNotFoundError:
-            print("ERROR: 1st_rd_qb_ids.csv also not found")
-            return None
-
 def load_first_round_qbs_with_ids():
     """
     Loads the first round QB data with player IDs.
@@ -1329,7 +1774,7 @@ def load_first_round_qbs_with_ids():
     for filepath in possible_files:
         if os.path.exists(filepath):
             print(f"\nFound file: {filepath}")
-            qbs = pd.read_csv(filepath)
+            qbs = load_csv_safe(filepath)
             print(f"Loaded {len(qbs)} records")
             print(f"Columns: {qbs.columns.tolist()}")
             
@@ -1388,14 +1833,14 @@ def normalize_player_name(name):
     
     return name
 
-def map_contract_to_player_ids(contracts_df, qb_ids_df, cache_file='cache/contract_player_id_mapping.csv', force_refresh=False):
+def map_contract_to_player_ids(contracts_df, player_ids_df, cache_file='cache/contract_player_id_mapping.csv', force_refresh=False):
     """
-    Maps contract data to player IDs from the first round QB list.
+    Maps contract data to player IDs from the full player ID list.
     Uses exact string matching after normalization.
     
     Args:
         contracts_df: Contract data with 'Player' column
-        qb_ids_df: QB data with 'player_name' and 'player_id' columns
+        player_ids_df: Player data with 'player_name' and 'player_id' columns
         cache_file: Where to cache the mapping
         force_refresh: Force recreation of mapping
     
@@ -1413,13 +1858,13 @@ def map_contract_to_player_ids(contracts_df, qb_ids_df, cache_file='cache/contra
     
     # Normalize names in both datasets
     contracts_df['Player_normalized'] = contracts_df['Player'].apply(normalize_player_name)
-    qb_ids_df['player_name_normalized'] = qb_ids_df['player_name'].apply(normalize_player_name)
+    player_ids_df['player_name_normalized'] = player_ids_df['player_name'].apply(normalize_player_name)
     
     # Create lookup dictionary for fast matching
-    name_to_id = dict(zip(qb_ids_df['player_name_normalized'], qb_ids_df['player_id']))
-    name_to_original = dict(zip(qb_ids_df['player_name_normalized'], qb_ids_df['player_name']))
+    name_to_id = dict(zip(player_ids_df['player_name_normalized'], player_ids_df['player_id']))
+    name_to_original = dict(zip(player_ids_df['player_name_normalized'], player_ids_df['player_name']))
     
-    print(f"\nAttempting to match {len(contracts_df)} contracts to {len(qb_ids_df)} first round QBs...")
+    print(f"\nAttempting to match {len(contracts_df)} contracts to {len(player_ids_df)} players...")
     
     # Perform exact matching
     contracts_df['player_id'] = contracts_df['Player_normalized'].map(name_to_id)
@@ -1442,7 +1887,6 @@ def map_contract_to_player_ids(contracts_df, qb_ids_df, cache_file='cache/contra
     unmatched = contracts_df[contracts_df['player_id'].isna()]
     if len(unmatched) > 0:
         print(f"\nUnmatched contracts ({len(unmatched)}):")
-        print("(These are likely non-first-round QBs)")
         for _, row in unmatched.head(10).iterrows():
             print(f"  - {row['Player']} ({row['Team']}, {row['Year']})")
         if len(unmatched) > 10:
@@ -1461,6 +1905,9 @@ def map_contract_to_player_ids(contracts_df, qb_ids_df, cache_file='cache/contra
 def validate_contract_mapping(mapped_contracts_df):
     """
     Validates the contract-to-player-ID mapping and generates a report.
+    
+    Note: This includes ALL players who got contracts, not just first-round QBs.
+    You can filter to first-round QBs later if needed.
     
     Args:
         mapped_contracts_df: DataFrame with player_id mapping
@@ -1551,13 +1998,14 @@ def test_name_mapping():
 def create_contract_player_mapping(force_refresh=False):
     """
     Main pipeline function to create contract-to-player-ID mapping.
+    Uses the FULL player_ids.csv list (not just first-round QBs).
     Uses caching to avoid recomputation.
     
     Args:
         force_refresh (bool): Force recreation of all mappings
     
     Returns:
-        DataFrame: Contracts with player_id mapping
+        DataFrame: Contracts with player_id mapping using only players who have had regular season football games (fantasy list).
     """
     print("\n" + "="*80)
     print("CONTRACT-TO-PLAYER MAPPING PIPELINE")
@@ -1566,19 +2014,38 @@ def create_contract_player_mapping(force_refresh=False):
     # Create cache directory
     os.makedirs('cache', exist_ok=True)
     
-    # Load base data
+    # Load contract data
     contracts = load_contract_data()
     if contracts is None:
         return None
     
-    qb_ids = load_first_round_qbs()
-    if qb_ids is None:
+    # Load FULL player ID list (not just first-round QBs)
+    print("\n" + "="*80)
+    print("LOADING FULL PLAYER ID LIST")
+    print("="*80)
+    
+    player_ids = load_csv_safe("player_ids.csv", "player IDs")
+    if player_ids is None:
+        print("\n✗ ERROR: player_ids.csv not found")
+        print("This file should contain all NFL players with their IDs")
         return None
+    
+    # Validate player_ids structure
+    required_cols = ['player_name', 'player_id']
+    if not validate_columns(player_ids, required_cols, "player_ids"):
+        return None
+    
+    print(f"Loaded {len(player_ids)} total players")
+    print(f"Unique players: {player_ids['player_id'].nunique()}")
+    
+    # Show sample
+    print("\nSample player IDs:")
+    print(player_ids.head(3)[['player_name', 'player_id']].to_string(index=False))
     
     # Perform mapping (with caching)
     mapped_contracts = map_contract_to_player_ids(
         contracts, 
-        qb_ids, 
+        player_ids, 
         cache_file='cache/contract_player_id_mapping.csv',
         force_refresh=force_refresh
     )
@@ -1616,10 +2083,27 @@ def create_payment_year_mapping(contract_df):
     print("CREATING PAYMENT YEAR MAPPING")
     print("="*80)
     
-    # Filter to only contracts with player_id (matched to first round QBs)
+    # Validate required columns
+    required_cols = ['player_id', 'Year']
+    if not validate_columns(contract_df, required_cols, "contract data"):
+        return {}
+    
+    # Filter to only contracts with player_id (matched to players)
     paid_contracts = contract_df[contract_df['player_id'].notna()].copy()
     
-    print(f"Found {len(paid_contracts)} contracts with player_id")
+    print(f"Total contracts: {len(contract_df)}")
+    print(f"Contracts with player_id: {len(paid_contracts)}")
+    
+    if len(paid_contracts) == 0:
+        print("⚠️  WARNING: No contracts have player_id mapped!")
+        print("This means no players can be marked as 'got_paid'")
+        return {}
+    
+    # Convert Year to numeric
+    paid_contracts['Year'] = pd.to_numeric(paid_contracts['Year'], errors='coerce')
+    paid_contracts = paid_contracts.dropna(subset=['Year'])
+    
+    print(f"Contracts with valid year: {len(paid_contracts)}")
     
     # Group by player and get the first payment year
     # (This is their 2nd contract / first big payday)
@@ -1630,382 +2114,23 @@ def create_payment_year_mapping(contract_df):
         first_payment_year = group['Year'].min()
         payment_mapping[player_id] = int(first_payment_year)
     
-    print(f"Created payment mapping for {len(payment_mapping)} QBs")
+    print(f"Created payment mapping for {len(payment_mapping)} players")
     
     # Show some examples
     if payment_mapping:
         print("\nExample mappings:")
-        for i, (player_id, year) in enumerate(list(payment_mapping.items())[:5]):
-            player_name = paid_contracts[paid_contracts['player_id'] == player_id].iloc[0]['Player']
-            print(f"  {player_name} ({player_id}): Paid in {year}")
-    
-    return payment_mapping
-
-def create_pick_number_mapping(pick_numbers_file='first_round_qbs_with_picks.csv'):
-    """
-    Creates a lightweight mapping of player_id -> pick_number.
-    
-    Args:
-        pick_numbers_file (str): Path to CSV with pick numbers
-    
-    Returns:
-        dict: {player_id: pick_number} for all first round QBs
-    """
-    print("\n" + "="*80)
-    print("CREATING PICK NUMBER MAPPING")
-    print("="*80)
-    
-    if not os.path.exists(pick_numbers_file):
-        print(f"✗ ERROR: File not found: {pick_numbers_file}")
-        return {}
-    
-    df = pd.read_csv(pick_numbers_file)
-    print(f"Loaded {len(df)} QBs with pick numbers")
-    print(f"Columns: {df.columns.tolist()}")
-    
-    # Create mapping
-    pick_mapping = dict(zip(df['player_id'], df['pick_number']))
-    
-    print(f"Created pick number mapping for {len(pick_mapping)} QBs")
-    
-    # Show some examples
-    if pick_mapping:
-        print("\nExample mappings:")
-        for i, (player_id, pick) in enumerate(list(pick_mapping.items())[:5]):
-            player_name = df[df['player_id'] == player_id].iloc[0]['player_name']
-            print(f"  {player_name} ({player_id}): Pick #{pick}")
-    
-    return pick_mapping
-
-def label_seasons_relative_to_payment(qb_seasons_df, payment_mapping):
-    """
-    Labels each QB season with years relative to their payment year.
-    
-    For QBs who got paid in year Y:
-    - Y-4 = 4 years before payment
-    - Y-3 = 3 years before payment
-    - Y-2 = 2 years before payment
-    - Y-1 = 1 year before payment (most recent year before decision)
-    - Y = payment year
-    - Y+1 = 1 year after payment
-    - Y+2 = 2 years after payment
-    etc.
-    
-    For QBs who never got paid: years_to_payment = NaN
-    
-    Args:
-        qb_seasons_df (DataFrame): All QB seasons data
-        payment_mapping (dict): {player_id: payment_year}
-    
-    Returns:
-        DataFrame: Original df with new columns:
-            - payment_year: The year they got paid (NaN if never paid)
-            - years_to_payment: Relative year (negative before, 0 at, positive after)
-            - got_paid: Boolean indicator
-    """
-    print("\n" + "="*80)
-    print("LABELING SEASONS RELATIVE TO PAYMENT")
-    print("="*80)
-    
-    df = qb_seasons_df.copy()
-    
-    # Ensure season is integer
-    df['season'] = pd.to_numeric(df['season'], errors='coerce')
-    df = df.dropna(subset=['season'])
-    df['season'] = df['season'].astype(int)
-    
-    # Add payment year from mapping
-    df['payment_year'] = df['player_id'].map(payment_mapping)
-    
-    # Calculate years relative to payment
-    # Negative = before payment, 0 = payment year, positive = after payment
-    df['years_to_payment'] = df['season'] - df['payment_year']
-    
-    # Add boolean indicator
-    df['got_paid'] = df['payment_year'].notna()
-    
-    # Stats
-    paid_qbs = df['got_paid'].sum() / len(df) * 100
-    unique_paid = df[df['got_paid']]['player_id'].nunique()
-    unique_total = df['player_id'].nunique()
-    
-    print(f"\nTotal seasons: {len(df)}")
-    print(f"Seasons from QBs who got paid: {df['got_paid'].sum()} ({paid_qbs:.1f}%)")
-    print(f"QBs who got paid: {unique_paid}/{unique_total}")
-    
-    # Show distribution of years_to_payment
-    print("\nDistribution of years relative to payment:")
-    for year_rel in sorted(df[df['got_paid']]['years_to_payment'].unique()):
-        count = (df['years_to_payment'] == year_rel).sum()
-        print(f"  Y{year_rel:+d}: {count} seasons")
-    
-    # Show examples
-    print("\nExample labeled seasons:")
-    sample_qb = df[df['got_paid']].iloc[0]['player_id']
-    sample_data = df[df['player_id'] == sample_qb][['season', 'player_name', 'payment_year', 'years_to_payment', 'got_paid']].head(10)
-    print(sample_data.to_string(index=False))
-    
-    return df
-
-def create_lookback_performance_features(labeled_df, metrics=['Pass_ANY/A', 'Pass_Rate', 'total_yards']):
-    """
-    Creates lookback features for discrete-time modeling.
-    
-    For each season at time t, creates columns for performance in previous years:
-    - metric_lag1: Performance 1 year ago (t-1)
-    - metric_lag2: Performance 2 years ago (t-2)
-    - metric_lag3: Performance 3 years ago (t-3)
-    - metric_lag4: Performance 4 years ago (t-4)
-    
-    This enables modeling payment decisions based on recent performance history.
-    
-    Args:
-        labeled_df (DataFrame): QB seasons with years_to_payment labels
-        metrics (list): Performance metrics to create lags for
-    
-    Returns:
-        DataFrame: Original df with lag features added
-    """
-    print("\n" + "="*80)
-    print("CREATING LOOKBACK PERFORMANCE FEATURES")
-    print("="*80)
-    
-    df = labeled_df.copy()
-    
-    # Sort by player and season
-    df = df.sort_values(['player_id', 'season']).reset_index(drop=True)
-    
-    # For each metric, create lag features
-    for metric in metrics:
-        if metric not in df.columns:
-            print(f"⚠️  Warning: {metric} not found in dataframe, skipping")
-            continue
-        
-        print(f"\nCreating lags for {metric}...")
-        
-        # Convert to numeric
-        df[metric] = pd.to_numeric(df[metric], errors='coerce')
-        
-        # Create lags (1-4 years back)
-        for lag in range(1, 5):
-            lag_col = f"{metric}_lag{lag}"
-            df[lag_col] = df.groupby('player_id')[metric].shift(lag)
-            
-            # Count non-null values
-            non_null = df[lag_col].notna().sum()
-            print(f"  {lag_col}: {non_null} non-null values")
-    
-    print(f"\nTotal columns after adding lags: {len(df.columns)}")
-    
-    # Show example of lookback features
-    print("\nExample lookback features (showing Pass_ANY/A):")
-    sample_qb = df[df['got_paid']].iloc[0]['player_id']
-    sample_data = df[df['player_id'] == sample_qb][
-        ['season', 'player_name', 'Pass_ANY/A', 'Pass_ANY/A_lag1', 'Pass_ANY/A_lag2', 'Pass_ANY/A_lag3']
-    ].head(10)
-    print(sample_data.to_string(index=False))
-    
-    return df
-
-def create_decision_point_dataset(labeled_df, decision_year_relative=0, metrics=['Pass_ANY/A']):
-    """
-    Creates a dataset for modeling payment decisions at a specific decision point.
-    
-    For example, decision_year_relative=-1 means we're modeling whether the QB got paid
-    based on their performance up to 1 year before payment (Y-1, Y-2, Y-3, Y-4).
-    
-    This is useful for discrete-time logistic regression at each decision point:
-    - Year 3 decisions (5th year option): decision_year_relative=-2
-    - Year 4 decisions (extension): decision_year_relative=-1
-    - Year 5 decisions (2nd contract): decision_year_relative=0
-    
-    Args:
-        labeled_df (DataFrame): QB seasons with lookback features
-        decision_year_relative (int): Which year to evaluate at (relative to payment)
-        metrics (list): Which performance metrics to include
-    
-    Returns:
-        DataFrame: Dataset ready for modeling payment probability
-    """
-    print("\n" + "="*80)
-    print(f"CREATING DECISION POINT DATASET (Y{decision_year_relative:+d})")
-    print("="*80)
-    
-    df = labeled_df.copy()
-    
-    # Filter to the specific decision year
-    decision_df = df[df['years_to_payment'] == decision_year_relative].copy()
-    
-    print(f"Seasons at Y{decision_year_relative:+d}: {len(decision_df)}")
-    
-    # Select relevant columns
-    feature_cols = ['player_id', 'player_name', 'season', 'draft_year', 'got_paid']
-    
-    # Add the performance metrics and their lags
-    for metric in metrics:
-        if metric in decision_df.columns:
-            feature_cols.append(metric)
-        
-        # Add lags
-        for lag in range(1, 5):
-            lag_col = f"{metric}_lag{lag}"
-            if lag_col in decision_df.columns:
-                feature_cols.append(lag_col)
-    
-    # Add pick number if available
-    if 'pick_number' in decision_df.columns:
-        feature_cols.append('pick_number')
-    
-    decision_df = decision_df[feature_cols].copy()
-    
-    # Remove rows with missing lag data (can't evaluate without history)
-    initial_count = len(decision_df)
-    decision_df = decision_df.dropna(subset=[col for col in feature_cols if '_lag' in col], how='all')
-    final_count = len(decision_df)
-    
-    print(f"After removing seasons with insufficient history: {final_count} ({initial_count - final_count} dropped)")
-    
-    # Show payment statistics
-    if 'got_paid' in decision_df.columns:
-        paid_count = decision_df['got_paid'].sum()
-        paid_pct = paid_count / len(decision_df) * 100 if len(decision_df) > 0 else 0
-        print(f"\nPayment outcome distribution:")
-        print(f"  Got paid: {paid_count} ({paid_pct:.1f}%)")
-        print(f"  Not paid: {len(decision_df) - paid_count} ({100-paid_pct:.1f}%)")
-    
-    # Show sample
-    print("\nSample decision point data:")
-    sample_cols = ['player_name', 'season', 'got_paid'] + [col for col in feature_cols if 'Pass_ANY/A' in col][:4]
-    print(decision_df[sample_cols].head(10).to_string(index=False))
-    
-    return decision_df
-
-def prepare_qb_payment_data(
-    qb_seasons_file='all_seasons_df.csv',
-    contract_file='QB_contract_data.csv', 
-    pick_numbers_file='first_round_qbs_with_picks.csv',
-    save_output=True,
-    output_file='qb_seasons_payment_labeled.csv'
-):
-    """
-    Master function that runs the full data preparation pipeline.
-    
-    Steps:
-    1. Load QB seasons data
-    2. Load and map contract data (payment years)
-    3. Load and map pick numbers
-    4. Label seasons relative to payment
-    5. Create lookback performance features
-    
-    Args:
-        qb_seasons_file (str): Path to QB seasons CSV
-        contract_file (str): Path to contract data CSV
-        pick_numbers_file (str): Path to pick numbers CSV
-        save_output (bool): Whether to save the prepared dataset
-        output_file (str): Where to save the output
-    
-    Returns:
-        DataFrame: Fully prepared dataset ready for modeling
-    """
-    print("\n" + "="*80)
-    print("MASTER DATA PREPARATION PIPELINE")
-    print("="*80)
-    
-    # Step 1: Load QB seasons
-    print("\n[1/5] Loading QB seasons data...")
-    if not os.path.exists(qb_seasons_file):
-        print(f"✗ ERROR: {qb_seasons_file} not found")
-        return None
-    
-    qb_seasons = pd.read_csv(qb_seasons_file)
-    print(f"✓ Loaded {len(qb_seasons)} QB seasons")
-    
-    # Step 2: Create payment mapping
-    print("\n[2/5] Creating payment year mapping...")
-    
-    # First need to load contract data with player_id mapping
-    if os.path.exists('cache/contract_player_id_mapping.csv'):
-        contracts = pd.read_csv('cache/contract_player_id_mapping.csv')
-        print(f"✓ Loaded {len(contracts)} contracts from cache")
-    elif os.path.exists(contract_file):
-        print("⚠️  Using raw contract file without player_id mapping")
-        print("   Consider running create_contract_player_mapping() first")
-        contracts = pd.read_csv(contract_file)
+        examples_shown = 0
+        for player_id, year in payment_mapping.items():
+            # Try to get player name if available
+            player_rows = paid_contracts[paid_contracts['player_id'] == player_id]
+            if len(player_rows) > 0:
+                player_name = player_rows.iloc[0].get('Player', player_rows.iloc[0].get('matched_name', 'Unknown'))
+                print(f"  {player_name} ({player_id}): Paid in {year}")
+                examples_shown += 1
+                if examples_shown >= 5:
+                    break
     else:
-        print(f"✗ ERROR: {contract_file} not found")
-        return None
-    
-    payment_mapping = create_payment_year_mapping(contracts)
-    
-    # Step 3: Create pick number mapping
-    print("\n[3/5] Creating pick number mapping...")
-    pick_mapping = create_pick_number_mapping(pick_numbers_file)
-    
-    # Add pick numbers to QB seasons
-    qb_seasons['pick_number'] = qb_seasons['player_id'].map(pick_mapping)
-    print(f"✓ Added pick numbers to {qb_seasons['pick_number'].notna().sum()} seasons")
-    
-    # Step 4: Label seasons relative to payment
-    print("\n[4/5] Labeling seasons relative to payment...")
-    labeled_df = label_seasons_relative_to_payment(qb_seasons, payment_mapping)
-    
-    # Step 5: Create lookback features
-    print("\n[5/5] Creating lookback performance features...")
-    metrics_to_lag = ['Pass_ANY/A', 'Pass_Rate', 'Pass_TD', 'Pass_Yds', 'total_yards', 'Pass_Succ%']
-    final_df = create_lookback_performance_features(labeled_df, metrics=metrics_to_lag)
-    
-    # Save if requested
-    if save_output:
-        final_df.to_csv(output_file, index=False)
-        print(f"\n✓ Saved prepared dataset to: {output_file}")
-        print(f"  Total rows: {len(final_df)}")
-        print(f"  Total columns: {len(final_df.columns)}")
-    
-    print("\n" + "="*80)
-    print("DATA PREPARATION COMPLETE")
-    print("="*80)
-    
-    return final_df
-
-def create_payment_year_mapping(contract_df):
-    """
-    Creates a lightweight mapping of player_id -> payment_year.
-    
-    This identifies when each QB got paid (2nd contract/extension) and returns
-    a simple dictionary for runtime lookup.
-    
-    Args:
-        contract_df (DataFrame): Contract data with player_id and Year columns
-    
-    Returns:
-        dict: {player_id: payment_year} for QBs who got paid
-    """
-    print("\n" + "="*80)
-    print("CREATING PAYMENT YEAR MAPPING")
-    print("="*80)
-    
-    # Filter to only contracts with player_id (matched to first round QBs)
-    paid_contracts = contract_df[contract_df['player_id'].notna()].copy()
-    
-    print(f"Found {len(paid_contracts)} contracts with player_id")
-    
-    # Group by player and get the first payment year
-    # (This is their 2nd contract / first big payday)
-    payment_mapping = {}
-    
-    for player_id, group in paid_contracts.groupby('player_id'):
-        # Get the earliest contract year (their first big payday)
-        first_payment_year = group['Year'].min()
-        payment_mapping[player_id] = int(first_payment_year)
-    
-    print(f"Created payment mapping for {len(payment_mapping)} QBs")
-    
-    # Show some examples
-    if payment_mapping:
-        print("\nExample mappings:")
-        for i, (player_id, year) in enumerate(list(payment_mapping.items())[:5]):
-            player_name = paid_contracts[paid_contracts['player_id'] == player_id].iloc[0]['Player']
-            print(f"  {player_name} ({player_id}): Paid in {year}")
+        print("⚠️  WARNING: Payment mapping is empty!")
     
     return payment_mapping
 
@@ -2027,7 +2152,7 @@ def create_pick_number_mapping(pick_numbers_file='first_round_qbs_with_picks.csv
         print(f"✗ ERROR: File not found: {pick_numbers_file}")
         return {}
     
-    df = pd.read_csv(pick_numbers_file)
+    df = load_csv_safe(pick_numbers_file)
     print(f"Loaded {len(df)} QBs with pick numbers")
     print(f"Columns: {df.columns.tolist()}")
     
@@ -2075,6 +2200,10 @@ def label_seasons_relative_to_payment(qb_seasons_df, payment_mapping):
     print("LABELING SEASONS RELATIVE TO PAYMENT")
     print("="*80)
     
+    required_cols = ['season', 'player_id']
+    if not validate_columns(qb_seasons_df, required_cols, "QB seasons"):
+        return None
+
     df = qb_seasons_df.copy()
     
     # Ensure season is integer
@@ -2092,6 +2221,12 @@ def label_seasons_relative_to_payment(qb_seasons_df, payment_mapping):
     # Add boolean indicator
     df['got_paid'] = df['payment_year'].notna()
     
+    df = validate_payment_years(df, 
+                           draft_year_col='draft_year', 
+                           payment_year_col='payment_year',
+                           years_to_payment_col='years_to_payment',
+                           max_years=12)
+
     # Stats
     paid_qbs = df['got_paid'].sum() / len(df) * 100
     unique_paid = df[df['got_paid']]['player_id'].nunique()
@@ -2138,11 +2273,13 @@ def create_lookback_performance_features(labeled_df, metrics=['Pass_ANY/A', 'Pas
     print("CREATING LOOKBACK PERFORMANCE FEATURES")
     print("="*80)
     
-    df = labeled_df.copy()
+    required_cols = ['player_id', 'season']
+    if not validate_columns(labeled_df, required_cols, "labeled seasons"):
+        return None
     
     # Sort by player and season
-    df = df.sort_values(['player_id', 'season']).reset_index(drop=True)
-    
+    df = labeled_df.sort_values(['player_id', 'season']).reset_index(drop=True)
+
     # For each metric, create lag features
     for metric in metrics:
         if metric not in df.columns:
@@ -2282,53 +2419,75 @@ def prepare_qb_payment_data(
     if not os.path.exists(qb_seasons_file):
         print(f"✗ ERROR: {qb_seasons_file} not found")
         return None
-    
-    qb_seasons = pd.read_csv(qb_seasons_file)
+
+    qb_seasons = load_csv_safe(qb_seasons_file, "QB seasons data")
+
+    if qb_seasons is None:
+        return None
+
+    # ADD THIS VALIDATION
+    required_cols = ['season', 'player_id', 'Team']
+    if not validate_columns(qb_seasons, required_cols, "QB seasons"):
+        return None
+
     print(f"✓ Loaded {len(qb_seasons)} QB seasons")
     
     # Step 2: Create payment mapping from existing contract mapping
     print("\n[2/5] Creating payment year mapping...")
-    
-    # Use the cached contract mapping created by create_contract_player_mapping()
+
+    # Use the cached contract mapping, create if missing
     if os.path.exists('cache/contract_player_id_mapping.csv'):
-        contracts = pd.read_csv('cache/contract_player_id_mapping.csv')
+        contracts = load_csv_safe('cache/contract_player_id_mapping.csv')
         print(f"✓ Loaded {len(contracts)} contracts from cache")
     else:
-        print(f"✗ ERROR: cache/contract_player_id_mapping.csv not found")
-        print("   Please run create_contract_player_mapping() first")
-        return None
-    
-    payment_mapping = create_payment_year_mapping(contracts)
-    
-    # Step 3: Create pick number mapping
-    print("\n[3/5] Creating pick number mapping...")
-    pick_mapping = create_pick_number_mapping(pick_numbers_file)
-    
-    # Add pick numbers to QB seasons
-    qb_seasons['pick_number'] = qb_seasons['player_id'].map(pick_mapping)
-    print(f"✓ Added pick numbers to {qb_seasons['pick_number'].notna().sum()} seasons")
-    
-    # Step 4: Label seasons relative to payment
-    print("\n[4/5] Labeling seasons relative to payment...")
-    labeled_df = label_seasons_relative_to_payment(qb_seasons, payment_mapping)
-    
-    # Step 5: Create lookback features
-    print("\n[5/5] Creating lookback performance features...")
-    metrics_to_lag = ['Pass_ANY/A', 'Pass_Rate', 'Pass_TD', 'Pass_Yds', 'total_yards', 'Pass_Succ%']
-    final_df = create_lookback_performance_features(labeled_df, metrics=metrics_to_lag)
-    
-    # Save if requested
-    if save_output:
-        final_df.to_csv(output_file, index=False)
-        print(f"\n✓ Saved prepared dataset to: {output_file}")
-        print(f"  Total rows: {len(final_df)}")
-        print(f"  Total columns: {len(final_df.columns)}")
-    
-    print("\n" + "="*80)
-    print("DATA PREPARATION COMPLETE")
-    print("="*80)
-    
-    return final_df
+        print(f"⚠️  cache/contract_player_id_mapping.csv not found")
+        print("   Auto-creating contract mapping now...")
+        
+        # Auto-create the mapping
+        mapped_contracts = create_contract_player_mapping(force_refresh=False)
+        
+        # Optional: Filter to just first-round QBs
+        #first_round_contracts = filter_contracts_to_first_round_qbs(mapped_contracts)
+
+        if mapped_contracts is None:
+            print("✗ ERROR: Failed to create contract mapping")
+            print("   Make sure QB_contract_data.csv and first_round_qbs files exist")
+            return None
+        
+        contracts = mapped_contracts
+        print(f"✓ Created mapping for {len(contracts)} contracts")
+        
+        payment_mapping = create_payment_year_mapping(contracts)
+        
+        # Step 3: Create pick number mapping
+        print("\n[3/5] Creating pick number mapping...")
+        pick_mapping = create_pick_number_mapping(pick_numbers_file)
+        
+        # Add pick numbers to QB seasons
+        qb_seasons['pick_number'] = qb_seasons['player_id'].map(pick_mapping)
+        print(f"✓ Added pick numbers to {qb_seasons['pick_number'].notna().sum()} seasons")
+        
+        # Step 4: Label seasons relative to payment
+        print("\n[4/5] Labeling seasons relative to payment...")
+        labeled_df = label_seasons_relative_to_payment(qb_seasons, payment_mapping)
+        
+        # Step 5: Create lookback features
+        print("\n[5/5] Creating lookback performance features...")
+        metrics_to_lag = ['Pass_ANY/A', 'Pass_Rate', 'Pass_TD', 'Pass_Yds', 'total_yards', 'Pass_Succ%']
+        final_df = create_lookback_performance_features(labeled_df, metrics=metrics_to_lag)
+        
+        # Save if requested
+        if save_output:
+            final_df.to_csv(output_file, index=False)
+            print(f"\n✓ Saved prepared dataset to: {output_file}")
+            print(f"  Total rows: {len(final_df)}")
+            print(f"  Total columns: {len(final_df.columns)}")
+        
+        print("\n" + "="*80)
+        print("DATA PREPARATION COMPLETE")
+        print("="*80)
+        
+        return final_df
 
 
 
@@ -2359,43 +2518,42 @@ if __name__ == "__main__":
     #print(response.content[0].text)
     
     #uncomment these to do the regression analysis again
-    train_df, test_df = create_train_test_split(test_size=0.2, split_by='temporal')
+    #train_df, test_df = create_train_test_split(test_size=0.2, split_by='temporal')
     #regression_with_pc1_factors(train_df, test_df)
 
+    train_df, test_df = load_train_test_split()
+    
     # Test QB name normalization
-    #test_name_mapping()
-    # Force refresh if source data changes
-    #mapped_contracts = create_contract_player_mapping(force_refresh=True)
+    # test_name_mapping()
+    
     # Create mapping (first time - will process and cache)
     mapped_contracts = create_contract_player_mapping()
-    
-    # Option 1: Run the full pipeline with one function
-    print("\n### OPTION 1: Full Pipeline ###")
-    prepared_df = prepare_qb_payment_data(
-        qb_seasons_file='all_seasons_df.csv',
-        pick_numbers_file='first_round_qbs_with_picks.csv',
-        save_output=True,
-        output_file='qb_seasons_payment_labeled.csv'
-    )
-    
-    if prepared_df is not None:
-        print("\n✓ Pipeline completed successfully!")
-        print(f"  Dataset shape: {prepared_df.shape}")
-        print(f"  QBs who got paid: {prepared_df[prepared_df['got_paid']]['player_id'].nunique()}")
-        print(f"  QBs who didn't get paid: {prepared_df[~prepared_df['got_paid']]['player_id'].nunique()}")
-        
-        # Show some stats
-        print("\nDataset summary:")
-        print(f"  Total seasons: {len(prepared_df)}")
-        print(f"  Unique QBs: {prepared_df['player_id'].nunique()}")
-        print(f"  Year range: {prepared_df['season'].min()}-{prepared_df['season'].max()}")
-        print(f"  QBs with pick numbers: {prepared_df['pick_number'].notna().sum()}")
-        
-        # Show year distribution relative to payment
-        print("\nSeasons by years_to_payment:")
-        year_dist = prepared_df[prepared_df['got_paid']].groupby('years_to_payment').size().sort_index()
-        for year_rel, count in year_dist.items():
-            if pd.notna(year_rel):
-                print(f"  Y{int(year_rel):+d}: {count} seasons")
+    #mapped_contracts = create_contract_player_mapping(force_refresh=True)   
 
+    # Debug specific player
+    #contracts = load_csv_safe("QB_contract_data.csv")
+    #player_ids = load_csv_safe("player_ids.csv")
+    #debug_name_matching("Ben Roethlisberger", contracts, player_ids)
+    #mapped_contracts = create_contract_player_mapping(force_refresh=True)
+    #now check the number of QBs in contract_player_id_mapping.csv after year 2000, without a match
+    
+    
+    # Test the pipeline step by step
+    
+    # Step 1: Load contracts
+    contracts = load_csv_safe('cache/contract_player_id_mapping.csv')
+    print(f"✓ Loaded {len(contracts)} contracts from cache")
+    print(f"Loaded contracts: {len(contracts)}")
+    print(f"Columns: {contracts.columns.tolist()}")
+    print(f"\nContracts with player_id: {contracts['player_id'].notna().sum()}")
+    
+    # Step 2: Test payment mapping
+    payment_mapping = create_payment_year_mapping(contracts)
+    print(f"\nPayment mapping created: {len(payment_mapping)} players")
+    
+    # Show a sample
+    if payment_mapping:
+        print("\nFirst 10 mappings:")
+        for i, (player_id, year) in enumerate(list(payment_mapping.items())[:10]):
+            print(f"  {player_id}: {year}")
 

@@ -24,29 +24,6 @@ From claude's recommended functions to work on in order:
 
 Data Preparation Functions
 
-prepare_qb_payment_data()
-
-Merges QB seasons with contract data
-Identifies which QBs got paid (2nd contract/extension)
-Calculates "years since draft" for each season
-Returns: DataFrame with payment outcomes
-
-
-calculate_years_to_payment(qb_seasons_df, contract_df)
-
-For each QB who got paid, determines signing year
-Calculates lookback windows (t-1, t-2, t-3, t-4 years before signing)
-Returns: DataFrame mapping QB_id → payment_year
-
-
-create_payment_labels(qb_seasons_df, payment_data)
-
-Labels each QB season with payment outcome (paid/not paid)
-Handles censored cases (still on rookie deal, left team without payment)
-Returns: Enhanced DataFrame with binary payment indicator
-
-
-
 Modeling Functions
 
 fit_payment_probability_model(train_df, metric='Pass_ANY/A', years_back=3)
