@@ -2311,7 +2311,7 @@ def create_pick_number_mapping(pick_numbers_file='first_round_qbs_with_picks.csv
             
             missing = df['player_id'].isna().sum()
             if missing > 0:
-                print(f"⚠️  Warning: {missing} QBs couldn't be matched to player_id")
+                print(f"⚠️  Warning: {missing} QBs couldn't be matched to player_id (the player may not have one)")
                 print("Missing QBs:")
                 for name in df[df['player_id'].isna()]['name'].head(10):
                     print(f"  - {name}")
@@ -2821,7 +2821,12 @@ def ridge_regression_payment_prediction(alpha_range=None, exclude_recent_drafts=
         print("✗ ERROR: qb_seasons_payment_labeled.csv not found")
         return None
     
-    payment_df = load_csv_safe('qb_seasons_payment_labeled.csv')
+    if not os.path.exists('qb_seasons_payment_labeled_era_adjusted.csv'):
+        print("✗ ERROR: qb_seasons_payment_labeled_era_adjusted.csv not found")
+        print("Run create_era_adjusted_payment_data() first")
+        return None
+
+    payment_df = load_csv_safe('qb_seasons_payment_labeled_era_adjusted.csv')
     print(f"✓ Loaded {len(payment_df)} seasons with payment labels")
     
     # CRITICAL: Remove QBs who haven't reached contract window yet
@@ -2861,7 +2866,7 @@ def ridge_regression_payment_prediction(alpha_range=None, exclude_recent_drafts=
     
     merged_df = pd.merge(
         payment_df,
-        season_records[['Season', 'Team', 'W', 'Pts']],
+        season_records[['Season', 'Team', 'W-L%', 'Pts']],
         left_on=['season', 'Team'],
         right_on=['Season', 'Team'],
         how='inner'
@@ -2869,6 +2874,23 @@ def ridge_regression_payment_prediction(alpha_range=None, exclude_recent_drafts=
     
     print(f"✓ Merged with team metrics: {len(merged_df)} seasons")
     
+    # ADD THIS NEW SECTION HERE:
+    print("\n" + "="*80)
+    print("ADJUSTING TEAM METRICS")
+    print("="*80)
+
+    # Load adjustment factors
+    if os.path.exists('era_adjustment_factors.csv'):
+        factor_df = pd.read_csv('era_adjustment_factors.csv')
+        pts_factors = factor_df[factor_df['stat'] == 'Pts'].set_index('year')['adjustment_factor'].to_dict()
+        
+        # Apply Pts adjustment
+        merged_df['Pts_adj'] = merged_df['Pts'] * merged_df['season'].map(pts_factors)
+        print(f"✓ Created Pts_adj: {merged_df['Pts_adj'].notna().sum()} values")
+    else:
+        print("⚠️ No adjustment factors found, using raw Pts")
+        merged_df['Pts_adj'] = merged_df['Pts']
+
     # Define reduced metric set
     qb_metrics = [
         'total_yards_adj',
@@ -2878,7 +2900,7 @@ def ridge_regression_payment_prediction(alpha_range=None, exclude_recent_drafts=
     ]
     
     team_metrics = [
-        'W',
+        'W-L%',      # Changed from 'W'
         'Pts_adj'
     ]
     
@@ -3146,7 +3168,7 @@ def year_weighting_regression(metric='total_yards_adj', max_decision_year=6):
     print(f"✓ Loaded {len(payment_df)} seasons with era-adjusted payment labels")
     
     # If analyzing team metric (W), need to merge with season records
-    if metric == 'W':
+    if metric == 'W-L%':
         season_records = load_csv_safe("season_records.csv", "season records")
         if season_records is None:
             return None
@@ -3161,7 +3183,7 @@ def year_weighting_regression(metric='total_yards_adj', max_decision_year=6):
         
         payment_df = pd.merge(
             payment_df,
-            season_records[['Season', 'Team', 'W']],
+            season_records[['Season', 'Team', 'W-L%']],
             left_on=['season', 'Team'],
             right_on=['Season', 'Team'],
             how='inner'
@@ -3359,7 +3381,7 @@ def calculate_era_adjustment_factors(reference_year=2024):
         'Pass_Yds': 'Pass_Yds',
         'Pass_ANY/A': 'NY/A',  # NEW - use Net Yards per Attempt as proxy
         'Rush_Rushing_Succ%': None,  # Can't calculate from season_averages, handle separately
-        'W': None,  # Wins don't inflate
+        'W-L%': None,  # NEW - Calculate from season_records
         'Pts': 'PF'
     }
         
@@ -3450,6 +3472,35 @@ def calculate_era_adjustment_factors(reference_year=2024):
             print(f"  Rush_Rushing_Succ%: R² = {model.score(years.reshape(-1, 1), values):.4f}")
             print(f"  {reference_year} predicted average: {reference_avg:.2f}%")
 
+    print("\nCalculating adjustment for W-L% from season records...")
+    if os.path.exists('season_records.csv'):
+        season_rec = pd.read_csv('season_records.csv')
+        season_rec['Season'] = pd.to_numeric(season_rec['Season'], errors='coerce')
+        season_rec['W-L%'] = pd.to_numeric(season_rec['W-L%'], errors='coerce')
+        
+        # Calculate yearly averages
+        yearly_avg = season_rec.groupby('Season')['W-L%'].mean().reset_index()
+        yearly_avg = yearly_avg.dropna()
+        
+        if len(yearly_avg) > 10:
+            years = yearly_avg['Season'].values
+            values = yearly_avg['W-L%'].values
+            
+            model = LinearRegression()
+            model.fit(years.reshape(-1, 1), values)
+            
+            reference_avg = model.predict([[reference_year]])[0]
+            predicted = model.predict(years.reshape(-1, 1))
+            
+            year_factors = {}
+            for year, pred_val in zip(years, predicted):
+                year_factors[int(year)] = reference_avg / pred_val
+            
+            adjustment_factors['W-L%'] = year_factors
+            
+            print(f"  W-L%: R² = {model.score(years.reshape(-1, 1), values):.4f}")
+            print(f"  {reference_year} predicted average: {reference_avg:.4f}")
+
     # Save adjustment factors
     print("\n" + "="*80)
     print("SAVING ADJUSTMENT FACTORS")
@@ -3471,7 +3522,7 @@ def calculate_era_adjustment_factors(reference_year=2024):
     
     return adjustment_factors
 
-def apply_era_adjustments(df, adjustment_factors, stats_to_adjust=['total_yards', 'Pass_TD', 'W', 'Pts']):
+def apply_era_adjustments(df, adjustment_factors, stats_to_adjust=['total_yards', 'Pass_TD', 'Pass_ANY/A', 'Rush_Rushing_Succ%']):
     """
     Applies era adjustment factors to a dataframe with QB/team stats.
     
@@ -3577,7 +3628,12 @@ def create_era_adjusted_payment_data(force_refresh=False):
     print(f"✓ Loaded {len(payment_df)} seasons")
     
     # Apply adjustments
-    stats_to_adjust = ['total_yards', 'Pass_TD', 'W', 'Pts']
+    stats_to_adjust = [
+        'total_yards', 
+        'Pass_TD', 
+        'Pass_ANY/A',
+        'Rush_Rushing_Succ%'
+    ]
     adjusted_df = apply_era_adjustments(payment_df, adjustment_factors, stats_to_adjust)
     
     # Save
@@ -3679,4 +3735,4 @@ if __name__ == "__main__":
             print("="*80)
             
             yards_weights = year_weighting_regression(metric='total_yards_adj', max_decision_year=6)
-            wins_weights = year_weighting_regression(metric='W', max_decision_year=6)
+            wins_weights = year_weighting_regression(metric='W-L%', max_decision_year=6)

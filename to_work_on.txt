@@ -19,15 +19,6 @@ heat map modeling of progression towards payday
 
 
 
-functions to work on:
-
-
-normalize_performance_by_era(df, metric, method='year_adjustment')
-
-Applies era adjustment (offensive inflation)
-Uses regression coefficient from earlier analysis
-Returns: DataFrame with adjusted metrics
-
 Heatmap Generation Functions
 
 generate_heatmap_zones(metric='Pass_ANY/A', years_range=(0, 5), metric_range='auto')
@@ -70,9 +61,7 @@ Saves as individual files
 Creates comparison summary table
 Returns: Summary DataFrame
 
-
-
-
+///////////////////////////////////////////////////////////////////////////////
 
 Visualization Helper Functions
 
@@ -80,7 +69,6 @@ setup_heatmap_aesthetics()
 
 Returns standardized colormap, font sizes, labels
 Ensures consistent look across all charts
-
 
 add_trajectory_annotations(ax, qb_trajectory, payment_year)
 
