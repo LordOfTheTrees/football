@@ -28,26 +28,6 @@ Applies era adjustment (offensive inflation)
 Uses regression coefficient from earlier analysis
 Returns: DataFrame with adjusted metrics
 
-Data Preparation Functions
-
-Modeling Functions
-
-fit_payment_probability_model(train_df, metric='Pass_ANY/A', years_back=3)
-
-Trains logistic regression: P(get paid) ~ performance in years t-1, t-2, t-3
-Uses specified metric (default Pass_ANY/A)
-Handles different decision points (Year 3 option, Year 4 extension, etc.)
-Returns: Trained model + performance metrics
-
-
-calculate_recency_weights(payment_df)
-
-Empirically determines how teams weight recent vs. older years
-Runs regression with performance at t-1, t-2, t-3 as separate predictors
-Returns: Dict of weights (e.g., {t-1: 0.6, t-2: 0.3, t-3: 0.1})
-
-
-
 Heatmap Generation Functions
 
 generate_heatmap_zones(metric='Pass_ANY/A', years_range=(0, 5), metric_range='auto')

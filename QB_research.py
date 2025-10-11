@@ -138,6 +138,42 @@ def validate_payment_years(df, draft_year_col='draft_year', payment_year_col='pa
     
     return df  # Return original df - just warning, not filtering
 
+def normalize_player_name(name):
+    """
+    Normalizes player names for exact matching.
+    Handles common variations (Jr., III, periods, extra spaces, initials, etc.)
+    
+    Args:
+        name (str): Player name
+    
+    Returns:
+        str: Normalized name
+    """
+    if pd.isna(name):
+        return ""
+    
+    name = str(name).strip()
+    
+    # Remove periods (handles J.J. -> JJ, T.J. -> TJ, etc.)
+    name = name.replace('.', '')
+    
+    # Handle specific initial patterns that might need spaces
+    # "JJ McCarthy" should match "J.J. McCarthy" or "J J McCarthy"
+    name = name.replace('  ', ' ')  # Collapse double spaces
+    
+    # Remove suffixes
+    suffixes = [' Jr', ' Sr', ' III', ' II', ' IV', ' V']
+    for suffix in suffixes:
+        name = name.replace(suffix, '')
+    
+    # Remove extra whitespace
+    name = ' '.join(name.split())
+    
+    # Lowercase for case-insensitive matching
+    name = name.lower()
+    
+    return name
+
 def debug_name_matching(player_name, contracts_df, player_ids_df):
     """
     Debug why a specific player isn't matching.
@@ -1639,7 +1675,7 @@ def ridge_regression_with_cv(train_df=None, test_df=None, alpha_range=None, use_
     
     # Load OLS results if available
     if os.path.exists('pc1_regression_variable_importance.csv'):
-        ols_importance = pd.read_csv('pc1_regression_variable_importance.csv')
+        ols_importance = load_csv_safe('pc1_regression_variable_importance.csv')
         
         comparison_df = importance_df.merge(
             ols_importance[['Variable', 'Std_Coefficient']], 
@@ -1801,38 +1837,6 @@ def load_first_round_qbs_with_ids():
     
     return None
 
-def normalize_player_name(name):
-    """
-    Normalizes player names for exact matching.
-    Handles common variations (Jr., III, periods, extra spaces, etc.)
-    
-    Args:
-        name (str): Player name
-    
-    Returns:
-        str: Normalized name
-    """
-    if pd.isna(name):
-        return ""
-    
-    name = str(name).strip()
-    
-    # Remove periods
-    name = name.replace('.', '')
-    
-    # Remove suffixes
-    suffixes = [' Jr', ' Sr', ' III', ' II', ' IV', ' V']
-    for suffix in suffixes:
-        name = name.replace(suffix, '')
-    
-    # Remove extra whitespace
-    name = ' '.join(name.split())
-    
-    # Lowercase for case-insensitive matching
-    name = name.lower()
-    
-    return name
-
 def map_contract_to_player_ids(contracts_df, player_ids_df, cache_file='cache/contract_player_id_mapping.csv', force_refresh=False):
     """
     Maps contract data to player IDs from the full player ID list.
@@ -1854,7 +1858,7 @@ def map_contract_to_player_ids(contracts_df, player_ids_df, cache_file='cache/co
     # Check cache first
     if os.path.exists(cache_file) and not force_refresh:
         print(f"Loading cached mapping from: {cache_file}")
-        return pd.read_csv(cache_file)
+        return load_csv_safe(cache_file)
     
     # Normalize names in both datasets
     contracts_df['Player_normalized'] = contracts_df['Player'].apply(normalize_player_name)
@@ -2070,9 +2074,8 @@ def create_payment_year_mapping(contract_df):
     """
     Creates mapping of player_id -> payment_year.
     
-    Strategy: For each QB, find FIRST contract that occurs in Year 3+ 
-    (payment_year >= draft_year + 2) WITH THEIR ORIGINAL DRAFT TEAM ONLY.
-    Excludes contracts signed with other teams.
+    Strategy: For each QB, find FIRST contract with draft team 
+    that occurs after Year 1 but before Year 7 (Years 2-6 inclusive).
     
     Args:
         contract_df (DataFrame): Contract data with player_id, Year, and Team columns
@@ -2081,7 +2084,7 @@ def create_payment_year_mapping(contract_df):
         dict: {player_id: payment_year} for QBs who got 2nd contract with draft team
     """
     print("\n" + "="*80)
-    print("CREATING PAYMENT YEAR MAPPING (DRAFT TEAM ONLY)")
+    print("CREATING PAYMENT YEAR MAPPING (DRAFT TEAM, YEARS 2-6)")
     print("="*80)
     
     # Validate required columns
@@ -2106,7 +2109,7 @@ def create_payment_year_mapping(contract_df):
     
     # Load draft years and draft teams
     if os.path.exists('all_seasons_df.csv'):
-        qb_seasons = pd.read_csv('all_seasons_df.csv')
+        qb_seasons = load_csv_safe('all_seasons_df.csv')
         qb_seasons['draft_year'] = pd.to_numeric(qb_seasons['draft_year'], errors='coerce')
         draft_info = qb_seasons.groupby('player_id').agg({
             'draft_year': 'first',
@@ -2124,9 +2127,7 @@ def create_payment_year_mapping(contract_df):
     
     print(f"Contracts with valid year, draft_year, and draft_team: {len(paid_contracts)}")
     
-    # Normalize team names for matching (handle abbreviation differences)
-    # The contract Team might be full name, draft_team is 3-letter code
-    # Create a mapping dict for common variations
+    # Normalize team names
     team_mapping = {
         'Cardinals': 'ARI', 'Falcons': 'ATL', 'Ravens': 'BAL', 'Bills': 'BUF',
         'Panthers': 'CAR', 'Bears': 'CHI', 'Bengals': 'CIN', 'Browns': 'CLE',
@@ -2141,43 +2142,46 @@ def create_payment_year_mapping(contract_df):
     
     paid_contracts['team_normalized'] = paid_contracts['Team'].map(team_mapping).fillna(paid_contracts['Team'])
     
-    # For each player, find FIRST contract in Year 3+ WITH DRAFT TEAM
+    # For each player, find FIRST contract with draft team in Years 2-6
     payment_mapping = {}
     excluded_other_team = 0
+    excluded_outside_window = 0
     
     for player_id, group in paid_contracts.groupby('player_id'):
         draft_year = group.iloc[0]['draft_year']
         draft_team = group.iloc[0]['draft_team']
         
-        # Filter to:
-        # 1. Contracts in Year 3+ (Year >= draft + 2)
-        # 2. Contracts with DRAFT TEAM only
+        # Filter to contracts with draft team in Years 2-6 (after Year 1, before Year 7)
         eligible_contracts = group[
-            (group['Year'] >= draft_year + 2) & 
+            (group['Year'] > draft_year + 1) &  # After Year 1
+            (group['Year'] < draft_year + 7) &  # Before Year 7
             (group['team_normalized'] == draft_team)
         ].sort_values('Year')
         
         if len(eligible_contracts) > 0:
-            # Take the FIRST contract in Year 3+ with draft team
+            # Take the FIRST eligible contract
             payment_year = eligible_contracts.iloc[0]['Year']
             payment_mapping[player_id] = int(payment_year)
         else:
-            # Check if they had contracts with OTHER teams
-            other_team_contracts = group[
-                (group['Year'] >= draft_year + 2) & 
+            # Track why excluded
+            other_team = group[
+                (group['Year'] > draft_year + 1) & 
+                (group['Year'] < draft_year + 7) &
                 (group['team_normalized'] != draft_team)
             ]
-            if len(other_team_contracts) > 0:
+            
+            if len(other_team) > 0:
                 excluded_other_team += 1
+            else:
+                excluded_outside_window += 1
     
     print(f"\nCreated payment mapping for {len(payment_mapping)} players")
     print(f"Excluded {excluded_other_team} players who signed with different team")
-    total_excluded = len(paid_contracts.groupby('player_id')) - len(payment_mapping) - excluded_other_team
-    print(f"Excluded {total_excluded} players with no contracts in Year 3+")
+    print(f"Excluded {excluded_outside_window} players with no contracts in Years 2-6 window")
     
     # Show examples
     if payment_mapping:
-        print("\nExample mappings (draft team contracts only):")
+        print("\nExample mappings (Years 2-6 with draft team):")
         examples = sorted(payment_mapping.items(), key=lambda x: x[1], reverse=True)[:10]
         for player_id, year in examples:
             player_rows = paid_contracts[paid_contracts['player_id'] == player_id]
@@ -2186,7 +2190,7 @@ def create_payment_year_mapping(contract_df):
                 draft_year = int(player_rows.iloc[0]['draft_year'])
                 draft_team = player_rows.iloc[0]['draft_team']
                 years_later = year - draft_year
-                print(f"  {player_name} ({draft_team}): Drafted {draft_year}, Paid (Y{years_later}) = {year}")
+                print(f"  {player_name} ({draft_team}): Drafted {draft_year}, Paid (Year {years_later}) = {year}")
     
     return payment_mapping
 
@@ -2792,6 +2796,796 @@ def plot_sample_trajectories(df, qb_names=None, metric='Pass_ANY/A', save_path='
     
     return fig
 
+def ridge_regression_payment_prediction(alpha_range=None, exclude_recent_drafts=True):
+    """
+    Ridge regression to identify what predicts getting paid.
+    
+    Uses AVERAGED performance metrics across Years 1-3:
+    - QB metrics: total_yards, Pass_TD, Pass_ANY/A, Rush_Rushing_Succ%
+    - Team metrics: W (Wins), Pts (Points For)
+    
+    Args:
+        alpha_range: List of alpha values to test
+        exclude_recent_drafts: If True, exclude QBs drafted after 2020 (haven't reached contract window)
+    
+    Returns:
+        dict: Results including most important predictor
+    """
+    print("\n" + "="*80)
+    print("RIDGE REGRESSION: WHAT PREDICTS GETTING PAID?")
+    print("Using AVERAGED performance (Years 1-3)")
+    print("="*80)
+    
+    # Load prepared payment data
+    if not os.path.exists('qb_seasons_payment_labeled.csv'):
+        print("✗ ERROR: qb_seasons_payment_labeled.csv not found")
+        return None
+    
+    payment_df = load_csv_safe('qb_seasons_payment_labeled.csv')
+    print(f"✓ Loaded {len(payment_df)} seasons with payment labels")
+    
+    # CRITICAL: Remove QBs who haven't reached contract window yet
+    if exclude_recent_drafts:
+        print("\n" + "="*80)
+        print("EXCLUDING RECENT DRAFT CLASSES")
+        print("="*80)
+        
+        current_year = 2025
+        cutoff_year = 2020  # QBs drafted 2020 or earlier have had chance to get paid
+        
+        payment_df['draft_year'] = pd.to_numeric(payment_df['draft_year'], errors='coerce')
+        
+        before_filter = len(payment_df['player_id'].unique())
+        payment_df = payment_df[payment_df['draft_year'] <= cutoff_year]
+        after_filter = len(payment_df['player_id'].unique())
+        
+        print(f"Excluding QBs drafted after {cutoff_year}")
+        print(f"  Before: {before_filter} unique QBs")
+        print(f"  After: {after_filter} unique QBs")
+        print(f"  Removed: {before_filter - after_filter} QBs (2021-2024 classes)")
+    
+    # Load season records for team metrics
+    season_records = load_csv_safe("season_records.csv", "season records")
+    if season_records is None:
+        return None
+    
+    # Prepare season records
+    season_records['Season'] = pd.to_numeric(season_records['Season'], errors='coerce')
+    season_records = season_records.dropna(subset=['Season'])
+    season_records['Season'] = season_records['Season'].astype(int)
+    
+    # Merge payment data with team metrics
+    payment_df['season'] = pd.to_numeric(payment_df['season'], errors='coerce')
+    payment_df = payment_df.dropna(subset=['season'])
+    payment_df['season'] = payment_df['season'].astype(int)
+    
+    merged_df = pd.merge(
+        payment_df,
+        season_records[['Season', 'Team', 'W', 'Pts']],
+        left_on=['season', 'Team'],
+        right_on=['Season', 'Team'],
+        how='inner'
+    )
+    
+    print(f"✓ Merged with team metrics: {len(merged_df)} seasons")
+    
+    # Define reduced metric set
+    qb_metrics = [
+        'total_yards_adj',
+        'Pass_TD_adj',
+        'Pass_ANY/A_adj',
+        'Rush_Rushing_Succ%_adj'
+    ]
+    
+    team_metrics = [
+        'W',
+        'Pts_adj'
+    ]
+    
+    all_metrics = qb_metrics + team_metrics
+    
+    # Check which QB metrics already have lags
+    print("\n" + "="*80)
+    print("CHECKING EXISTING LAGS")
+    print("="*80)
+    
+    missing_qb_metrics = []
+    
+    for metric in qb_metrics:
+        has_lags = all(f"{metric}_lag{lag}" in merged_df.columns for lag in [1, 2, 3])
+        if has_lags:
+            print(f"✓ {metric}: has lag features")
+        else:
+            print(f"✗ {metric}: missing lag features, will create")
+            missing_qb_metrics.append(metric)
+    
+    # Create missing QB metric lags
+    if missing_qb_metrics:
+        print("\n" + "="*80)
+        print("CREATING MISSING QB METRIC LAGS")
+        print("="*80)
+        
+        merged_df = merged_df.sort_values(['player_id', 'season'])
+        
+        for metric in missing_qb_metrics:
+            merged_df[metric] = pd.to_numeric(merged_df[metric], errors='coerce')
+            for lag in [1, 2, 3]:
+                lag_col = f"{metric}_lag{lag}"
+                merged_df[lag_col] = merged_df.groupby('player_id')[metric].shift(lag)
+                non_null = merged_df[lag_col].notna().sum()
+                print(f"  {lag_col}: {non_null} non-null values")
+    
+    # Create team metric lags
+    print("\n" + "="*80)
+    print("CREATING TEAM METRIC LAGS")
+    print("="*80)
+    
+    merged_df = merged_df.sort_values(['player_id', 'season'])
+    
+    for metric in team_metrics:
+        merged_df[metric] = pd.to_numeric(merged_df[metric], errors='coerce')
+        for lag in [1, 2, 3]:
+            lag_col = f"{metric}_lag{lag}"
+            merged_df[lag_col] = merged_df.groupby('player_id')[metric].shift(lag)
+            non_null = merged_df[lag_col].notna().sum()
+            print(f"  {lag_col}: {non_null} non-null values")
+    
+    # Create AVERAGED features across lags
+    print("\n" + "="*80)
+    print("CREATING AVERAGED FEATURES (lag1, lag2, lag3)")
+    print("="*80)
+    
+    features = []
+    
+    for metric in all_metrics:
+        avg_col = f"{metric}_avg"
+        merged_df[avg_col] = merged_df[[f"{metric}_lag1", f"{metric}_lag2", f"{metric}_lag3"]].mean(axis=1)
+        features.append(avg_col)
+        non_null = merged_df[avg_col].notna().sum()
+        print(f"  {avg_col}: {non_null} non-null values")
+    
+    print(f"\n✓ Total features: {len(features)} (reduced from {len(all_metrics) * 3})")
+    
+    # Prepare features and target
+    X = merged_df[features + ['got_paid', 'player_id']].copy()
+    
+    # Drop rows with missing values
+    X = X.dropna(subset=features)
+    print(f"\nComplete cases: {len(X)}")
+    
+    # Check payment distribution among eligible QBs
+    unique_qbs = X.groupby('player_id')['got_paid'].first()
+    paid_qbs = unique_qbs.sum()
+    total_qbs = len(unique_qbs)
+    
+    print(f"\n" + "="*80)
+    print("ELIGIBLE QB PAYMENT DISTRIBUTION")
+    print("="*80)
+    print(f"Total eligible QBs (drafted ≤{cutoff_year}): {total_qbs}")
+    print(f"  Got paid: {paid_qbs} ({paid_qbs/total_qbs*100:.1f}%)")
+    print(f"  Not paid: {total_qbs - paid_qbs} ({(total_qbs - paid_qbs)/total_qbs*100:.1f}%)")
+    
+    if len(X) < 30:
+        print("\n✗ ERROR: Insufficient complete cases for modeling")
+        return None
+    
+    y = X['got_paid'].astype(int)
+    X = X[features]
+    
+    # Payment distribution in dataset
+    paid_count = y.sum()
+    paid_pct = paid_count / len(y) * 100
+    print(f"\nPayment outcome in dataset (season-level):")
+    print(f"  Got paid: {paid_count} ({paid_pct:.1f}%)")
+    print(f"  Not paid: {len(y) - paid_count} ({100-paid_pct:.1f}%)")
+    
+    # Sample size check
+    observations_per_feature = len(X) / len(features)
+    print(f"\nSample size ratio:")
+    print(f"  Observations per feature: {observations_per_feature:.1f}")
+    if observations_per_feature < 10:
+        print(f"  ⚠️  Warning: Low ratio (recommend 10-20+)")
+    else:
+        print(f"  ✓ Good ratio for modeling")
+    
+    # Train/test split (80/20)
+    split_idx = int(len(X) * 0.8)
+    X_train, X_test = X.iloc[:split_idx], X.iloc[split_idx:]
+    y_train, y_test = y.iloc[:split_idx], y.iloc[split_idx:]
+    
+    print(f"\nTrain/test split:")
+    print(f"  Train: {len(X_train)} samples ({y_train.sum()} paid)")
+    print(f"  Test: {len(X_test)} samples ({y_test.sum()} paid)")
+    
+    # Standardize features
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+    
+    # Ridge regression with CV
+    print("\n" + "="*80)
+    print("RIDGE REGRESSION WITH 5-FOLD CV")
+    print("="*80)
+    
+    if alpha_range is None:
+        alpha_range = [0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
+    
+    ridge_cv = RidgeCV(alphas=alpha_range, cv=5, scoring='r2')
+    ridge_cv.fit(X_train_scaled, y_train)
+    
+    best_alpha = ridge_cv.alpha_
+    print(f"\n✓ Best alpha: {best_alpha}")
+    
+    # Train final model
+    ridge_model = Ridge(alpha=best_alpha)
+    ridge_model.fit(X_train_scaled, y_train)
+    
+    # CV scores
+    cv_scores = cross_val_score(ridge_model, X_train_scaled, y_train, cv=5, scoring='r2')
+    print(f"\nCross-validation R² scores:")
+    for i, score in enumerate(cv_scores, 1):
+        print(f"  Fold {i}: {score:.4f}")
+    print(f"Mean CV R²: {cv_scores.mean():.4f} (+/- {cv_scores.std() * 2:.4f})")
+    
+    # Training performance
+    y_train_pred = ridge_model.predict(X_train_scaled)
+    train_r2 = ridge_model.score(X_train_scaled, y_train)
+    train_rmse = np.sqrt(np.mean((y_train - y_train_pred)**2))
+    
+    print(f"\n" + "="*80)
+    print("TRAINING PERFORMANCE")
+    print("="*80)
+    print(f"  R² = {train_r2:.4f}")
+    print(f"  RMSE = {train_rmse:.4f}")
+    
+    # Test performance
+    y_test_pred = ridge_model.predict(X_test_scaled)
+    test_r2 = ridge_model.score(X_test_scaled, y_test)
+    test_rmse = np.sqrt(np.mean((y_test - y_test_pred)**2))
+    
+    print(f"\n" + "="*80)
+    print("TEST PERFORMANCE")
+    print("="*80)
+    print(f"  R² = {test_r2:.4f}")
+    print(f"  RMSE = {test_rmse:.4f}")
+    
+    # Variable importance
+    print(f"\n" + "="*80)
+    print("VARIABLE IMPORTANCE")
+    print("="*80)
+    
+    importance_df = pd.DataFrame({
+        'Feature': features,
+        'Coefficient': ridge_model.coef_,
+        'Abs_Coefficient': np.abs(ridge_model.coef_)
+    }).sort_values('Abs_Coefficient', ascending=False)
+    
+    print("\nAll features ranked by importance:")
+    display(importance_df)
+    
+    # Identify most important metric overall
+    print(f"\n" + "="*80)
+    print("MOST IMPORTANT PREDICTOR")
+    print("="*80)
+    
+    top_feature = importance_df.iloc[0]['Feature']
+    top_coef = importance_df.iloc[0]['Coefficient']
+    
+    # Extract base metric name (remove _avg)
+    base_metric = top_feature.replace('_avg', '')
+    
+    print(f"\n🏆 WINNER: {base_metric}")
+    print(f"   Feature: {top_feature}")
+    print(f"   Coefficient: {top_coef:.4f}")
+    
+    # Separate QB vs Team
+    print(f"\n" + "="*80)
+    print("QB METRICS vs TEAM METRICS")
+    print("="*80)
+    
+    qb_features = importance_df[importance_df['Feature'].str.contains('|'.join([m.replace('%', '') for m in qb_metrics]))]
+    team_features = importance_df[importance_df['Feature'].str.contains('|'.join(team_metrics))]
+    
+    print(f"\nQB metric features:")
+    display(qb_features)
+    
+    print(f"\nTeam metric features:")
+    display(team_features)
+    
+    # Save results
+    results = {
+        'model': ridge_model,
+        'scaler': scaler,
+        'best_alpha': best_alpha,
+        'features': features,
+        'cv_r2_mean': cv_scores.mean(),
+        'cv_r2_std': cv_scores.std(),
+        'train_r2': train_r2,
+        'test_r2': test_r2,
+        'train_rmse': train_rmse,
+        'test_rmse': test_rmse,
+        'variable_importance': importance_df,
+        'top_predictor': base_metric,
+        'top_feature': top_feature,
+        'eligible_qbs': total_qbs,
+        'paid_qbs': paid_qbs
+    }
+    
+    importance_df.to_csv('payment_prediction_importance.csv', index=False)
+    print(f"\n✓ Results saved to: payment_prediction_importance.csv")
+    
+    return results
+
+def year_weighting_regression(metric='total_yards_adj', max_decision_year=6):
+    """
+    Determines how each prior year is weighted in payment decisions.
+    
+    For each decision year (3-6), runs regression:
+        got_paid ~ metric_year0 + metric_year1 + metric_year2 + ... + metric_year(N-1)
+    
+    Shows which years matter most for the payment decision.
+    
+    Args:
+        metric (str): Metric to analyze ('total_yards' or 'W')
+        max_decision_year (int): Latest decision year to model (default 6)
+    
+    Returns:
+        dict: Weighting results for each decision year
+    """
+    print("\n" + "="*80)
+    print(f"YEAR-BY-YEAR WEIGHTING ANALYSIS: {metric}")
+    print("="*80)
+    
+    # Load prepared payment data
+    if not os.path.exists('qb_seasons_payment_labeled_era_adjusted.csv'):
+        print("✗ ERROR: qb_seasons_payment_labeled_era_adjusted.csv not found")
+        print("Run create_era_adjusted_payment_data() first")
+        return None
+
+    payment_df = load_csv_safe('qb_seasons_payment_labeled_era_adjusted.csv')
+    print(f"✓ Loaded {len(payment_df)} seasons with era-adjusted payment labels")
+    
+    # If analyzing team metric (W), need to merge with season records
+    if metric == 'W':
+        season_records = load_csv_safe("season_records.csv", "season records")
+        if season_records is None:
+            return None
+        
+        season_records['Season'] = pd.to_numeric(season_records['Season'], errors='coerce')
+        season_records = season_records.dropna(subset=['Season'])
+        season_records['Season'] = season_records['Season'].astype(int)
+        
+        payment_df['season'] = pd.to_numeric(payment_df['season'], errors='coerce')
+        payment_df = payment_df.dropna(subset=['season'])
+        payment_df['season'] = payment_df['season'].astype(int)
+        
+        payment_df = pd.merge(
+            payment_df,
+            season_records[['Season', 'Team', 'W']],
+            left_on=['season', 'Team'],
+            right_on=['Season', 'Team'],
+            how='inner'
+        )
+    
+    # Filter to eligible QBs (drafted ≤2020)
+    cutoff_year = 2020
+    payment_df['draft_year'] = pd.to_numeric(payment_df['draft_year'], errors='coerce')
+    payment_df = payment_df[payment_df['draft_year'] <= cutoff_year]
+    
+    # Calculate years since draft
+    payment_df['years_since_draft'] = payment_df['season'] - payment_df['draft_year']
+    
+    print(f"Analyzing metric: {metric}")
+    print(f"QBs in dataset: {payment_df['player_id'].nunique()}")
+    
+    # Results storage
+    all_results = {}
+    
+    # For each decision year (3-6)
+    for decision_year in range(3, max_decision_year + 1):
+        print("\n" + "="*80)
+        print(f"DECISION YEAR {decision_year} (payment in Year {decision_year})")
+        print(f"Using performance from Years 0 to {decision_year - 1}")
+        print("="*80)
+        
+        # Get performance for each year 0 to (decision_year - 1)
+        year_features = []
+        
+        # Pivot data to get one row per player with columns for each year
+        player_data = []
+        
+        for player_id, group in payment_df.groupby('player_id'):
+            group = group.sort_values('years_since_draft')
+            
+            record = {
+                'player_id': player_id,
+                'got_paid': group['got_paid'].iloc[0]
+            }
+            
+            # Get metric value for each year 0 to (decision_year - 1)
+            for year in range(decision_year):
+                year_data = group[group['years_since_draft'] == year]
+                if len(year_data) > 0:
+                    record[f'{metric}_year{year}'] = pd.to_numeric(year_data[metric].iloc[0], errors='coerce')
+                else:
+                    record[f'{metric}_year{year}'] = np.nan
+                
+                year_features.append(f'{metric}_year{year}')
+        
+            player_data.append(record)
+        
+        year_features = sorted(list(set(year_features)))  # Remove duplicates
+        df = pd.DataFrame(player_data)
+        
+        print(f"Players with data: {len(df)}")
+        
+        # Drop rows with missing values
+        df = df.dropna(subset=year_features)
+        
+        print(f"Complete cases: {len(df)}")
+        
+        if len(df) < 20:
+            print(f"⚠️  Insufficient data for Year {decision_year} decision")
+            continue
+        
+        # Payment distribution
+        paid = df['got_paid'].sum()
+        print(f"Payment distribution: {paid} paid, {len(df) - paid} not paid")
+        
+        # Prepare X and y
+        X = df[year_features]
+        y = df['got_paid'].astype(int)
+        
+        # Standardize features
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+        
+        # Ridge regression
+        ridge_model = Ridge(alpha=10.0)  # Use moderate regularization
+        ridge_model.fit(X_scaled, y)
+        
+        # Get coefficients
+        coefficients = pd.DataFrame({
+            'Year': [f'Year {i}' for i in range(decision_year)],
+            'Feature': year_features,
+            'Coefficient': ridge_model.coef_,
+            'Abs_Coefficient': np.abs(ridge_model.coef_)
+        }).sort_values('Year')
+        
+        # Normalize coefficients to sum to 1 (show as weights)
+        total_abs = coefficients['Abs_Coefficient'].sum()
+        coefficients['Weight_%'] = (coefficients['Abs_Coefficient'] / total_abs * 100)
+        
+        print(f"\nYear-by-year coefficients:")
+        display(coefficients[['Year', 'Coefficient', 'Weight_%']])
+        
+        # Model performance
+        r2 = ridge_model.score(X_scaled, y)
+        print(f"\nModel R²: {r2:.4f}")
+        
+        # Store results
+        all_results[f'year_{decision_year}'] = {
+            'decision_year': decision_year,
+            'coefficients': coefficients,
+            'model': ridge_model,
+            'scaler': scaler,
+            'features': year_features,
+            'r2': r2,
+            'n_samples': len(df)
+        }
+    
+    # Summary across all decision years
+    print("\n" + "="*80)
+    print(f"SUMMARY: YEAR WEIGHTS ACROSS DECISION YEARS ({metric})")
+    print("="*80)
+    
+    summary_data = []
+    for decision_year in range(3, max_decision_year + 1):
+        key = f'year_{decision_year}'
+        if key in all_results:
+            result = all_results[key]
+            coefs = result['coefficients']
+            
+            for _, row in coefs.iterrows():
+                summary_data.append({
+                    'Decision_Year': decision_year,
+                    'Performance_Year': row['Year'],
+                    'Weight_%': row['Weight_%'],
+                    'Coefficient': row['Coefficient']
+                })
+    
+    summary_df = pd.DataFrame(summary_data)
+    
+    if len(summary_df) > 0:
+        # Pivot to show weights matrix
+        pivot_weights = summary_df.pivot(index='Performance_Year', 
+                                         columns='Decision_Year', 
+                                         values='Weight_%')
+        
+        print("\nWeight Matrix (% importance of each year):")
+        print("Rows = Performance year, Columns = Decision year")
+        display(pivot_weights)
+        
+        # Average weight across all decision years for each performance year
+        print("\n" + "="*80)
+        print("AVERAGE WEIGHTS ACROSS ALL DECISION YEARS")
+        print("="*80)
+        
+        avg_weights = summary_df.groupby('Performance_Year')['Weight_%'].mean().sort_index()
+        print("\nAverage importance of each performance year:")
+        for year, weight in avg_weights.items():
+            print(f"  {year}: {weight:.1f}%")
+        
+        # Save results
+        summary_df.to_csv(f'year_weights_{metric}.csv', index=False)
+        pivot_weights.to_csv(f'year_weights_matrix_{metric}.csv')
+        print(f"\n✓ Results saved to year_weights_{metric}.csv and year_weights_matrix_{metric}.csv")
+    
+    return all_results
+
+def calculate_era_adjustment_factors(reference_year=2024):
+    """
+    Calculates linear inflation adjustment factors for offensive stats.
+    
+    Fits linear trend: league_avg_stat = β0 + β1 * year
+    Then creates adjustment factor: factor = reference_year_avg / year_avg
+    
+    Args:
+        reference_year (int): Year to adjust all stats to (default 2024)
+    
+    Returns:
+        dict: Adjustment factors by year and stat
+    """
+    print("\n" + "="*80)
+    print(f"CALCULATING ERA ADJUSTMENT FACTORS (baseline: {reference_year})")
+    print("="*80)
+    
+    # Load league averages by year
+    season_avg = load_csv_safe("season_averages.csv", "season averages")
+    if season_avg is None:
+        return None
+    
+    # Convert Year to numeric
+    season_avg['Year'] = pd.to_numeric(season_avg['Year'], errors='coerce')
+    season_avg = season_avg.dropna(subset=['Year'])
+    season_avg = season_avg.sort_values('Year')
+    
+    print(f"League averages available: {int(season_avg['Year'].min())}-{int(season_avg['Year'].max())}")
+    
+    # Stats to adjust (map internal names to season_averages.csv column names)
+    stats_mapping = {
+        'total_yards': 'Total_Yards',
+        'Pass_TD': 'Pass_TD',
+        'Pass_Yds': 'Pass_Yds',
+        'Pass_ANY/A': 'NY/A',  # NEW - use Net Yards per Attempt as proxy
+        'Rush_Rushing_Succ%': None,  # Can't calculate from season_averages, handle separately
+        'W': None,  # Wins don't inflate
+        'Pts': 'PF'
+    }
+        
+    adjustment_factors = {}
+    
+    for stat_name, csv_col in stats_mapping.items():
+        if csv_col is None:
+            # Wins don't need adjustment
+            print(f"\n{stat_name}: No adjustment needed (fixed scale)")
+            adjustment_factors[stat_name] = {year: 1.0 for year in season_avg['Year']}
+            continue
+        
+        if csv_col not in season_avg.columns:
+            print(f"\n⚠️  Warning: {csv_col} not found in season_averages.csv, skipping {stat_name}")
+            continue
+        
+        print(f"\n{stat_name} (using {csv_col}):")
+        
+        # Get year and stat values
+        year_data = season_avg[['Year', csv_col]].copy()
+        year_data[csv_col] = pd.to_numeric(year_data[csv_col], errors='coerce')
+        year_data = year_data.dropna()
+        
+        years = year_data['Year'].values
+        values = year_data[csv_col].values
+        
+        # Fit linear regression: stat = β0 + β1 * year
+        from sklearn.linear_model import LinearRegression
+        model = LinearRegression()
+        model.fit(years.reshape(-1, 1), values)
+        
+        # Get predicted values
+        predicted = model.predict(years.reshape(-1, 1))
+        
+        # Calculate reference year average
+        reference_avg = model.predict([[reference_year]])[0]
+        
+        # Calculate adjustment factors for each year
+        year_factors = {}
+        for year, pred_val in zip(years, predicted):
+            # factor = reference_year_avg / year_avg
+            # Multiply old stats by this to get 2024-equivalent
+            factor = reference_avg / pred_val
+            year_factors[int(year)] = factor
+        
+        adjustment_factors[stat_name] = year_factors
+        
+        # Show trend
+        print(f"  Linear trend: {csv_col} = {model.intercept_:.2f} + {model.coef_[0]:.2f} * year")
+        print(f"  R² = {model.score(years.reshape(-1, 1), values):.4f}")
+        print(f"  {reference_year} predicted average: {reference_avg:.2f}")
+        
+        # Show sample adjustments
+        print(f"\n  Sample adjustment factors (multiply stat by factor):")
+        sample_years = [2005, 2010, 2015, 2020, 2024]
+        for year in sample_years:
+            if year in year_factors:
+                pred_val = model.predict([[year]])[0]
+                print(f"    {year}: {year_factors[year]:.4f} (avg was {pred_val:.1f}, now {pred_val * year_factors[year]:.1f})")
+    
+    print("\nCalculating adjustment for Rush_Rushing_Succ% from QB data...")
+    if os.path.exists('qb_seasons_payment_labeled.csv'):
+        qb_df = pd.read_csv('qb_seasons_payment_labeled.csv')
+        qb_df['season'] = pd.to_numeric(qb_df['season'], errors='coerce')
+        qb_df['Rush_Rushing_Succ%'] = pd.to_numeric(qb_df['Rush_Rushing_Succ%'], errors='coerce')
+        
+        # Calculate yearly averages
+        yearly_avg = qb_df.groupby('season')['Rush_Rushing_Succ%'].mean().reset_index()
+        yearly_avg = yearly_avg.dropna()
+        
+        if len(yearly_avg) > 10:  # Need enough data
+            years = yearly_avg['season'].values
+            values = yearly_avg['Rush_Rushing_Succ%'].values
+            
+            # Fit linear trend
+            model = LinearRegression()
+            model.fit(years.reshape(-1, 1), values)
+            
+            reference_avg = model.predict([[reference_year]])[0]
+            predicted = model.predict(years.reshape(-1, 1))
+            
+            year_factors = {}
+            for year, pred_val in zip(years, predicted):
+                year_factors[int(year)] = reference_avg / pred_val
+            
+            adjustment_factors['Rush_Rushing_Succ%'] = year_factors
+            
+            print(f"  Rush_Rushing_Succ%: R² = {model.score(years.reshape(-1, 1), values):.4f}")
+            print(f"  {reference_year} predicted average: {reference_avg:.2f}%")
+
+    # Save adjustment factors
+    print("\n" + "="*80)
+    print("SAVING ADJUSTMENT FACTORS")
+    print("="*80)
+    
+    # Convert to DataFrame for easy saving
+    factor_rows = []
+    for stat_name, year_dict in adjustment_factors.items():
+        for year, factor in year_dict.items():
+            factor_rows.append({
+                'stat': stat_name,
+                'year': year,
+                'adjustment_factor': factor
+            })
+    
+    factor_df = pd.DataFrame(factor_rows)
+    factor_df.to_csv('era_adjustment_factors.csv', index=False)
+    print("✓ Saved to: era_adjustment_factors.csv")
+    
+    return adjustment_factors
+
+def apply_era_adjustments(df, adjustment_factors, stats_to_adjust=['total_yards', 'Pass_TD', 'W', 'Pts']):
+    """
+    Applies era adjustment factors to a dataframe with QB/team stats.
+    
+    Creates new columns with '_adj' suffix containing adjusted values.
+    
+    Args:
+        df (DataFrame): Data with 'season' column and stats to adjust
+        adjustment_factors (dict): Output from calculate_era_adjustment_factors()
+        stats_to_adjust (list): Which stats to adjust
+    
+    Returns:
+        DataFrame: Original df with new adjusted columns
+    """
+    print("\n" + "="*80)
+    print("APPLYING ERA ADJUSTMENTS")
+    print("="*80)
+    
+    df = df.copy()
+    
+    # Ensure season is int
+    df['season'] = pd.to_numeric(df['season'], errors='coerce')
+    df = df.dropna(subset=['season'])
+    df['season'] = df['season'].astype(int)
+    
+    for stat in stats_to_adjust:
+        if stat not in adjustment_factors:
+            print(f"⚠️  No adjustment factors for {stat}, skipping")
+            continue
+        
+        if stat not in df.columns:
+            print(f"⚠️  {stat} not in dataframe, skipping")
+            continue
+        
+        # Create adjusted column
+        adj_col = f"{stat}_adj"
+        
+        # Map year to factor
+        df['_temp_factor'] = df['season'].map(adjustment_factors[stat])
+        
+        # Apply adjustment: adjusted = original * factor
+        df[stat] = pd.to_numeric(df[stat], errors='coerce')
+        df[adj_col] = df[stat] * df['_temp_factor']
+        
+        # Clean up
+        df = df.drop(columns=['_temp_factor'])
+        
+        # Show results
+        non_null = df[adj_col].notna().sum()
+        print(f"✓ {stat} → {adj_col}: {non_null} values adjusted")
+        
+        # Show example
+        sample = df[df[stat].notna()].head(3)
+        if len(sample) > 0:
+            print(f"  Example: {sample.iloc[0]['season']:.0f} - "
+                  f"Original: {sample.iloc[0][stat]:.1f}, "
+                  f"Adjusted: {sample.iloc[0][adj_col]:.1f}")
+    
+    return df
+
+def create_era_adjusted_payment_data(force_refresh=False):
+    """
+    Creates era-adjusted version of payment data.
+    
+    Args:
+        force_refresh (bool): Recalculate adjustment factors
+    
+    Returns:
+        DataFrame: Payment data with era-adjusted stats
+    """
+    print("\n" + "="*80)
+    print("CREATING ERA-ADJUSTED PAYMENT DATA")
+    print("="*80)
+    
+    # Calculate or load adjustment factors
+    if force_refresh or not os.path.exists('era_adjustment_factors.csv'):
+        adjustment_factors = calculate_era_adjustment_factors(reference_year=2024)
+    else:
+        print("Loading existing adjustment factors from era_adjustment_factors.csv")
+        factor_df = load_csv_safe('era_adjustment_factors.csv')
+        
+        # Convert back to dict format
+        adjustment_factors = {}
+        for stat in factor_df['stat'].unique():
+            stat_data = factor_df[factor_df['stat'] == stat]
+            adjustment_factors[stat] = dict(zip(stat_data['year'], stat_data['adjustment_factor']))
+        
+        print(f"✓ Loaded adjustment factors for {len(adjustment_factors)} stats")
+    
+    # Load payment data
+    if not os.path.exists('qb_seasons_payment_labeled.csv'):
+        print("✗ ERROR: qb_seasons_payment_labeled.csv not found")
+        print("Run prepare_qb_payment_data() first")
+        return None
+
+    # Try to load era-adjusted version first, fall back to regular
+    if os.path.exists('qb_seasons_payment_labeled_era_adjusted.csv'):
+        payment_df = load_csv_safe('qb_seasons_payment_labeled_era_adjusted.csv')
+        print(f"✓ Using ERA-ADJUSTED data")
+    else:
+        payment_df = load_csv_safe('qb_seasons_payment_labeled.csv')
+        print(f"⚠️  Using non-adjusted data (run create_era_adjusted_payment_data() first)")
+
+    print(f"✓ Loaded {len(payment_df)} seasons")
+    
+    # Apply adjustments
+    stats_to_adjust = ['total_yards', 'Pass_TD', 'W', 'Pts']
+    adjusted_df = apply_era_adjustments(payment_df, adjustment_factors, stats_to_adjust)
+    
+    # Save
+    output_file = 'qb_seasons_payment_labeled_era_adjusted.csv'
+    adjusted_df.to_csv(output_file, index=False)
+    print(f"\n✓ Saved era-adjusted data to: {output_file}")
+    
+    return adjusted_df
 
 
 if __name__ == "__main__":
@@ -2857,4 +3651,32 @@ if __name__ == "__main__":
     
     if prepared_df is not None:
         report = validate_payment_data(prepared_df)
-        plot_sample_trajectories(prepared_df)
+        #plot_sample_trajectories(prepared_df)
+        
+        # Create era-adjusted version
+        print("\n\n" + "="*80)
+        print("ERA ADJUSTMENT")
+        print("="*80)
+        adjusted_df = create_era_adjusted_payment_data(force_refresh=True)
+
+        if adjusted_df is None:
+            print("✗ ERROR: Failed to create era-adjusted data")
+            exit(1)
+
+        # REGRESSION 1: What predicts getting paid?
+        print("\n\n" + "="*80)
+        print("REGRESSION 1: IDENTIFYING MOST IMPORTANT PREDICTOR (ERA-ADJUSTED)")
+        print("="*80)
+        
+        payment_results = ridge_regression_payment_prediction()
+        
+        if payment_results:
+            print(f"\n\n🏆 TOP PREDICTOR: {payment_results['top_predictor']}")
+            
+            # REGRESSION 2: Year-by-year weighting
+            print("\n\n" + "="*80)
+            print("REGRESSION 2: YEAR-BY-YEAR WEIGHTING ANALYSIS")
+            print("="*80)
+            
+            yards_weights = year_weighting_regression(metric='total_yards_adj', max_decision_year=6)
+            wins_weights = year_weighting_regression(metric='W', max_decision_year=6)
