@@ -1,31 +1,20 @@
 to investigate:
 
-what is most deterministic on free agency contract for QB w/ drafted team
-    team stats?
-    individual stats?
-    use a logistic regression to predict whether or not they got a second contract with their team
-    do a regression weighting the previous years depending on when they got their contract (yr 3, 4, 5)
-
-What is the most predictive with % of salary cap at signing
-    what is second beyond year of signing? (assuming this is nr 1)
-
 heat map modeling of progression towards payday
     per year average across all stats for QBs drafted in that slot
         determine yearly infation coefficitent using regression and do an offset before averaging qb's since 2000
     cluster analysis to determine starts and draft position (how QBs of various draft slots are treated by teams)
     plot X-y performance curve WRT most predictive attribute (passing stat/s) as the Y, and years since draft as the X
 
-
-
-
-
 Heatmap Generation Functions
 
-generate_heatmap_zones(metric='Pass_ANY/A', years_range=(0, 5), metric_range='auto')
+generate_heatmap_zones(metric='total_yards_adj', years_range=(3, 6), metric_range='auto')
 
 Creates grid of (year, metric_value) combinations
 For each cell, predicts P(payment) using trained model
 Returns: 2D array suitable for heatmap plotting
+
+/////////////////////////////not sure if I can do these here, I plan to do them in tableau if they arent easy ////////////////////////////
 
 plot_trajectory_heatmap(qb_name, qb_id, heatmap_data, qb_trajectory, save_path=None)
 
@@ -37,6 +26,9 @@ Returns: matplotlib figure
 
 
 //////////////////////////////////////////later//////////////////////////////////
+
+What is the most predictive with % of salary cap at signing
+    what is second beyond year of signing? (assuming this is nr 1)
 
 Comparison & Analysis Functions
 
