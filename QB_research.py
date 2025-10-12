@@ -2737,65 +2737,6 @@ def validate_payment_data(df):
     
     return report
 
-def plot_sample_trajectories(df, qb_names=None, metric='Pass_ANY/A', save_path='sample_trajectories.png'):
-    """Plots trajectory charts for sample QBs."""
-    print("\n" + "="*80)
-    print("GENERATING SAMPLE TRAJECTORY PLOTS")
-    print("="*80)
-    
-    if qb_names is None:
-        paid_qbs = df[df['got_paid'] == True]['player_name'].unique()
-        unpaid_qbs = df[df['got_paid'] == False]['player_name'].unique()
-        
-        sample_paid = np.random.choice(paid_qbs, size=min(3, len(paid_qbs)), replace=False)
-        sample_unpaid = np.random.choice(unpaid_qbs, size=min(2, len(unpaid_qbs)), replace=False)
-        
-        qb_names = list(sample_paid) + list(sample_unpaid)
-    
-    print(f"Plotting {len(qb_names)} QBs: {', '.join(qb_names)}")
-    
-    fig, axes = plt.subplots(len(qb_names), 1, figsize=(12, 4*len(qb_names)))
-    if len(qb_names) == 1:
-        axes = [axes]
-    
-    for ax, qb_name in zip(axes, qb_names):
-        qb_data = df[df['player_name'] == qb_name].copy()
-        qb_data = qb_data.sort_values('season')
-        
-        if len(qb_data) == 0:
-            continue
-        
-        draft_year = qb_data['draft_year'].iloc[0]
-        qb_data['years_since_draft'] = qb_data['season'] - draft_year
-        metric_values = pd.to_numeric(qb_data[metric], errors='coerce')
-        
-        ax.plot(qb_data['years_since_draft'], metric_values, 
-                'o-', linewidth=2, markersize=8, label=metric)
-        
-        payment_year = qb_data['payment_year'].iloc[0]
-        if pd.notna(payment_year):
-            payment_year_rel = int(payment_year - draft_year)
-            ax.axvline(x=payment_year_rel, color='green', linestyle='--', 
-                      linewidth=2, alpha=0.7, label=f'Paid ({int(payment_year)})')
-        
-        pick_num = qb_data['pick_number'].iloc[0]
-        got_paid = qb_data['got_paid'].iloc[0]
-        status = "✓ Got Paid" if got_paid else "✗ Not Paid"
-        
-        ax.set_xlabel('Years Since Draft', fontsize=12)
-        ax.set_ylabel(metric, fontsize=12)
-        ax.set_title(f'{qb_name} - Pick #{int(pick_num)} - Drafted {int(draft_year)} - {status}', 
-                    fontsize=14, fontweight='bold')
-        ax.grid(True, alpha=0.3)
-        ax.legend()
-    
-    plt.tight_layout()
-    plt.savefig(save_path, dpi=300, bbox_inches='tight')
-    print(f"\n✓ Saved to: {save_path}")
-    plt.show()
-    
-    return fig
-
 def ridge_regression_payment_prediction(alpha_range=None, exclude_recent_drafts=True):
     """
     Ridge regression to identify what predicts getting paid.
@@ -3643,6 +3584,322 @@ def create_era_adjusted_payment_data(force_refresh=False):
     
     return adjusted_df
 
+def create_payment_probability_surface(
+    metric='total_yards_adj', 
+    years_range=(0, 6),
+    value_bins=50,
+    min_qbs_per_cell=3
+):
+    """
+    Creates a 2D grid of payment probabilities based on actual performance values.
+    
+    For each combination of (years_since_draft, metric_value), calculates:
+    P(getting paid) = count(got_paid) / count(total QBs in that cell)
+    
+    Args:
+        metric (str): Performance metric to analyze
+        years_range (tuple): Min and max years since draft to include
+        value_bins (int): Number of bins to divide metric values into
+        min_qbs_per_cell (int): Minimum QBs required in cell to calculate probability
+    
+    Returns:
+        DataFrame: Grid with years_since_draft, metric_bin_min, metric_bin_max, 
+                   pct_got_paid, n_qbs, n_paid
+    """
+    print("\n" + "="*80)
+    print(f"CREATING PAYMENT PROBABILITY SURFACE: {metric}")
+    print("="*80)
+    
+    # Load era-adjusted payment data
+    if not os.path.exists('qb_seasons_payment_labeled_era_adjusted.csv'):
+        print("✗ ERROR: Run create_era_adjusted_payment_data() first")
+        return None
+    
+    payment_df = load_csv_safe('qb_seasons_payment_labeled_era_adjusted.csv')
+    
+    # Filter to eligible QBs (drafted ≤2020)
+    cutoff_year = 2020
+    payment_df['draft_year'] = pd.to_numeric(payment_df['draft_year'], errors='coerce')
+    payment_df = payment_df[payment_df['draft_year'] <= cutoff_year]
+    
+    # Calculate years since draft
+    payment_df['season'] = pd.to_numeric(payment_df['season'], errors='coerce')
+    payment_df['years_since_draft'] = payment_df['season'] - payment_df['draft_year']
+    
+    # Filter to years range
+    min_year, max_year = years_range
+    payment_df = payment_df[
+        (payment_df['years_since_draft'] >= min_year) & 
+        (payment_df['years_since_draft'] <= max_year)
+    ]
+    
+    # Convert metric to numeric
+    payment_df[metric] = pd.to_numeric(payment_df[metric], errors='coerce')
+    payment_df = payment_df.dropna(subset=[metric, 'years_since_draft', 'got_paid'])
+    
+    print(f"Total QB seasons: {len(payment_df)}")
+    print(f"Unique QBs: {payment_df['player_id'].nunique()}")
+    print(f"Years range: {min_year}-{max_year}")
+    print(f"Metric range: {payment_df[metric].min():.1f} to {payment_df[metric].max():.1f}")
+    
+    # Create metric value bins based on overall distribution
+    payment_df['metric_bin'] = pd.cut(
+        payment_df[metric], 
+        bins=value_bins,
+        include_lowest=True
+    )
+    
+    # Group by (years_since_draft, metric_bin) and calculate payment rate
+    grouped = payment_df.groupby(['years_since_draft', 'metric_bin'], observed=True).agg({
+        'got_paid': ['sum', 'count']
+    }).reset_index()
+    
+    grouped.columns = ['years_since_draft', 'metric_bin', 'n_paid', 'n_qbs']
+    
+    # Calculate payment percentage
+    grouped['pct_got_paid'] = (grouped['n_paid'] / grouped['n_qbs'] * 100)
+    
+    # Filter out cells with too few QBs
+    grouped = grouped[grouped['n_qbs'] >= min_qbs_per_cell]
+    
+    # Extract bin boundaries - do this BEFORE calculating mid
+    min_vals = []
+    max_vals = []
+    for interval in grouped['metric_bin']:
+        min_vals.append(float(interval.left))
+        max_vals.append(float(interval.right))
+    
+    grouped['metric_bin_min'] = min_vals
+    grouped['metric_bin_max'] = max_vals
+    grouped['metric_bin_mid'] = (grouped['metric_bin_min'] + grouped['metric_bin_max']) / 2
+    
+    # Drop the interval column
+    grouped = grouped.drop(columns=['metric_bin'])
+    
+    print(f"\nCreated {len(grouped)} grid cells")
+    print(f"Cells per year:")
+    for year in sorted(grouped['years_since_draft'].unique()):
+        count = len(grouped[grouped['years_since_draft'] == year])
+        print(f"  Year {int(year)}: {count} cells")
+    
+    # Show payment rate distribution
+    print(f"\nPayment probability distribution:")
+    print(f"  Min: {grouped['pct_got_paid'].min():.1f}%")
+    print(f"  25th: {grouped['pct_got_paid'].quantile(0.25):.1f}%")
+    print(f"  Median: {grouped['pct_got_paid'].median():.1f}%")
+    print(f"  75th: {grouped['pct_got_paid'].quantile(0.75):.1f}%")
+    print(f"  Max: {grouped['pct_got_paid'].max():.1f}%")
+    
+    # Save to CSV (sanitize metric name for filesystem)
+    safe_metric_name = metric.replace('/', '_').replace('%', 'pct')
+    output_file = f'payment_probability_surface_{safe_metric_name}.csv'
+    grouped.to_csv(output_file, index=False)
+    print(f"\n✓ Saved to: {output_file}")
+    
+    return grouped
+
+def export_individual_qb_trajectories(
+    metrics=['total_yards_adj', 'Pass_ANY/A_adj'],
+    qb_list=None,
+    years_range=(0, 6)
+):
+    """
+    Exports year-by-year performance trajectories for individual QBs.
+    
+    Creates one row per QB per year with their actual metric values.
+    This data gets overlaid as lines on the heatmap in Tableau.
+    
+    Args:
+        metrics (list): Performance metrics to include
+        qb_list (list): Specific player_ids to export (None = all)
+        years_range (tuple): Min and max years since draft to include
+    
+    Returns:
+        DataFrame: QB trajectories in long format
+    """
+    print("\n" + "="*80)
+    print("EXPORTING INDIVIDUAL QB TRAJECTORIES")
+    print("="*80)
+    
+    # Load era-adjusted payment data
+    if not os.path.exists('qb_seasons_payment_labeled_era_adjusted.csv'):
+        print("✗ ERROR: Run create_era_adjusted_payment_data() first")
+        return None
+    
+    payment_df = load_csv_safe('qb_seasons_payment_labeled_era_adjusted.csv')
+    
+    # Filter to eligible QBs (drafted ≤2020)
+    cutoff_year = 2020
+    payment_df['draft_year'] = pd.to_numeric(payment_df['draft_year'], errors='coerce')
+    payment_df = payment_df[payment_df['draft_year'] <= cutoff_year]
+    
+    # Calculate years since draft
+    payment_df['season'] = pd.to_numeric(payment_df['season'], errors='coerce')
+    payment_df['years_since_draft'] = payment_df['season'] - payment_df['draft_year']
+    
+    # Filter to years range
+    min_year, max_year = years_range
+    payment_df = payment_df[
+        (payment_df['years_since_draft'] >= min_year) & 
+        (payment_df['years_since_draft'] <= max_year)
+    ]
+    
+    # Filter to specific QBs if requested
+    if qb_list is not None:
+        payment_df = payment_df[payment_df['player_id'].isin(qb_list)]
+        print(f"Filtering to {len(qb_list)} specific QBs")
+    
+    # Select columns to export
+    base_cols = [
+        'player_id',
+        'player_name', 
+        'draft_year',
+        'draft_team',
+        'pick_number',
+        'season',
+        'years_since_draft',
+        'got_paid',
+        'payment_year',
+        'years_to_payment'
+    ]
+    
+    export_cols = base_cols + metrics
+    
+    # Check which columns exist
+    available_cols = [col for col in export_cols if col in payment_df.columns]
+    missing_cols = [col for col in export_cols if col not in payment_df.columns]
+    
+    if missing_cols:
+        print(f"⚠️  Warning: {len(missing_cols)} columns not found:")
+        for col in missing_cols[:5]:
+            print(f"  - {col}")
+    
+    trajectories_df = payment_df[available_cols].copy()
+    
+    # Convert metrics to numeric
+    for metric in metrics:
+        if metric in trajectories_df.columns:
+            trajectories_df[metric] = pd.to_numeric(trajectories_df[metric], errors='coerce')
+    
+    # Sort by player and year
+    trajectories_df = trajectories_df.sort_values(['player_id', 'years_since_draft'])
+    
+    print(f"\nExported {len(trajectories_df)} QB-season records")
+    print(f"Unique QBs: {trajectories_df['player_id'].nunique()}")
+    print(f"QBs who got paid: {trajectories_df[trajectories_df['got_paid']]['player_id'].nunique()}")
+    print(f"QBs who didn't get paid: {trajectories_df[~trajectories_df['got_paid']]['player_id'].nunique()}")
+    
+    # Show sample
+    print("\nSample trajectory (first QB):")
+    sample_qb = trajectories_df['player_id'].iloc[0]
+    sample = trajectories_df[trajectories_df['player_id'] == sample_qb][
+        ['player_name', 'years_since_draft'] + metrics + ['got_paid']
+    ]
+    print(sample.to_string(index=False))
+    
+    # Save to CSV
+    output_file = 'qb_trajectories_for_tableau.csv'
+    trajectories_df.to_csv(output_file, index=False)
+    print(f"\n✓ Saved to: {output_file}")
+    
+    return trajectories_df
+
+def export_cohort_summary_stats(
+    metrics=['total_yards_adj', 'Pass_ANY/A_adj'],
+    years_range=(0, 6)
+):
+    """
+    Exports summary statistics for the entire first-round QB cohort by year.
+    
+    Helps Tableau set appropriate axis ranges and shows distribution shape.
+    
+    Args:
+        metrics (list): Performance metrics to summarize
+        years_range (tuple): Min and max years since draft to include
+    
+    Returns:
+        DataFrame: Summary stats by year and metric
+    """
+    print("\n" + "="*80)
+    print("EXPORTING COHORT SUMMARY STATISTICS")
+    print("="*80)
+    
+    # Load era-adjusted payment data
+    if not os.path.exists('qb_seasons_payment_labeled_era_adjusted.csv'):
+        print("✗ ERROR: Run create_era_adjusted_payment_data() first")
+        return None
+    
+    payment_df = load_csv_safe('qb_seasons_payment_labeled_era_adjusted.csv')
+    
+    # Filter to eligible QBs (drafted ≤2020)
+    cutoff_year = 2020
+    payment_df['draft_year'] = pd.to_numeric(payment_df['draft_year'], errors='coerce')
+    payment_df = payment_df[payment_df['draft_year'] <= cutoff_year]
+    
+    # Calculate years since draft
+    payment_df['season'] = pd.to_numeric(payment_df['season'], errors='coerce')
+    payment_df['years_since_draft'] = payment_df['season'] - payment_df['draft_year']
+    
+    # Filter to years range
+    min_year, max_year = years_range
+    payment_df = payment_df[
+        (payment_df['years_since_draft'] >= min_year) & 
+        (payment_df['years_since_draft'] <= max_year)
+    ]
+    
+    print(f"Cohort size: {payment_df['player_id'].nunique()} QBs")
+    print(f"Years range: {min_year}-{max_year}")
+    
+    # Calculate summary stats for each metric and year
+    summary_rows = []
+    
+    for metric in metrics:
+        if metric not in payment_df.columns:
+            print(f"⚠️  Warning: {metric} not found, skipping")
+            continue
+        
+        print(f"\nProcessing {metric}...")
+        
+        # Convert to numeric
+        payment_df[metric] = pd.to_numeric(payment_df[metric], errors='coerce')
+        
+        # Group by years_since_draft
+        for year in sorted(payment_df['years_since_draft'].unique()):
+            year_data = payment_df[payment_df['years_since_draft'] == year][metric].dropna()
+            
+            if len(year_data) == 0:
+                continue
+            
+            summary_rows.append({
+                'metric': metric,
+                'years_since_draft': int(year),
+                'count': len(year_data),
+                'min': year_data.min(),
+                'p10': year_data.quantile(0.10),
+                'p25': year_data.quantile(0.25),
+                'median': year_data.median(),
+                'mean': year_data.mean(),
+                'p75': year_data.quantile(0.75),
+                'p90': year_data.quantile(0.90),
+                'max': year_data.max(),
+                'std': year_data.std()
+            })
+    
+    summary_df = pd.DataFrame(summary_rows)
+    
+    print(f"\nCreated summary stats for {len(summary_df)} year-metric combinations")
+    
+    # Display sample
+    print("\nSample statistics:")
+    print(summary_df.head(10).to_string(index=False))
+    
+    # Save to CSV
+    output_file = 'cohort_summary_stats.csv'
+    summary_df.to_csv(output_file, index=False)
+    print(f"\n✓ Saved to: {output_file}")
+    
+    return summary_df
+
 
 if __name__ == "__main__":
     # Uncomment these if you need to regenerate the data
@@ -3719,7 +3976,7 @@ if __name__ == "__main__":
             print("✗ ERROR: Failed to create era-adjusted data")
             exit(1)
 
-        # REGRESSION 1: What predicts getting paid?
+        '''# REGRESSION 1: What predicts getting paid?
         print("\n\n" + "="*80)
         print("REGRESSION 1: IDENTIFYING MOST IMPORTANT PREDICTOR (ERA-ADJUSTED)")
         print("="*80)
@@ -3736,3 +3993,57 @@ if __name__ == "__main__":
             
             yards_weights = year_weighting_regression(metric='total_yards_adj', max_decision_year=6)
             wins_weights = year_weighting_regression(metric='W-L%', max_decision_year=6)
+            '''
+        '''results = run_trajectory_visualization_pipeline(
+            metric='total_yards_adj',
+            n_sample_qbs=3,
+            force_refresh=False  # Change to True to regenerate all files
+        )'''
+        '''results = run_trajectory_visualization_pipeline(
+            metric='Pass_ANY/A_adj',
+            n_sample_qbs=3,
+            force_refresh=False
+        )'''
+
+    print("\n" + "="*80)
+    print("GENERATING TABLEAU EXPORT FILES")
+    print("="*80)
+    
+    # Define metrics to analyze
+    primary_metrics = ['total_yards_adj', 'Pass_ANY/A_adj']
+    years_to_include = (0, 6)  # Y0 through Y6
+    
+    # 1. Create payment probability surface (heatmap background)
+    print("\n\n[1/3] Creating payment probability surfaces...")
+    for metric in primary_metrics:
+        surface = create_payment_probability_surface(
+            metric=metric,
+            years_range=years_to_include,
+            value_bins=50,  # Adjust for smoothness vs. data sufficiency
+            min_qbs_per_cell=3
+        )
+    
+    # 2. Export individual QB trajectories (overlay lines)
+    print("\n\n[2/3] Exporting QB trajectories...")
+    trajectories = export_individual_qb_trajectories(
+        metrics=primary_metrics,
+        qb_list=None,  # None = all QBs, or pass list of player_ids
+        years_range=years_to_include
+    )
+    
+    # 3. Export cohort summary stats (reference lines/ranges)
+    print("\n\n[3/3] Exporting cohort summary statistics...")
+    summary = export_cohort_summary_stats(
+        metrics=primary_metrics,
+        years_range=years_to_include
+    )
+    
+    print("\n\n" + "="*80)
+    print("TABLEAU EXPORT COMPLETE")
+    print("="*80)
+    print("\nGenerated files:")
+    print("  1. payment_probability_surface_total_yards_adj.csv")
+    print("  2. payment_probability_surface_Pass_ANY/A_adj.csv")
+    print("  3. qb_trajectories_for_tableau.csv")
+    print("  4. cohort_summary_stats.csv")
+    print("\nReady for Tableau visualization!")

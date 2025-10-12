@@ -1,9 +1,6 @@
 to investigate:
 
 heat map modeling of progression towards payday
-    per year average across all stats for QBs drafted in that slot
-        determine yearly infation coefficitent using regression and do an offset before averaging qb's since 2000
-    cluster analysis to determine starts and draft position (how QBs of various draft slots are treated by teams)
     plot X-y performance curve WRT most predictive attribute (passing stat/s) as the Y, and years since draft as the X
 
 Heatmap Generation Functions
