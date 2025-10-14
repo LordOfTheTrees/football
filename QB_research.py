@@ -3698,6 +3698,259 @@ def create_payment_probability_surface(
     
     return grouped
 
+def create_simple_knn_payment_surface(
+    metric='total_yards_adj',
+    decision_year=4,
+    k_values=[5, 10, 15, 20],
+    year_weights=None
+):
+    """
+    Simple KNN: For each (year, performance_value) point, find K nearest
+    actual QB seasons and return % that eventually got paid.
+    
+    Args:
+        metric (str): Performance metric to analyze
+        decision_year (int): Which decision year (3, 4, 5, or 6)
+        k_values (list): List of K values to test
+        year_weights (dict): Weights by year {0: w0, 1: w1, ...}
+                            Higher weight = more important = stronger influence on distance
+    
+    Returns:
+        dict: Results for each K value
+    """
+    print("\n" + "="*80)
+    print(f"SIMPLE KNN PAYMENT SURFACE: {metric}, Decision Year {decision_year}")
+    print("="*80)
+    
+    # Load era-adjusted payment data
+    if not os.path.exists('qb_seasons_payment_labeled_era_adjusted.csv'):
+        print("✗ ERROR: Run create_era_adjusted_payment_data() first")
+        return None
+    
+    payment_df = load_csv_safe('qb_seasons_payment_labeled_era_adjusted.csv')
+    
+    # Filter to eligible QBs (drafted ≤2020)
+    cutoff_year = 2020
+    payment_df['draft_year'] = pd.to_numeric(payment_df['draft_year'], errors='coerce')
+    payment_df = payment_df[payment_df['draft_year'] <= cutoff_year]
+    
+    # Calculate years since draft
+    payment_df['season'] = pd.to_numeric(payment_df['season'], errors='coerce')
+    payment_df['years_since_draft'] = payment_df['season'] - payment_df['draft_year']
+    
+    # Only use years BEFORE the decision year (0 to decision_year-1)
+    payment_df = payment_df[payment_df['years_since_draft'] < decision_year]
+    
+    print(f"Decision Year {decision_year}: Using performance from Years 0-{decision_year-1}")
+    print(f"Total QB seasons: {len(payment_df)}")
+    print(f"Unique QBs: {payment_df['player_id'].nunique()}")
+    
+    # Load year weights if not provided
+    if year_weights is None:
+        safe_metric_name = metric.replace('/', '_').replace('%', 'pct')
+        weights_file = f'year_weights_{safe_metric_name}.csv'
+        
+        if os.path.exists(weights_file):
+            weights_df = load_csv_safe(weights_file)
+            weights_df = weights_df[weights_df['Decision_Year'] == decision_year]
+            
+            if len(weights_df) == 0:
+                print(f"⚠️  No weights found for decision year {decision_year}, using uniform weights")
+                year_weights = {i: 1.0 for i in range(decision_year)}
+            else:
+                year_weights = {}
+                for _, row in weights_df.iterrows():
+                    year_str = row['Performance_Year']
+                    year_num = int(year_str.split()[-1])
+                    year_weights[year_num] = row['Weight_%'] / 100.0
+                
+                print(f"✓ Loaded year weights from {weights_file}")
+        else:
+            print(f"⚠️  Weights file not found, using uniform weights")
+            year_weights = {i: 1.0 for i in range(decision_year)}
+    
+    print(f"\nYear weights for Decision Year {decision_year}:")
+    for year in sorted(year_weights.keys()):
+        print(f"  Year {year}: {year_weights[year]:.3f}")
+    
+    # Prepare data
+    payment_df[metric] = pd.to_numeric(payment_df[metric], errors='coerce')
+    payment_df = payment_df.dropna(subset=[metric, 'years_since_draft', 'got_paid'])
+    
+    print(f"\nValid observations: {len(payment_df)}")
+    print(f"  Got paid: {payment_df['got_paid'].sum()}")
+    print(f"  Not paid: {(~payment_df['got_paid']).sum()}")
+    
+    # Create feature matrix: [years_since_draft, metric_value]
+    X = payment_df[['years_since_draft', metric]].values
+    y = payment_df['got_paid'].values.astype(int)
+    
+    print(f"\nMetric range: {X[:, 1].min():.0f} to {X[:, 1].max():.0f}")
+    
+    # Standardize for distance calculation
+    from sklearn.preprocessing import StandardScaler
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+    
+    # Apply year weights to scale the importance of the year dimension
+    # Higher weight = more important = larger scaling factor
+    X_scaled_weighted = X_scaled.copy()
+    for i in range(len(X_scaled_weighted)):
+        year = int(payment_df.iloc[i]['years_since_draft'])
+        weight = year_weights.get(year, 1.0)
+        # Scale year dimension by sqrt(weight) so distance contribution is proportional to weight
+        X_scaled_weighted[i, 0] *= np.sqrt(weight)
+    
+    # Create fine prediction grid
+    year_grid = np.linspace(0, decision_year - 1, 40)  # 40 points across years
+    metric_grid = np.linspace(X[:, 1].min() * 0.9, X[:, 1].max() * 1.1, 100)  # 100 points across metric
+    
+    print(f"\nCreating prediction grid:")
+    print(f"  Years: {len(year_grid)} points from 0 to {decision_year-1}")
+    print(f"  Metric: {len(metric_grid)} points from {metric_grid.min():.0f} to {metric_grid.max():.0f}")
+    print(f"  Total grid points: {len(year_grid) * len(metric_grid)}")
+    
+    # Create all combinations
+    grid_points = []
+    for year in year_grid:
+        for value in metric_grid:
+            grid_points.append([year, value])
+    
+    X_grid = np.array(grid_points)
+    X_grid_scaled = scaler.transform(X_grid)
+    
+    # Apply same year weighting to grid points
+    X_grid_scaled_weighted = X_grid_scaled.copy()
+    for i in range(len(X_grid_scaled_weighted)):
+        year_idx = int(X_grid[i, 0])
+        weight = year_weights.get(year_idx, 1.0)
+        X_grid_scaled_weighted[i, 0] *= np.sqrt(weight)
+    
+    # Run KNN for each K value
+    results = {}
+    
+    for k in k_values:
+        print(f"\n{'='*80}")
+        print(f"Running KNN with K={k}")
+        print(f"{'='*80}")
+        
+        predictions = []
+        
+        for i, grid_point_weighted in enumerate(X_grid_scaled_weighted):
+            if i % 500 == 0:
+                print(f"  Processing grid point {i}/{len(X_grid_scaled_weighted)}...", end='\r')
+            
+            # Calculate weighted Euclidean distance to all training points
+            distances = np.sqrt(np.sum((X_scaled_weighted - grid_point_weighted)**2, axis=1))
+            
+            # Find K nearest neighbors
+            k_nearest_idx = np.argsort(distances)[:k]
+            k_nearest_labels = y[k_nearest_idx]
+            
+            # Payment probability = proportion that got paid
+            prob = k_nearest_labels.mean()
+            predictions.append(prob * 100)
+        
+        print(f"  Processing grid point {len(X_grid_scaled_weighted)}/{len(X_grid_scaled_weighted)}... Done!")
+        
+        predictions = np.array(predictions)
+        
+        # Create results dataframe
+        results_df = pd.DataFrame(X_grid, columns=['year', metric])
+        results_df['payment_probability'] = predictions
+        results_df['decision_year'] = decision_year
+        results_df['k_value'] = k
+        results_df['metric_name'] = metric
+        
+        print(f"\n  Prediction range: {predictions.min():.1f}% to {predictions.max():.1f}%")
+        print(f"  Mean probability: {predictions.mean():.1f}%")
+        
+        results[k] = {
+            'predictions_df': results_df,
+            'predictions': predictions,
+            'scaler': scaler
+        }
+        
+        # Save to CSV
+        safe_metric_name = metric.replace('/', '_').replace('%', 'pct')
+        output_file = f'simple_knn_decision{decision_year}_{safe_metric_name}_k{k}.csv'
+        results_df.to_csv(output_file, index=False)
+        print(f"  ✓ Saved to: {output_file}")
+    
+    # Compare K values
+    print(f"\n{'='*80}")
+    print(f"COMPARISON ACROSS K VALUES")
+    print(f"{'='*80}")
+    
+    comparison_df = pd.DataFrame([
+        {
+            'K': k,
+            'Min_Prob_%': results[k]['predictions'].min(),
+            'Mean_Prob_%': results[k]['predictions'].mean(),
+            'Max_Prob_%': results[k]['predictions'].max(),
+            'Std_Prob_%': results[k]['predictions'].std()
+        }
+        for k in k_values
+    ])
+    
+    display(comparison_df)
+    
+    return results
+
+def run_all_simple_knn_surfaces(
+    metrics=['total_yards_adj', 'Pass_ANY/A_adj'],
+    decision_years=[3, 4, 5, 6],
+    k_values=[5, 10, 15, 20]
+):
+    """
+    Master function to generate all simple KNN surfaces.
+    
+    Args:
+        metrics (list): Performance metrics to analyze
+        decision_years (list): Which decision years to model
+        k_values (list): K values to test
+    
+    Returns:
+        dict: All results organized by metric and decision year
+    """
+    print("\n" + "="*80)
+    print("GENERATING ALL SIMPLE KNN PAYMENT SURFACES")
+    print("="*80)
+    
+    all_results = {}
+    
+    for metric in metrics:
+        print(f"\n\n{'#'*80}")
+        print(f"METRIC: {metric}")
+        print(f"{'#'*80}")
+        
+        all_results[metric] = {}
+        
+        for decision_year in decision_years:
+            results = create_simple_knn_payment_surface(
+                metric=metric,
+                decision_year=decision_year,
+                k_values=k_values
+            )
+            
+            if results is not None:
+                all_results[metric][decision_year] = results
+    
+    # Create summary report
+    print("\n\n" + "="*80)
+    print("GENERATION COMPLETE - FILES CREATED")
+    print("="*80)
+    
+    for metric in metrics:
+        safe_metric_name = metric.replace('/', '_').replace('%', 'pct')
+        print(f"\n{metric}:")
+        for decision_year in decision_years:
+            for k in k_values:
+                filename = f'simple_knn_decision{decision_year}_{safe_metric_name}_k{k}.csv'
+                print(f"  {filename}")
+    
+    return all_results
+
 def export_individual_qb_trajectories(
     metrics=['total_yards_adj', 'Pass_ANY/A_adj'],
     qb_list=None,
@@ -4013,37 +4266,29 @@ if __name__ == "__main__":
     primary_metrics = ['total_yards_adj', 'Pass_ANY/A_adj']
     years_to_include = (0, 6)  # Y0 through Y6
     
-    # 1. Create payment probability surface (heatmap background)
+    # 1. Create payment probability surface (KNN)
     print("\n\n[1/3] Creating payment probability surfaces...")
-    for metric in primary_metrics:
-        surface = create_payment_probability_surface(
-            metric=metric,
-            years_range=years_to_include,
-            value_bins=50,  # Adjust for smoothness vs. data sufficiency
-            min_qbs_per_cell=3
-        )
+    all_knn_results = run_all_simple_knn_surfaces(
+        metrics=['total_yards_adj', 'Pass_ANY/A_adj'],
+        decision_years=[3, 4, 5, 6],
+        k_values=[5, 10, 15, 20]
+    )
     
-    # 2. Export individual QB trajectories (overlay lines)
+    '''# 2. Export individual QB trajectories (overlay lines)
     print("\n\n[2/3] Exporting QB trajectories...")
     trajectories = export_individual_qb_trajectories(
         metrics=primary_metrics,
         qb_list=None,  # None = all QBs, or pass list of player_ids
         years_range=years_to_include
-    )
+    )'''
     
-    # 3. Export cohort summary stats (reference lines/ranges)
+    '''# 3. Export cohort summary stats (reference lines/ranges)
     print("\n\n[3/3] Exporting cohort summary statistics...")
     summary = export_cohort_summary_stats(
         metrics=primary_metrics,
         years_range=years_to_include
-    )
+    )'''
     
     print("\n\n" + "="*80)
     print("TABLEAU EXPORT COMPLETE")
     print("="*80)
-    print("\nGenerated files:")
-    print("  1. payment_probability_surface_total_yards_adj.csv")
-    print("  2. payment_probability_surface_Pass_ANY/A_adj.csv")
-    print("  3. qb_trajectories_for_tableau.csv")
-    print("  4. cohort_summary_stats.csv")
-    print("\nReady for Tableau visualization!")

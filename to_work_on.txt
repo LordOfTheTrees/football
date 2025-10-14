@@ -1,27 +1,4 @@
 to investigate:
-
-heat map modeling of progression towards payday
-    plot X-y performance curve WRT most predictive attribute (passing stat/s) as the Y, and years since draft as the X
-
-Heatmap Generation Functions
-
-generate_heatmap_zones(metric='total_yards_adj', years_range=(3, 6), metric_range='auto')
-
-Creates grid of (year, metric_value) combinations
-For each cell, predicts P(payment) using trained model
-Returns: 2D array suitable for heatmap plotting
-
-/////////////////////////////not sure if I can do these here, I plan to do them in tableau if they arent easy ////////////////////////////
-
-plot_trajectory_heatmap(qb_name, qb_id, heatmap_data, qb_trajectory, save_path=None)
-
-Plots heatmap background (payment probability zones)
-Overlays individual QB's trajectory line
-Marks payment decision point
-Adds reference lines (draft slot average)
-Returns: matplotlib figure
-
-
 //////////////////////////////////////////later//////////////////////////////////
 
 What is the most predictive with % of salary cap at signing
@@ -41,26 +18,3 @@ compare_qb_to_slot_average(qb_trajectory, slot_average)
 Calculates how QB performed vs. their draft slot expectation
 Identifies years above/below average
 Returns: Comparison metrics
-
-
-batch_generate_trajectory_charts(qb_list, output_dir='trajectory_charts/')
-
-Generates heatmap charts for multiple QBs
-Saves as individual files
-Creates comparison summary table
-Returns: Summary DataFrame
-
-///////////////////////////////////////////////////////////////////////////////
-
-Visualization Helper Functions
-
-setup_heatmap_aesthetics()
-
-Returns standardized colormap, font sizes, labels
-Ensures consistent look across all charts
-
-add_trajectory_annotations(ax, qb_trajectory, payment_year)
-
-Adds labels for key events (drafted, paid, years)
-Highlights payment decision point
-Returns: modified axis object

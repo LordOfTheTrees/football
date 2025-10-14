@@ -1,0 +1,1300 @@
+<?xml version='1.0' encoding='utf-8' ?>
+
+<!-- build 20252.25.0912.2314                               -->
+<workbook original-version='18.1' source-build='2025.2.3 (20252.25.0912.2314)' source-platform='win' version='18.1' xmlns:user='http://www.tableausoftware.com/xml/user'>
+  <document-format-change-manifest>
+    <AnimationOnByDefault />
+    <Heatmap />
+    <MarkAnimation />
+    <ObjectModelEncapsulateLegacy />
+    <ObjectModelExtractV2 />
+    <ObjectModelTableType />
+    <SchemaViewerObjectModel />
+    <SheetIdentifierTracking />
+    <_.fcp.VConnDownstreamExtractsWithWarnings.true...VConnDownstreamExtractsWithWarnings />
+    <WindowsPersistSimpleIdentifiers />
+  </document-format-change-manifest>
+  <preferences>
+    <preference name='ui.encoding.shelf.height' value='24' />
+    <preference name='ui.shelf.height' value='26' />
+  </preferences>
+  <datasources>
+    <datasource caption='simple_knn_decision4_total_yards_adj_k5' inline='true' name='federated.1jr53tz0eo33fc1fw19mt086g6z0' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='simple_knn_decision4_total_yards_adj_k5' name='textscan.0p78qt00wg2e0q1fah3lf0xvwpwv'>
+            <connection class='textscan' directory='D:/proton drive/My files/Backup Docs/Personal Coding/football/KNN_surfaces' filename='simple_knn_decision4_total_yards_adj_k5.csv' password='' server='' />
+          </named-connection>
+        </named-connections>
+        <relation connection='textscan.0p78qt00wg2e0q1fah3lf0xvwpwv' name='simple_knn_decision4_total_yards_adj_k5.csv' table='[simple_knn_decision4_total_yards_adj_k5#csv]' type='table'>
+          <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+            <column datatype='real' name='year' ordinal='0' />
+            <column datatype='real' name='total_yards_adj' ordinal='1' />
+            <column datatype='real' name='payment_probability' ordinal='2' />
+            <column datatype='integer' name='decision_year' ordinal='3' />
+            <column datatype='integer' name='k_value' ordinal='4' />
+            <column datatype='string' name='metric_name' ordinal='5' />
+          </columns>
+        </relation>
+        <metadata-records>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[simple_knn_decision4_total_yards_adj_k5.csv]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='character-set'>&quot;UTF-8&quot;</attribute>
+              <attribute datatype='string' name='collation'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
+              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
+              <attribute datatype='string' name='locale'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>year</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[year]</local-name>
+            <parent-name>[simple_knn_decision4_total_yards_adj_k5.csv]</parent-name>
+            <remote-alias>year</remote-alias>
+            <ordinal>0</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision4_total_yards_adj_k5.csv_4995103525F644CF99CB080412049EA7]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>total_yards_adj</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[total_yards_adj]</local-name>
+            <parent-name>[simple_knn_decision4_total_yards_adj_k5.csv]</parent-name>
+            <remote-alias>total_yards_adj</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision4_total_yards_adj_k5.csv_4995103525F644CF99CB080412049EA7]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>payment_probability</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[payment_probability]</local-name>
+            <parent-name>[simple_knn_decision4_total_yards_adj_k5.csv]</parent-name>
+            <remote-alias>payment_probability</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision4_total_yards_adj_k5.csv_4995103525F644CF99CB080412049EA7]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>decision_year</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[decision_year]</local-name>
+            <parent-name>[simple_knn_decision4_total_yards_adj_k5.csv]</parent-name>
+            <remote-alias>decision_year</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision4_total_yards_adj_k5.csv_4995103525F644CF99CB080412049EA7]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>k_value</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[k_value]</local-name>
+            <parent-name>[simple_knn_decision4_total_yards_adj_k5.csv]</parent-name>
+            <remote-alias>k_value</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision4_total_yards_adj_k5.csv_4995103525F644CF99CB080412049EA7]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>metric_name</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[metric_name]</local-name>
+            <parent-name>[simple_knn_decision4_total_yards_adj_k5.csv]</parent-name>
+            <remote-alias>metric_name</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RUS' />
+            <object-id>[simple_knn_decision4_total_yards_adj_k5.csv_4995103525F644CF99CB080412049EA7]</object-id>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='simple_knn_decision4_total_yards_adj_k5.csv' datatype='table' name='[__tableau_internal_object_id__].[simple_knn_decision4_total_yards_adj_k5.csv_4995103525F644CF99CB080412049EA7]' role='measure' type='quantitative' />
+      <column caption='Decision Year' datatype='integer' name='[decision_year]' role='dimension' type='quantitative' />
+      <column caption='K Value' datatype='integer' name='[k_value]' role='measure' type='quantitative' />
+      <column caption='Metric Name' datatype='string' name='[metric_name]' role='dimension' type='nominal' />
+      <column caption='Payment Probability' datatype='real' name='[payment_probability]' role='measure' type='quantitative' />
+      <column caption='Total Yards Adj' datatype='real' name='[total_yards_adj]' role='measure' type='quantitative' />
+      <column caption='Year' datatype='real' name='[year]' role='dimension' type='quantitative' />
+      <extract _.fcp.VConnDownstreamExtractsWithWarnings.true...user-specific='false' count='-1' enabled='true' object-id='' units='records'>
+        <connection access_mode='readonly' author-locale='en_US' class='hyper' dbname='C:/Users/Andre/AppData/Local/Temp/TableauTemp/#TableauTemp_1btszls1nbx3ks1g9spws07ijsid.hyper' default-settings='hyper' schema='Extract' sslmode='' tablename='Extract' update-time='10/14/2025 04:10:30 PM' username='tableau_internal_user'>
+          <relation name='Extract' table='[Extract].[Extract]' type='table' />
+          <metadata-records>
+            <metadata-record class='column'>
+              <remote-name>year</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[year]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>year</remote-alias>
+              <ordinal>0</ordinal>
+              <family>simple_knn_decision4_total_yards_adj_k5.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>40</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision4_total_yards_adj_k5.csv_4995103525F644CF99CB080412049EA7]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>total_yards_adj</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[total_yards_adj]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>total_yards_adj</remote-alias>
+              <ordinal>1</ordinal>
+              <family>simple_knn_decision4_total_yards_adj_k5.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>100</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision4_total_yards_adj_k5.csv_4995103525F644CF99CB080412049EA7]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>payment_probability</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[payment_probability]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>payment_probability</remote-alias>
+              <ordinal>2</ordinal>
+              <family>simple_knn_decision4_total_yards_adj_k5.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>6</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision4_total_yards_adj_k5.csv_4995103525F644CF99CB080412049EA7]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>decision_year</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[decision_year]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>decision_year</remote-alias>
+              <ordinal>3</ordinal>
+              <family>simple_knn_decision4_total_yards_adj_k5.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>1</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision4_total_yards_adj_k5.csv_4995103525F644CF99CB080412049EA7]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>k_value</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[k_value]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>k_value</remote-alias>
+              <ordinal>4</ordinal>
+              <family>simple_knn_decision4_total_yards_adj_k5.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>1</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision4_total_yards_adj_k5.csv_4995103525F644CF99CB080412049EA7]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>metric_name</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[metric_name]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>metric_name</remote-alias>
+              <ordinal>5</ordinal>
+              <family>simple_knn_decision4_total_yards_adj_k5.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>1</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RUS' />
+              <object-id>[simple_knn_decision4_total_yards_adj_k5.csv_4995103525F644CF99CB080412049EA7]</object-id>
+            </metadata-record>
+          </metadata-records>
+        </connection>
+      </extract>
+      <layout dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+      <object-graph>
+        <objects>
+          <object caption='simple_knn_decision4_total_yards_adj_k5.csv' id='simple_knn_decision4_total_yards_adj_k5.csv_4995103525F644CF99CB080412049EA7'>
+            <properties context=''>
+              <relation connection='textscan.0p78qt00wg2e0q1fah3lf0xvwpwv' name='simple_knn_decision4_total_yards_adj_k5.csv' table='[simple_knn_decision4_total_yards_adj_k5#csv]' type='table'>
+                <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+                  <column datatype='real' name='year' ordinal='0' />
+                  <column datatype='real' name='total_yards_adj' ordinal='1' />
+                  <column datatype='real' name='payment_probability' ordinal='2' />
+                  <column datatype='integer' name='decision_year' ordinal='3' />
+                  <column datatype='integer' name='k_value' ordinal='4' />
+                  <column datatype='string' name='metric_name' ordinal='5' />
+                </columns>
+              </relation>
+            </properties>
+            <properties context='extract'>
+              <relation name='Extract' table='[Extract].[Extract]' type='table' />
+            </properties>
+          </object>
+        </objects>
+      </object-graph>
+    </datasource>
+    <datasource caption='simple_knn_decision4_total_yards_adj_k10' inline='true' name='federated.0ku3ya80vaigwh1commyz09qf617' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='simple_knn_decision4_total_yards_adj_k10' name='textscan.1dzbbeg078843p10rvb1k1y68yel'>
+            <connection class='textscan' directory='D:/proton drive/My files/Backup Docs/Personal Coding/football/KNN_surfaces' filename='simple_knn_decision4_total_yards_adj_k10.csv' password='' server='' />
+          </named-connection>
+        </named-connections>
+        <relation connection='textscan.1dzbbeg078843p10rvb1k1y68yel' name='simple_knn_decision4_total_yards_adj_k10.csv' table='[simple_knn_decision4_total_yards_adj_k10#csv]' type='table'>
+          <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+            <column datatype='real' name='year' ordinal='0' />
+            <column datatype='real' name='total_yards_adj' ordinal='1' />
+            <column datatype='real' name='payment_probability' ordinal='2' />
+            <column datatype='integer' name='decision_year' ordinal='3' />
+            <column datatype='integer' name='k_value' ordinal='4' />
+            <column datatype='string' name='metric_name' ordinal='5' />
+          </columns>
+        </relation>
+        <metadata-records>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[simple_knn_decision4_total_yards_adj_k10.csv]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='character-set'>&quot;UTF-8&quot;</attribute>
+              <attribute datatype='string' name='collation'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
+              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
+              <attribute datatype='string' name='locale'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>year</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[year]</local-name>
+            <parent-name>[simple_knn_decision4_total_yards_adj_k10.csv]</parent-name>
+            <remote-alias>year</remote-alias>
+            <ordinal>0</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision4_total_yards_adj_k10.csv_92F69ED2282343AEBA33D99BE9C64F16]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>total_yards_adj</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[total_yards_adj]</local-name>
+            <parent-name>[simple_knn_decision4_total_yards_adj_k10.csv]</parent-name>
+            <remote-alias>total_yards_adj</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision4_total_yards_adj_k10.csv_92F69ED2282343AEBA33D99BE9C64F16]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>payment_probability</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[payment_probability]</local-name>
+            <parent-name>[simple_knn_decision4_total_yards_adj_k10.csv]</parent-name>
+            <remote-alias>payment_probability</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision4_total_yards_adj_k10.csv_92F69ED2282343AEBA33D99BE9C64F16]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>decision_year</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[decision_year]</local-name>
+            <parent-name>[simple_knn_decision4_total_yards_adj_k10.csv]</parent-name>
+            <remote-alias>decision_year</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision4_total_yards_adj_k10.csv_92F69ED2282343AEBA33D99BE9C64F16]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>k_value</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[k_value]</local-name>
+            <parent-name>[simple_knn_decision4_total_yards_adj_k10.csv]</parent-name>
+            <remote-alias>k_value</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision4_total_yards_adj_k10.csv_92F69ED2282343AEBA33D99BE9C64F16]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>metric_name</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[metric_name]</local-name>
+            <parent-name>[simple_knn_decision4_total_yards_adj_k10.csv]</parent-name>
+            <remote-alias>metric_name</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RUS' />
+            <object-id>[simple_knn_decision4_total_yards_adj_k10.csv_92F69ED2282343AEBA33D99BE9C64F16]</object-id>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='simple_knn_decision4_total_yards_adj_k10.csv' datatype='table' name='[__tableau_internal_object_id__].[simple_knn_decision4_total_yards_adj_k10.csv_92F69ED2282343AEBA33D99BE9C64F16]' role='measure' type='quantitative' />
+      <column caption='Decision Year' datatype='integer' name='[decision_year]' role='dimension' type='quantitative' />
+      <column caption='K Value' datatype='integer' name='[k_value]' role='measure' type='quantitative' />
+      <column caption='Metric Name' datatype='string' name='[metric_name]' role='dimension' type='nominal' />
+      <column caption='Payment Probability' datatype='real' name='[payment_probability]' role='measure' type='quantitative' />
+      <column caption='Total Yards Adj' datatype='real' name='[total_yards_adj]' role='measure' type='quantitative' />
+      <column caption='Year' datatype='real' name='[year]' role='dimension' type='quantitative' />
+      <extract _.fcp.VConnDownstreamExtractsWithWarnings.true...user-specific='false' count='-1' enabled='true' object-id='' units='records'>
+        <connection access_mode='readonly' author-locale='en_US' class='hyper' dbname='C:/Users/Andre/AppData/Local/Temp/TableauTemp/#TableauTemp_0xoztmp1d1v99913b8o7n0f6k29m.hyper' default-settings='hyper' schema='Extract' sslmode='' tablename='Extract' update-time='10/14/2025 04:12:10 PM' username='tableau_internal_user'>
+          <relation name='Extract' table='[Extract].[Extract]' type='table' />
+          <metadata-records>
+            <metadata-record class='column'>
+              <remote-name>year</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[year]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>year</remote-alias>
+              <ordinal>0</ordinal>
+              <family>simple_knn_decision4_total_yards_adj_k10.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>40</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision4_total_yards_adj_k10.csv_92F69ED2282343AEBA33D99BE9C64F16]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>total_yards_adj</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[total_yards_adj]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>total_yards_adj</remote-alias>
+              <ordinal>1</ordinal>
+              <family>simple_knn_decision4_total_yards_adj_k10.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>100</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision4_total_yards_adj_k10.csv_92F69ED2282343AEBA33D99BE9C64F16]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>payment_probability</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[payment_probability]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>payment_probability</remote-alias>
+              <ordinal>2</ordinal>
+              <family>simple_knn_decision4_total_yards_adj_k10.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>11</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision4_total_yards_adj_k10.csv_92F69ED2282343AEBA33D99BE9C64F16]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>decision_year</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[decision_year]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>decision_year</remote-alias>
+              <ordinal>3</ordinal>
+              <family>simple_knn_decision4_total_yards_adj_k10.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>1</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision4_total_yards_adj_k10.csv_92F69ED2282343AEBA33D99BE9C64F16]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>k_value</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[k_value]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>k_value</remote-alias>
+              <ordinal>4</ordinal>
+              <family>simple_knn_decision4_total_yards_adj_k10.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>1</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision4_total_yards_adj_k10.csv_92F69ED2282343AEBA33D99BE9C64F16]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>metric_name</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[metric_name]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>metric_name</remote-alias>
+              <ordinal>5</ordinal>
+              <family>simple_knn_decision4_total_yards_adj_k10.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>1</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RUS' />
+              <object-id>[simple_knn_decision4_total_yards_adj_k10.csv_92F69ED2282343AEBA33D99BE9C64F16]</object-id>
+            </metadata-record>
+          </metadata-records>
+        </connection>
+      </extract>
+      <layout dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+      <object-graph>
+        <objects>
+          <object caption='simple_knn_decision4_total_yards_adj_k10.csv' id='simple_knn_decision4_total_yards_adj_k10.csv_92F69ED2282343AEBA33D99BE9C64F16'>
+            <properties context=''>
+              <relation connection='textscan.1dzbbeg078843p10rvb1k1y68yel' name='simple_knn_decision4_total_yards_adj_k10.csv' table='[simple_knn_decision4_total_yards_adj_k10#csv]' type='table'>
+                <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+                  <column datatype='real' name='year' ordinal='0' />
+                  <column datatype='real' name='total_yards_adj' ordinal='1' />
+                  <column datatype='real' name='payment_probability' ordinal='2' />
+                  <column datatype='integer' name='decision_year' ordinal='3' />
+                  <column datatype='integer' name='k_value' ordinal='4' />
+                  <column datatype='string' name='metric_name' ordinal='5' />
+                </columns>
+              </relation>
+            </properties>
+            <properties context='extract'>
+              <relation name='Extract' table='[Extract].[Extract]' type='table' />
+            </properties>
+          </object>
+        </objects>
+      </object-graph>
+    </datasource>
+    <datasource caption='simple_knn_decision4_total_yards_adj_k20' inline='true' name='federated.17t5k8j1utoyyc1fvcihc041lmli' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='simple_knn_decision4_total_yards_adj_k20' name='textscan.0jtb5np0zoxe6e1gcg3520fp7wag'>
+            <connection class='textscan' directory='D:/proton drive/My files/Backup Docs/Personal Coding/football/KNN_surfaces' filename='simple_knn_decision4_total_yards_adj_k20.csv' password='' server='' />
+          </named-connection>
+        </named-connections>
+        <relation connection='textscan.0jtb5np0zoxe6e1gcg3520fp7wag' name='simple_knn_decision4_total_yards_adj_k20.csv' table='[simple_knn_decision4_total_yards_adj_k20#csv]' type='table'>
+          <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+            <column datatype='real' name='year' ordinal='0' />
+            <column datatype='real' name='total_yards_adj' ordinal='1' />
+            <column datatype='real' name='payment_probability' ordinal='2' />
+            <column datatype='integer' name='decision_year' ordinal='3' />
+            <column datatype='integer' name='k_value' ordinal='4' />
+            <column datatype='string' name='metric_name' ordinal='5' />
+          </columns>
+        </relation>
+        <metadata-records>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[simple_knn_decision4_total_yards_adj_k20.csv]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='character-set'>&quot;UTF-8&quot;</attribute>
+              <attribute datatype='string' name='collation'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
+              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
+              <attribute datatype='string' name='locale'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>year</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[year]</local-name>
+            <parent-name>[simple_knn_decision4_total_yards_adj_k20.csv]</parent-name>
+            <remote-alias>year</remote-alias>
+            <ordinal>0</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision4_total_yards_adj_k20.csv_96687EC77D0E47C08F92C0F78AB98E4C]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>total_yards_adj</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[total_yards_adj]</local-name>
+            <parent-name>[simple_knn_decision4_total_yards_adj_k20.csv]</parent-name>
+            <remote-alias>total_yards_adj</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision4_total_yards_adj_k20.csv_96687EC77D0E47C08F92C0F78AB98E4C]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>payment_probability</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[payment_probability]</local-name>
+            <parent-name>[simple_knn_decision4_total_yards_adj_k20.csv]</parent-name>
+            <remote-alias>payment_probability</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision4_total_yards_adj_k20.csv_96687EC77D0E47C08F92C0F78AB98E4C]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>decision_year</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[decision_year]</local-name>
+            <parent-name>[simple_knn_decision4_total_yards_adj_k20.csv]</parent-name>
+            <remote-alias>decision_year</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision4_total_yards_adj_k20.csv_96687EC77D0E47C08F92C0F78AB98E4C]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>k_value</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[k_value]</local-name>
+            <parent-name>[simple_knn_decision4_total_yards_adj_k20.csv]</parent-name>
+            <remote-alias>k_value</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision4_total_yards_adj_k20.csv_96687EC77D0E47C08F92C0F78AB98E4C]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>metric_name</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[metric_name]</local-name>
+            <parent-name>[simple_knn_decision4_total_yards_adj_k20.csv]</parent-name>
+            <remote-alias>metric_name</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RUS' />
+            <object-id>[simple_knn_decision4_total_yards_adj_k20.csv_96687EC77D0E47C08F92C0F78AB98E4C]</object-id>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='simple_knn_decision4_total_yards_adj_k20.csv' datatype='table' name='[__tableau_internal_object_id__].[simple_knn_decision4_total_yards_adj_k20.csv_96687EC77D0E47C08F92C0F78AB98E4C]' role='measure' type='quantitative' />
+      <column caption='Decision Year' datatype='integer' name='[decision_year]' role='dimension' type='quantitative' />
+      <column caption='K Value' datatype='integer' name='[k_value]' role='measure' type='quantitative' />
+      <column caption='Metric Name' datatype='string' name='[metric_name]' role='dimension' type='nominal' />
+      <column caption='Payment Probability' datatype='real' name='[payment_probability]' role='measure' type='quantitative' />
+      <column caption='Total Yards Adj' datatype='real' name='[total_yards_adj]' role='measure' type='quantitative' />
+      <column caption='Year' datatype='real' name='[year]' role='dimension' type='quantitative' />
+      <extract _.fcp.VConnDownstreamExtractsWithWarnings.true...user-specific='false' count='-1' enabled='true' object-id='' units='records'>
+        <connection access_mode='readonly' author-locale='en_US' class='hyper' dbname='C:/Users/Andre/AppData/Local/Temp/TableauTemp/#TableauTemp_1ly6oqo15iyp0n16y1p6s1qfzi7l.hyper' default-settings='hyper' schema='Extract' sslmode='' tablename='Extract' update-time='10/14/2025 04:12:11 PM' username='tableau_internal_user'>
+          <relation name='Extract' table='[Extract].[Extract]' type='table' />
+          <metadata-records>
+            <metadata-record class='column'>
+              <remote-name>year</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[year]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>year</remote-alias>
+              <ordinal>0</ordinal>
+              <family>simple_knn_decision4_total_yards_adj_k20.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>40</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision4_total_yards_adj_k20.csv_96687EC77D0E47C08F92C0F78AB98E4C]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>total_yards_adj</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[total_yards_adj]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>total_yards_adj</remote-alias>
+              <ordinal>1</ordinal>
+              <family>simple_knn_decision4_total_yards_adj_k20.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>100</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision4_total_yards_adj_k20.csv_96687EC77D0E47C08F92C0F78AB98E4C]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>payment_probability</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[payment_probability]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>payment_probability</remote-alias>
+              <ordinal>2</ordinal>
+              <family>simple_knn_decision4_total_yards_adj_k20.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>19</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision4_total_yards_adj_k20.csv_96687EC77D0E47C08F92C0F78AB98E4C]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>decision_year</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[decision_year]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>decision_year</remote-alias>
+              <ordinal>3</ordinal>
+              <family>simple_knn_decision4_total_yards_adj_k20.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>1</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision4_total_yards_adj_k20.csv_96687EC77D0E47C08F92C0F78AB98E4C]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>k_value</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[k_value]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>k_value</remote-alias>
+              <ordinal>4</ordinal>
+              <family>simple_knn_decision4_total_yards_adj_k20.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>1</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision4_total_yards_adj_k20.csv_96687EC77D0E47C08F92C0F78AB98E4C]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>metric_name</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[metric_name]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>metric_name</remote-alias>
+              <ordinal>5</ordinal>
+              <family>simple_knn_decision4_total_yards_adj_k20.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>1</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RUS' />
+              <object-id>[simple_knn_decision4_total_yards_adj_k20.csv_96687EC77D0E47C08F92C0F78AB98E4C]</object-id>
+            </metadata-record>
+          </metadata-records>
+        </connection>
+      </extract>
+      <layout dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+      <object-graph>
+        <objects>
+          <object caption='simple_knn_decision4_total_yards_adj_k20.csv' id='simple_knn_decision4_total_yards_adj_k20.csv_96687EC77D0E47C08F92C0F78AB98E4C'>
+            <properties context=''>
+              <relation connection='textscan.0jtb5np0zoxe6e1gcg3520fp7wag' name='simple_knn_decision4_total_yards_adj_k20.csv' table='[simple_knn_decision4_total_yards_adj_k20#csv]' type='table'>
+                <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+                  <column datatype='real' name='year' ordinal='0' />
+                  <column datatype='real' name='total_yards_adj' ordinal='1' />
+                  <column datatype='real' name='payment_probability' ordinal='2' />
+                  <column datatype='integer' name='decision_year' ordinal='3' />
+                  <column datatype='integer' name='k_value' ordinal='4' />
+                  <column datatype='string' name='metric_name' ordinal='5' />
+                </columns>
+              </relation>
+            </properties>
+            <properties context='extract'>
+              <relation name='Extract' table='[Extract].[Extract]' type='table' />
+            </properties>
+          </object>
+        </objects>
+      </object-graph>
+    </datasource>
+  </datasources>
+  <worksheets>
+    <worksheet name='KNN10;yards;d4'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='simple_knn_decision4_total_yards_adj_k10' name='federated.0ku3ya80vaigwh1commyz09qf617' />
+          </datasources>
+          <datasource-dependencies datasource='federated.0ku3ya80vaigwh1commyz09qf617'>
+            <column-instance column='[year]' derivation='None' name='[none:year:qk]' pivot='key' type='quantitative' />
+            <column caption='Payment Probability' datatype='real' name='[payment_probability]' role='measure' type='quantitative' />
+            <column-instance column='[payment_probability]' derivation='Sum' name='[sum:payment_probability:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[total_yards_adj]' derivation='Sum' name='[sum:total_yards_adj:qk]' pivot='key' type='quantitative' />
+            <column caption='Total Yards Adj' datatype='real' name='[total_yards_adj]' role='measure' type='quantitative' />
+            <column caption='Year' datatype='real' name='[year]' role='dimension' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='false' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.0ku3ya80vaigwh1commyz09qf617].[sum:payment_probability:qk]' palette='red_green_diverging_10_0' type='interpolated' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Square' />
+            <mark-sizing mark-sizing-setting='marks-scaling-off' />
+            <encodings>
+              <color column='[federated.0ku3ya80vaigwh1commyz09qf617].[sum:payment_probability:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='size' value='6.110161304473877' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.0ku3ya80vaigwh1commyz09qf617].[sum:total_yards_adj:qk]</rows>
+        <cols>[federated.0ku3ya80vaigwh1commyz09qf617].[none:year:qk]</cols>
+      </table>
+      <simple-id uuid='{FB038692-0858-4655-981E-B00EC61037E9}' />
+    </worksheet>
+    <worksheet name='KNN20;yards;d4'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='simple_knn_decision4_total_yards_adj_k20' name='federated.17t5k8j1utoyyc1fvcihc041lmli' />
+          </datasources>
+          <datasource-dependencies datasource='federated.17t5k8j1utoyyc1fvcihc041lmli'>
+            <column-instance column='[year]' derivation='None' name='[none:year:qk]' pivot='key' type='quantitative' />
+            <column caption='Payment Probability' datatype='real' name='[payment_probability]' role='measure' type='quantitative' />
+            <column-instance column='[payment_probability]' derivation='Sum' name='[sum:payment_probability:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[total_yards_adj]' derivation='Sum' name='[sum:total_yards_adj:qk]' pivot='key' type='quantitative' />
+            <column caption='Total Yards Adj' datatype='real' name='[total_yards_adj]' role='measure' type='quantitative' />
+            <column caption='Year' datatype='real' name='[year]' role='dimension' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='false' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.17t5k8j1utoyyc1fvcihc041lmli].[sum:payment_probability:qk]' palette='red_green_diverging_10_0' type='interpolated' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Square' />
+            <mark-sizing mark-sizing-setting='marks-scaling-off' />
+            <encodings>
+              <color column='[federated.17t5k8j1utoyyc1fvcihc041lmli].[sum:payment_probability:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='size' value='5.9130978584289551' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.17t5k8j1utoyyc1fvcihc041lmli].[sum:total_yards_adj:qk]</rows>
+        <cols>[federated.17t5k8j1utoyyc1fvcihc041lmli].[none:year:qk]</cols>
+      </table>
+      <simple-id uuid='{68A8A255-FDDF-401E-BB7A-B2174074552C}' />
+    </worksheet>
+    <worksheet name='KNN5;yards;d4'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='simple_knn_decision4_total_yards_adj_k5' name='federated.1jr53tz0eo33fc1fw19mt086g6z0' />
+          </datasources>
+          <datasource-dependencies datasource='federated.1jr53tz0eo33fc1fw19mt086g6z0'>
+            <column-instance column='[year]' derivation='None' name='[none:year:qk]' pivot='key' type='quantitative' />
+            <column caption='Payment Probability' datatype='real' name='[payment_probability]' role='measure' type='quantitative' />
+            <column-instance column='[payment_probability]' derivation='Sum' name='[sum:payment_probability:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[total_yards_adj]' derivation='Sum' name='[sum:total_yards_adj:qk]' pivot='key' type='quantitative' />
+            <column caption='Total Yards Adj' datatype='real' name='[total_yards_adj]' role='measure' type='quantitative' />
+            <column caption='Year' datatype='real' name='[year]' role='dimension' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='false' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.1jr53tz0eo33fc1fw19mt086g6z0].[sum:payment_probability:qk]' palette='red_green_diverging_10_0' type='interpolated' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Square' />
+            <mark-sizing mark-sizing-setting='marks-scaling-off' />
+            <encodings>
+              <color column='[federated.1jr53tz0eo33fc1fw19mt086g6z0].[sum:payment_probability:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <encoding attr='density-color' palette='red_green_diverging_10_0' type='interpolated' />
+                <format attr='density-intensity' value='0.98391342163085938' />
+                <format attr='mark-transparency' value='254' />
+                <format attr='density-kernel-size' value='2.1988949775695801' />
+                <format attr='size' value='6.3166670799255371' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.1jr53tz0eo33fc1fw19mt086g6z0].[sum:total_yards_adj:qk]</rows>
+        <cols>[federated.1jr53tz0eo33fc1fw19mt086g6z0].[none:year:qk]</cols>
+      </table>
+      <simple-id uuid='{4FE61356-90B2-47DA-BE38-F4A6753FB792}' />
+    </worksheet>
+  </worksheets>
+  <windows saved-dpi-scale-factor='1.5' source-height='106'>
+    <window class='worksheet' name='KNN5;yards;d4'>
+      <cards>
+        <edge name='left'>
+          <strip size='300'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='160'>
+            <card pane-specification-id='0' param='[federated.1jr53tz0eo33fc1fw19mt086g6z0].[sum:payment_probability:qk]' type='color' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <highlight>
+          <color-one-way>
+            <field>[federated.1jr53tz0eo33fc1fw19mt086g6z0].[none:year:qk]</field>
+          </color-one-way>
+        </highlight>
+      </viewpoint>
+      <simple-id uuid='{EBCF1685-9594-498F-AB2D-ACC0F9D6E326}' />
+    </window>
+    <window class='worksheet' name='KNN10;yards;d4'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='160'>
+            <card pane-specification-id='0' param='[federated.0ku3ya80vaigwh1commyz09qf617].[sum:payment_probability:qk]' type='color' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <highlight>
+          <color-one-way>
+            <field>[federated.0ku3ya80vaigwh1commyz09qf617].[none:year:qk]</field>
+          </color-one-way>
+        </highlight>
+      </viewpoint>
+      <simple-id uuid='{28C694F7-A607-4286-8BD4-E0B886561F09}' />
+    </window>
+    <window class='worksheet' maximized='true' name='KNN20;yards;d4'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='160'>
+            <card pane-specification-id='0' param='[federated.17t5k8j1utoyyc1fvcihc041lmli].[sum:payment_probability:qk]' type='color' />
+          </strip>
+        </edge>
+      </cards>
+      <viewpoint>
+        <highlight>
+          <color-one-way>
+            <field>[federated.17t5k8j1utoyyc1fvcihc041lmli].[none:year:qk]</field>
+          </color-one-way>
+        </highlight>
+      </viewpoint>
+      <simple-id uuid='{0A3959CB-7561-4EAE-94D1-F015D9DF5C76}' />
+    </window>
+  </windows>
+  <thumbnails>
+    <thumbnail height='192' name='KNN10;yards;d4' width='192'>
+      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
+      mehws4TojP8PWKn78xgCPD8AAAAASUVORK5CYII=
+    </thumbnail>
+    <thumbnail height='192' name='KNN20;yards;d4' width='192'>
+      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
+    </thumbnail>
+    <thumbnail height='192' name='KNN5;yards;d4' width='192'>
+      iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAACXBIWXMAABYlAAAWJQFJUiTw
+      AAAURklEQVR4nO3dyW8beXbA8W9Vcd8kitr3ffHStqenO5mZILkEQU4BAgyQc05J/qsg99wC
+      BEiCYJAgma3TPW3LsiVrpVaKoiRu4lZVvxxky3Jb3e0iKYpUvQ+gBkWrWI/sevUr1u/VK00p
+      pRDCpfTbXkGj+aWUavg1mhGHxHI/Y7n1BLBtuy1eo1QqNfwaSqmmxGJZVlNiacYG04xYmvGZ
+      wN3E4jABFMXcGRvbuwBYtTJnuSJWrcL6xha2UhSyGfYO08hxlegEHid/rJTJxvYBi4tzKKVY
+      e71GRffgMatMz0zyam2TaqlAf8TgpNBNT1DHtu2G91TNeA1N0zBNs6HXeBdDM95Ps2JpdO/b
+      rFiaMRo1Ixan24qzBKjlSaezlIu/p3dgED3cTfUsgy8UIBiOoaq7BENB+nvDbJwX6Yt0A2AY
+      hrN3cX2dSqFpWkOvAVCtVvF4HL3dj7z7cBuNxTTNpsQCoOuNHcU2IxbLstB1HU3TOi4WR5+e
+      5u2iK6Lj93oIdvXSFfRcbliqxqtXKwRiCYrZM16s7TLcF6vrDQjRSprT06BKWZgWeD3GtecU
+      pmni9XpRtoVpv/93y7IaHgFs2254r1upVPD7/Q29howAN+vkEcDx2jTNwOv57nMaXq/38rFu
+      4L31c0vONeMMg7h/2nBTFaJ1XJMAjR62iPvJNQkgh0DiJq5JACFu4jgBvm/S4/okUTvW18kh
+      kLiJw5lgxfrqCpYRZGIwztbuEUr3kggbHJ/l6B+ZIpva4aJs8fDpE3x6Y6fFmkkOgcRNnCWA
+      WWB3P0P/8BCBSDczkwavNvbJ5Ks8fvyIl8uvMLw+liYCJI8LTPWF2qYUwrIsKYW4xVhcUQqB
+      ptM/NMpwuMLOYZpMOsOzz5ZYebkMSoF2WftTq11OaLw77GiHUgifzyelELcUSydPhDn69HQj
+      RCxgcZDXiXlMggGdnd19xof6eLG8wvjMLLGQl51Ti4neYF1v4LbIIZC4ieNSCKfapRTi4uKC
+      UCjU0GvICHCzTh4BGltbG/mnX/0z//r1rxwupbi6cEG7+s8P//31h5+0zA3rAvjkjUV9z7o+
+      CPz71/VjMSr1PpZ3+0KH70sphYbm4D19z7qux/I963r/vr7n75T6OP4feF/3JgF2Tw74v43n
+      3/8HVxvRtae+M/h96l7j+nL1LHNf1+VkBGiXdclEmHC1ezMCwCecnvyxf67j61C9X6Hu47ra
+      Pb6blrs/I0D7TT6LDnB/EkCIOjjuClHInrK+vYtSit3tDQqlClatzPr6FpZS5M9P2D04lh2y
+      6AjOSiFsk82dQxYW50gn36DHhthYW8XAZnp2iterm1TLBQaiHtKFOP0R723FLURTOKwFynNy
+      kqPy9VdogW6ejkc5PzDQDC/BUBRVu+wK0ZcIs5EtkghGW1YLZKvmNGcS7uIoATRvF7GIhlfX
+      SSQi/OH5SwxNI2qYvFpZIdDVQy61y4vzU+aefIlhXB5htaIWSNfk64xwzlkCaAaff/ElpqXw
+      egwGBmt4PF7gWleI0QEsGzwe2SBF+6ujK4R+1RXiXScI+LArhGz7olPIpipcTRJAuJokgHA1
+      SQDhapIAwtUcngVS2JaN4vJKJNu20HQDjXdXfnlQysZWCo+0IREdwGFbFPjqd78lMThK1Khx
+      WDSplSt0B3SqNvijPWSP98C2mXvyJVG/DDCivTkeAfx+L8VCgf6RbgoH+/iDIapoPHiwyPLy
+      CqFoFzMDYTZPcswOSimEaG/OEsA2GZ9Z4nT3DWu7pzx+8oTN1RXsmsbFRR7NG6BSvuD4xCQ+
+      MNDStihSCiHq4SwBdC/l/BHBvjGm++Ikd7aZmJ4jGtDZSh6yOD9DMXvCeclmJCqVoKL9OawF
+      0hgaHb/6fWJq5urx3Ow0ALF4H7F4k6IT4pbJcYNwNUkA4WqSAMLV7k1blJ7+IFPz3XUvv7ed
+      o1aVU6luc28SwOfTCYXrP/Okt9G9DETryCGQcDVnI4BSbKy9xjICzM6Ms766ennHeL9iZz/N
+      5Ow82eNdsiWbBwtzjnqlCnEXHI0ACsV5ocjY6AjprXVUIEp3LMbOQZpHDxfY2VjnvFBhvEsn
+      mSl9dN+wen8+5TWEqIfD7wAaU5MTrH77FZovRHy0j7XXKwRDAdB0UDaG14vX56VaNbFtu+Fb
+      +HzqBm5LEog6OKwFqpJKpVG+CIsLE6ysbhMIx4iHdF48f0H/6DTZo21Wti949Gyct11RWnKD
+      DF2Ot0QdnJVCGH6WHjy4+v0nz55cPR56WyExmPisOZG12OhkDNt2NooU8lXShxe3FJFohXtz
+      GrRRgaDzj6JWlfuOdTo5DSpcTRJAuJokgHA1SQDhapIAwtUc3yHGNE1qtRoKUMrGenvBerVa
+      RSmwLYtazbyVYIVoNsdtUb756vf0Do0yMT7K9torTqsa3R4LEwNPqJt8eg+UYuazL4hJWxTR
+      5hy3RfH5veRzeYrnaWx/Fz4zSxWDB4uXbVGC19qihFvZFsXhJJYQUEdblLHJeU731kkXTTBL
+      HB9nGEh0UShk0X1ByuUCqXSN+FCL26LcQT2/x6MTifkcL1fMXx4uirvnuC1KtZQiPDDBUH8C
+      pRTDI6P4DdjeO2JhfpqL7CnZkuWKG+SFoz7CUecJsPYyI1eftQnHbVEGh8c++D0UDAIwMz0F
+      QLQ7QbT+KxOFaCn5lipcTRJAuJokgHA1SQDhanI9wB3oGwhhWc7Og5YuTHLnlVuKyL0kAe5A
+      vDfoeJmzTFkS4BY4bouyvvYK2wgyMdLLxtYegXCM3oiHnYM0EzOXbVFyJYulxXmk15Rod47b
+      omTzF4yMDGF4AiwuzpM7P2Xn8LItSnJznWyxwnjcaGpblE/6uZWPR9x3Dr8Ea0xPT7L+4muK
+      NZNvvv6WuYVFDF1/3xbFY+D1ejDN921RGv151xnih36ktkDUw2EtUI2jo2NsX4TSyQGeUJjj
+      42N6osHLtihj02SPdljZKfH46URL26Jo0hZF1MFhWxTfB21RBq/92+DbConBnsfNiEuIlpCz
+      QB0iGPIwMBx2vFz66EJKxX+AJECHCAQ9dfUuyqRLkgA/QGaChatJAghXkwQQriYJIFzNcVuU
+      o/0kG1tJbGWzs7lOrljGrFyw9mYD01ZkT4/Z2TuSmVnRERy2RVGkT3MsLi2S3n6DNz7K1voa
+      hqaYmZ1idW2DWuWCgaiH43wPA3VcLytEKzm+Q0w44OH519/gDUVYmgxztm+gGTqBYARVSxII
+      BOjtCbGZK9EbMqQtimhrju8QUzVBKYuhvhjfPl/GYxhENYuVlZeEuvvIHid5nj1j4ekXGG9r
+      Ie5rWxTR+RzfIWZhYR6laeiaRjwxgGF4AIVlWXg8HtRoP5at8Bjy/bod6LrmeOfgptHU8dSi
+      puu8+zg9nneLa1ePNU3HU/8OXzTZ3IMex8vsbuVcc/GN7KaFq0kCCFeTBBCuJgkgXE0SQLha
+      0xLguxfAC9EJHJ8GrV5k+c0f3vB0boSt4zMM3UtPSOMkW6R3aIJsaodSxeLh02f4DZmcEu3N
+      cS3Q+uYeXbEgYFMulfD6NM6KisePH/NyeQXDG+DhcJDkcZ7p/rCUQoi25igBzFKWi6pJ5iQF
+      tSoPP3vK5qtllG2gbBN0A8uyKJer+P3ee3+HGNH5HCWAN9TNT3/SzclJhljYx+bmG7r7BukJ
+      GrxcWWNqboFceo/9vM3SsPP2f0K0Wl0Xxff2JgBYXFy8eu5xvBeAyNgUw00ITIhWkNOgwtUk
+      AYSrSQIIV5MEEK4mCSBcTVojio8MDIfpHQg5WqZasdjbzt1SRLfHcQIoZZNKpRkY6Odwbwct
+      EKM36mcrecjUzDTF8xOyJYvx0SFkaqoz+fzOJy47tTu9wwRQHCY3eXOQJWCXKRsRRroirL5+
+      xezcNGtrG9SqJQZjHlK5BIMxaYsi2pujBLAqRZLHObyqyn7qBC1S4/nRHuGgH38gjDIrBAIB
+      Et0hNvMl+sLSFkW0N8ddIeZnJllf32B0dJA3+2cYhoeAbl+2RYn3kUvtSlsU0TEcJYDu8dLT
+      08OXX152GngWH0AzDDR43xZlRNqiiM7R0Fkgw/N+cWmLIjqR7KaFq0kCCFeTBBCuJjPBoil0
+      QyPa1XnzPpIAoil8PoPx6a67DsMxaYsiXK2Otijn/PqbN/zZL77gKLlJugw9PptMrkhicJxs
+      aody1Za2KKIj1NEWZZ94VwizUuCsrNDMCucm19qiBHk40vq2KIN93TxenGhoPaJ+5UqVN1uH
+      dx2GY47bopRqFifpIwIeHTSdg8M0QwM92Nb7tiilUpVA0NfStih+n49Q0F/3eoQ7OW6L8vmz
+      bjKZERKJBErZ9Pf14ddtXr1eY3JukXx6j8OCxeJI4LZiFqJp6joLlEhctkXRNJ1Ez2Vd0KPu
+      t21RRicZalJwQtw2mQgTriYJIFzt3kyEeW0ImHcdhXvZltaRJfD3JgH+5MDPL5ajdx2Ga6UD
+      Fv/4WeeVQnReygrRRJIAwtUcHwLZVoXllU0WZ0ZZ397DH4qQCHvYPTphbHqeXCpJrmzxYGkR
+      uUxXtDvHpRCbb9ap2ja6L8jC/CwvXr6mVNB49HCJlyuraLrOZMJP8uSCid4gSils224oyGa8
+      hhA3cXQIZJbOOcjkyaQOuSgW+MO3y8wvLqHp+tvOSApd1zEMA9OyrypDW/UjhFMOSyHi/Okv
+      /phkcpdq/gxvKEQqlaI3FubF8xcMjs+STW3zerfCoycT6Prl3rvRWiD48Xoi07axK7W61yMa
+      YxudOULXdRp0fHwMgN5rzw2MXlZi9scfNRxUPcqvtyn926/vZN0CCv0BeLJ012E4JmeBhKtJ
+      AghXuzczweJuRWo6f57svOsxJAFEUwRNjWcnUgohREeRBBCu5jgBlFJUKhWUUlwUC5cTXrZF
+      Pl9AKTCrFS5K5duIVYimc/wdIJs+4HcrO/zR4gjJrIlVKRPy2HgDQY5OAhROj/DqMLb0jK5A
+      69pEe4f64PFsy9YnPqR7O/PrpLNaIKtKMnVOfzzM4WmRpQcPWF1+iakZzE9Ns7y8QjASZWYg
+      wmYmT2Qw2rK2KEY8ijE53NB6hPs4u0VSrUowGGRnZ4v5iRGSB2lqto1PKTKZNEYgTLl4zt5h
+      mcT4QEvboliahlQDCaccJYAnEGFuNsLY6DB+v5/jowMG5xfxGzaHqQzzs5OUC1kKFZvecGcO
+      icJd6tpKA4HLnj8DQyNXz42OXh5+hKPdhOXKRNEh5DSocDVJAOFqkgDC1SQBhKtJAghXkwQQ
+      ruawK4TF+uoqFUtnZmKQjZ0DQpEY8ZDO3lGGsak5ssdJciWbBw8WkRvEiHbncB5AZ2x8grVX
+      q5yenuIJRcien3OR54O2KFO9l21RJlvaFkXmgYVzjhJA0zRq1Qq6rsiVLKJdYSoFDU3XPmqL
+      Ylvv63carQX6lLYn0hVF1MPZIVCtxO5hClv3MtgTI3Vyij8Qoiek8+L5MkMTM2SPdni9l+XR
+      Z61ti7LSY7E9JmXYdyVS0/j5UeddEqmpW+4oZVlWwwlg2/aPvsZ/JP+F3x//T93rEY3pLen8
+      7avwXYfhmFSsiaawCxdk/3PlrsNwTBJANIcCZXbeHUokAURT6NEQ3X/xs7sOwzGZCBOuJgkg
+      XO3eHAJlzvNsJVN3HYZrVSwfcM/PAimlKF0UUbqHcMB/+djwEvR5yOWLxGIxzFqZiqmIhIK3
+      FfONCsUSx5lsS9cp3guo1v7/bhaHI4DNaeaU48MjJucmOEgXGOrvZXdjh0A4TOo0S/E0hd+A
+      4cVndLewLYoQ9XBYCmHg92rkKibp/UNsw8fe/iFew8PExNRHbVGiLWyLYttSCyGcc3YIZFZQ
+      3jAj3T70cAzNE6J0ngalSKdTGIEwpcI5yYMyvROtbYuiyx35RB2cHQIZXnS7Rnx0lkS8i0w6
+      hX9mlpDfIHWcYWF2knIxT7Fik5C2KKIDODwE0untH7j6vbd/8Orx8PAQAKFIjFCkSdEJcctk
+      HkC4miSAcDVJAOFqkgDC1SQBhKs1LQGuX/97yxeZCdE0dbVFyeZKfPbTzzlJrpMuQ4/P5rxQ
+      Ij4wRja1Q7lq8fDp5wQ8Mjkl2pvjUoju7hjp8yJ2JU+uZmDYJXJlePT4MS+XVzD8IR6Nhtg5
+      zjMzEJZSCNHWnI0AtkV37xBDmWPWkyk8WBwcphns78G2qmB4MGsmFxdlQuE+KYUQbc9ZvYKy
+      2NrYAn+cBzNTaCj6+/sJGIpXq5tMz82TPznguGgxPxq4pZCFaB5nh0CGj/mFhevP0BOPA/Do
+      YQ8AoeFxBm5YVoh2JKdBhavdm5LNRDzK1JiMPXdlqOaFw7uOwrl7kwCRUJD+3q67DsO14iX9
+      /iRAMrlDtZjjNF8C3WBx6SGxsHypFffPDd8BFIFAgHC0i56eHnq6o3z77YvWRyZEC9w4Ahxs
+      r/Pfv/2a+fk58hX45V/9ZavjEqIlbhgBNJ5+8XMGe6J4vV5K5fctx5WySW5tsJXcxzKrbK6/
+      4Sh9RuUix+vXa1RMm8zxIZs7e3K7CtERbj4Nqmn89S//hu5IkIUPzvtD/9AopUyKfLnK0Ngk
+      qf0ka+tbTE+N8GZtnb2jE6IUOMpWWhG/EA258RDot//172wenLG1s8s//P3fXT2vaTr58zS5
+      So1pv5/1lWWGxmc4Se3j9QXBquL3++mKhdgqlOmPeFpXC6Qauw2TcKcbE6B/cIjDTAGsKofp
+      DPGuy6vcVa3EyXkRvwEHW+sUlY9iIU/IAy9fLhNNDJJNJXmxfs7S0y8w3t4lryW1QJrM6Qnn
+      fvAOMVatylmuSG8ifvWcsm3QNDTtffHZ9bu4KGVj22AYlxuk3CHGHe7ZHWIUBweHVAqnVDxd
+      HySApn+8p72+h9Y0nQa297r5LY1oVSpC70qk1pmf/c0JoOB3v/lfKqYiGAqyOD3W4rCc+/mh
+      j58tS0Mi4cz/A7R/4r5S9BJZAAAAAElFTkSuQmCC
+    </thumbnail>
+  </thumbnails>
+</workbook>
