@@ -4299,7 +4299,7 @@ def check_recent_qb_inclusion():
     
     # Test with include_recent_drafts=True
     trajectories = export_individual_qb_trajectories(
-        metrics=['total_yards_adj'],
+        metrics=['total_yards_adj', 'Pass_ANY/A_adj'],
         include_recent_drafts=True
     )
     
@@ -4424,6 +4424,93 @@ def export_cohort_summary_stats(
     
     return summary_df
 
+def fix_individual_qb_files():
+    """
+    Adds missing draft_year and draft_team columns to individual QB files.
+    """
+    print("="*80)
+    print("FIXING INDIVIDUAL QB FILES - ADDING MISSING METADATA")
+    print("="*80)
+    
+    # Define the missing metadata for each QB
+    qb_metadata = {
+        'AlleJo02': {
+            'draft_year': 2018,
+            'draft_team': 'BUF',
+            'pick_number': 7
+        },
+        'FielJu00': {
+            'draft_year': 2021, 
+            'draft_team': 'CHI',
+            'pick_number': 11
+        }
+        # Add more QBs here as needed:
+        # 'BurrJo01': {
+        #     'draft_year': 2020,
+        #     'draft_team': 'CIN', 
+        #     'pick_number': 1
+        # }
+    }
+    
+    qb_data_dir = 'QB_Data'
+    if not os.path.exists(qb_data_dir):
+        print(f"✗ ERROR: {qb_data_dir} directory not found")
+        return
+    
+    fixed_count = 0
+    
+    for player_id, metadata in qb_metadata.items():
+        file_path = f"{qb_data_dir}/{player_id}.csv"
+        
+        if not os.path.exists(file_path):
+            print(f"⚠️  {file_path} not found, skipping")
+            continue
+        
+        print(f"\n📝 Fixing {player_id}...")
+        
+        # Load the QB file
+        df = pd.read_csv(file_path)
+        print(f"   Loaded {len(df)} records")
+        
+        # Check if columns already exist
+        missing_cols = []
+        for col in ['draft_year', 'draft_team', 'pick_number']:
+            if col not in df.columns:
+                missing_cols.append(col)
+        
+        if not missing_cols:
+            print(f"   ✓ All metadata columns already exist")
+            continue
+        
+        print(f"   Adding missing columns: {missing_cols}")
+        
+        # Add the missing metadata columns
+        for col, value in metadata.items():
+            if col in missing_cols:
+                df[col] = value
+                print(f"     + {col} = {value}")
+        
+        # Save the updated file
+        backup_path = f"{file_path}.backup"
+        if not os.path.exists(backup_path):
+            df_original = pd.read_csv(file_path)
+            df_original.to_csv(backup_path, index=False)
+            print(f"   💾 Created backup: {backup_path}")
+        
+        df.to_csv(file_path, index=False)
+        print(f"   ✅ Updated {file_path}")
+        fixed_count += 1
+    
+    print(f"\n" + "="*80)
+    print(f"SUMMARY: Fixed {fixed_count} QB files")
+    print("="*80)
+    
+    if fixed_count > 0:
+        print("✅ Individual QB files now have required metadata columns")
+        print("🔄 Run the full pipeline rebuild script next")
+    else:
+        print("ℹ️  No files needed fixing")
+
 
 if __name__ == "__main__":
     # Uncomment these if you need to regenerate the data
@@ -4453,20 +4540,19 @@ if __name__ == "__main__":
     #train_df, test_df = create_train_test_split(test_size=0.2, split_by='temporal')
     #regression_with_pc1_factors(train_df, test_df)
 
-    #train_df, test_df = load_train_test_split()
+    train_df, test_df = load_train_test_split()
     
     # Test QB name normalization
-    # test_name_mapping()
+    test_name_mapping()
     
     # Create mapping (first time - will process and cache)
     #mapped_contracts = create_contract_player_mapping()
-    #mapped_contracts = create_contract_player_mapping(force_refresh=True)   
+    mapped_contracts = create_contract_player_mapping(force_refresh=True)   
 
     # Debug specific player
-    #contracts = load_csv_safe("QB_contract_data.csv")
-    #player_ids = load_csv_safe("player_ids.csv")
-    #debug_name_matching("Ben Roethlisberger", contracts, player_ids)
-    #mapped_contracts = create_contract_player_mapping(force_refresh=True)
+    contracts = load_csv_safe("QB_contract_data.csv")
+    player_ids = load_csv_safe("player_ids.csv")
+    debug_name_matching("Josh Allen", contracts, player_ids)
     #now check the number of QBs in contract_player_id_mapping.csv after year 2000, without a match
         
     # Test the pipeline step by step
@@ -4490,6 +4576,8 @@ if __name__ == "__main__":
     
     # Verify recent QBs are included
     check_recent_qb_inclusion()
+
+    fix_individual_qb_files()
 
     if prepared_df is not None:
         '''report = validate_payment_data(prepared_df)
