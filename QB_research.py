@@ -4511,115 +4511,224 @@ def fix_individual_qb_files():
     else:
         print("ℹ️  No files needed fixing")
 
+def standardize_qb_columns(df):
+    """Standardizes column names across QB datasets"""
+    
+    # Handle numbered unnamed columns
+    df.columns = [col.replace('Rush_Unnamed: 32_level_0_Fmb', 'Rush_Fumbles') 
+                  for col in df.columns]
+    df.columns = [col.replace('Rush_Unnamed: 33_level_0_Awards', 'Rush_Awards') 
+                  for col in df.columns]
+    
+    # Ensure required columns exist
+    required_cols = ['draft_year', 'draft_team', 'pick_number', 'player_name', 'player_id']
+    for col in required_cols:
+        if col not in df.columns:
+            df[col] = None
+            
+    return df
+
+def create_all_seasons_from_existing_qb_files():
+    """Create all_seasons_df.csv from existing QB_Data/*.csv files (no web pulling)"""
+    
+    import glob
+    import pandas as pd
+    
+    # Check if QB_Data directory exists
+    if not os.path.exists('QB_Data'):
+        print("✗ QB_Data directory not found")
+        return False
+    
+    # Find all QB CSV files
+    qb_files = glob.glob('QB_Data/*.csv')
+    if not qb_files:
+        print("✗ No QB files found in QB_Data/ directory")
+        return False
+    
+    print(f"Found {len(qb_files)} QB files to process")
+    
+    all_seasons = []
+    
+    for file_path in qb_files:
+        try:
+            df = pd.read_csv(file_path)
+            
+            # Extract player_id from filename (e.g., 'AlleJo02.csv' -> 'AlleJo02')
+            player_id = os.path.basename(file_path).replace('.csv', '')
+            
+            # Add player_id if not present
+            if 'player_id' not in df.columns:
+                df['player_id'] = player_id
+            
+            all_seasons.append(df)
+            print(f"  ✓ Loaded {len(df)} seasons for {player_id}")
+            
+        except Exception as e:
+            print(f"  ✗ Error loading {file_path}: {e}")
+    
+    if not all_seasons:
+        return False
+    
+    # Combine all QB data
+    combined_df = pd.concat(all_seasons, ignore_index=True)
+    combined_df.to_csv('all_seasons_df.csv', index=False)
+    print(f"✓ Created all_seasons_df.csv with {len(combined_df)} total seasons")
+    
+    # Create best_seasons_df.csv (top season per player by total_yards)
+    if 'total_yards' in combined_df.columns:
+        # Convert to numeric and handle NaN
+        combined_df['total_yards'] = pd.to_numeric(combined_df['total_yards'], errors='coerce')
+        combined_df = combined_df.dropna(subset=['total_yards'])
+        
+        if len(combined_df) > 0:
+            best_seasons = combined_df.loc[combined_df.groupby('player_id')['total_yards'].idxmax()]
+            best_seasons.to_csv('best_seasons_df.csv', index=False)
+            print(f"✓ Created best_seasons_df.csv with {len(best_seasons)} best seasons")
+    
+    return True
+
+def create_player_ids_from_qb_data():
+    """Create player_ids.csv from QB data (no web pulling)"""
+    
+    if not os.path.exists('all_seasons_df.csv'):
+        return False
+    
+    df = pd.read_csv('all_seasons_df.csv')
+    
+    # Extract unique player info
+    player_info = df.groupby('player_id').agg({
+        'player_name': 'first',
+        'season': 'min'  # Use first season as 'year'
+    }).reset_index()
+    
+    player_info = player_info.rename(columns={'season': 'year'})
+    player_info.to_csv('player_ids.csv', index=False)
+    print(f"✓ Created player_ids.csv with {len(player_info)} players")
+    
+    return True
+
 
 if __name__ == "__main__":
-    # Uncomment these if you need to regenerate the data
-    # PFR.get_player_ids()
-    # PFR.update_qb_ids()
-    # PFR.pull_updated_QB_data()
-    # Initialize the client with your API key
-    #client = Anthropic(api_key=ANTHROPIC_API_KEY)
-    
-    #response = client.messages.create(
-    #model="claude-sonnet-4-20250514",  # Specify the model
-    #max_tokens=1000,  # Maximum tokens in the response
-    #temperature=0.7,  # Controls randomness (0-1)
-    #system="You are a helpful assistant",  # Optional system prompt
-    #messages=[
-    #   {
-    #        "role": "user",
-    #        "content": "who is the best quarterback in the NFL based on sustained peak combined total yards per season?"
-    #    }
-    #]
-    #)
-
-    # Access the response
-    #print(response.content[0].text)
-    
-    #uncomment these to do the regression analysis again
-    #train_df, test_df = create_train_test_split(test_size=0.2, split_by='temporal')
-    #regression_with_pc1_factors(train_df, test_df)
-
-    train_df, test_df = load_train_test_split()
-    
-    # Test QB name normalization
-    test_name_mapping()
-    
-    # Create mapping (first time - will process and cache)
-    mapped_contracts = create_contract_player_mapping()
-    #mapped_contracts = create_contract_player_mapping(force_refresh=True)   
-
-    # Debug specific player
-    contracts = load_csv_safe("QB_contract_data.csv")
-    player_ids = load_csv_safe("player_ids.csv")
-    debug_name_matching("Josh Allen", contracts, player_ids)
-    #now check the number of QBs in contract_player_id_mapping.csv after year 2000, without a match
-        
-    # Test the pipeline step by step
-    
-    # Step 1: Load contracts
-    contracts = load_csv_safe('cache/contract_player_id_mapping.csv')
-    print(f"✓ Loaded {len(contracts)} contracts from cache")
-    print(f"Loaded contracts: {len(contracts)}")
-    print(f"Columns: {contracts.columns.tolist()}")
-    print(f"\nContracts with player_id: {contracts['player_id'].notna().sum()}")
-    
-    # Step 2: Test payment mapping
-    payment_mapping = create_payment_year_mapping(contracts)
-    print(f"\nPayment mapping created: {len(payment_mapping)} players")
-    
-    print("Starting payment data preparation pipeline...")
-    prepared_df = prepare_qb_payment_data()
-    
-    # Run the complete export with recent drafts
-    generate_complete_tableau_exports()
-    
-    # Verify recent QBs are included
-    check_recent_qb_inclusion()
-
-    fix_individual_qb_files()
-
-    if prepared_df is not None:
-        report = validate_payment_data(prepared_df)
-        #plot_sample_trajectories(prepared_df)
-        
-        # Create era-adjusted version
-        print("\n\n" + "="*80)
-        print("ERA ADJUSTMENT")
-        print("="*80)
-        adjusted_df = create_era_adjusted_payment_data(force_refresh=True)
-
-        if adjusted_df is None:
-            print("✗ ERROR: Failed to create era-adjusted data")
-            exit(1)
-
-    print("\n" + "="*80)
-    print("GENERATING TABLEAU EXPORT FILES")
+    print("="*80)
+    print("CLEAN QB DATA REBUILD WORKFLOW")
     print("="*80)
     
-    # Define metrics to analyze
-    primary_metrics = ['total_yards_adj', 'Pass_ANY/A_adj']
-    years_to_include = (0, 6)  # Y0 through Y6
+    # STEP 1: Fix individual QB files FIRST (before any data processing)
+    fix_individual_qb_files()
     
-    # 1. Create payment probability surface (KNN)
-    '''print("\n\n[1/3] Creating payment probability surfaces...")
-    all_knn_results = run_all_simple_knn_surfaces(
-        metrics=['total_yards_adj', 'Pass_ANY/A_adj'],
-        decision_years=[3, 4, 5, 6],
-        k_values=[5, 10, 15, 20]
-    )'''
-    # 2. Export individual QB trajectories (overlay lines)
-    print("\n\n[2/3] Exporting QB trajectories...")
-    trajectories = export_individual_qb_trajectories(
-        metrics=primary_metrics,
-        qb_list=None,  # None = all QBs, or pass list of player_ids
-        years_range=years_to_include,
-        include_recent_drafts=True  # Include recent drafts for complete visualization
-    )
+    print("\n" + "="*80)
+    print("CREATING CORE FILES FROM EXISTING QB_DATA (WEB-FREE)")
+    print("="*80)
     
-    # 3. Export cohort summary stats (reference lines/ranges)
-    '''print("\n\n[3/3] Exporting cohort summary statistics...")
-    summary = export_cohort_summary_stats(
-        metrics=primary_metrics,
-        years_range=years_to_include
-    )'''
+    # Check what files exist
+    core_files = {
+        'all_seasons_df.csv': os.path.exists('all_seasons_df.csv'),
+        'best_seasons_df.csv': os.path.exists('best_seasons_df.csv'), 
+        'player_ids.csv': os.path.exists('player_ids.csv'),
+        'QB_contract_data.csv': os.path.exists('QB_contract_data.csv')
+    }
+    
+    print("Current core file status:")
+    for file, exists in core_files.items():
+        status = "✓" if exists else "✗"
+        print(f"  {status} {file}")
+    
+    # Create missing files if needed
+    if not core_files['all_seasons_df.csv']:
+        print("\nCreating missing files from existing QB_Data...")
+        
+        if not create_all_seasons_from_existing_qb_files():
+            print("✗ Failed to create season files from QB_Data")
+            exit(1)
+        
+        if not create_player_ids_from_qb_data():
+            print("✗ Failed to create player_ids.csv")
+            exit(1)
+    else:
+        print("✓ Core files already exist")
+    
+    # STEP 3: Continue with rest of your workflow...
+    print("\n" + "="*80)
+    print("CREATING CONTRACT MAPPING")
+    print("="*80)
+    mapped_contracts = create_contract_player_mapping(force_refresh=True)
+    
+    # STEP 3: Create contract mapping (force refresh to clear any corruption)
+    print("\n" + "="*80)
+    print("CREATING CONTRACT MAPPING")
+    print("="*80)
+    mapped_contracts = create_contract_player_mapping(force_refresh=True)
+    
+    if mapped_contracts is None:
+        print("✗ ERROR: Failed to create contract mapping")
+        exit(1)
+    
+    # STEP 4: Test name matching for debugging
+    print("\n" + "="*80)
+    print("TESTING NAME MATCHING")
+    print("="*80)
+    test_name_mapping()
+    
+    # Debug specific players
+    contracts_raw = load_csv_safe("QB_contract_data.csv")
+    player_ids = load_csv_safe("player_ids.csv")
+    if contracts_raw is not None and player_ids is not None:
+        debug_name_matching("Josh Allen", contracts_raw, player_ids)
+        debug_name_matching("Justin Fields", contracts_raw, player_ids)
+    
+    # STEP 5: Create payment mapping
+    print("\n" + "="*80)
+    print("CREATING PAYMENT MAPPING")
+    print("="*80)
+    payment_mapping = create_payment_year_mapping(mapped_contracts)
+    print(f"✓ Payment mapping created: {len(payment_mapping)} players")
+    
+    # STEP 6: Prepare QB payment data (this builds the main dataset)
+    print("\n" + "="*80)
+    print("PREPARING QB PAYMENT DATA")
+    print("="*80)
+    prepared_df = prepare_qb_payment_data()
+    
+    if prepared_df is None:
+        print("✗ ERROR: Failed to prepare payment data")
+        exit(1)
+    
+    # Validate the prepared data
+    report = validate_payment_data(prepared_df)
+    
+    # STEP 7: Create era-adjusted version (force refresh to avoid circular dependency)
+    print("\n" + "="*80)
+    print("CREATING ERA-ADJUSTED DATA")
+    print("="*80)
+    adjusted_df = create_era_adjusted_payment_data(force_refresh=True)
+    
+    if adjusted_df is None:
+        print("✗ ERROR: Failed to create era-adjusted data")
+        exit(1)
+    
+    # STEP 8: Create train/test split (only after core data is ready)
+    print("\n" + "="*80)
+    print("CREATING TRAIN/TEST SPLIT")
+    print("="*80)
+    train_df, test_df = create_train_test_split(test_size=0.2, split_by='temporal')
+    
+    # STEP 9: Generate Tableau exports
+    print("\n" + "="*80)
+    print("GENERATING TABLEAU EXPORTS")
+    print("="*80)
+    trajectories, summary = generate_complete_tableau_exports()
+    
+    # STEP 10: Verify data quality
+    print("\n" + "="*80)
+    print("VERIFYING DATA QUALITY")
+    print("="*80)
+    check_recent_qb_inclusion()
+    
+    print("\n" + "="*80)
+    print("REBUILD COMPLETE!")
+    print("="*80)
+    print("✓ Individual QB files fixed")
+    print("✓ Contract mapping regenerated")
+    print("✓ Payment data prepared")
+    print("✓ Era adjustments applied") 
+    print("✓ Tableau exports generated")
