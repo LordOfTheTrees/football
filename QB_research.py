@@ -3705,18 +3705,9 @@ def create_simple_knn_payment_surface(
     year_weights=None
 ):
     """
-    Simple KNN: For each (year, performance_value) point, find K nearest
-    actual QB seasons and return % that eventually got paid.
-    
-    Args:
-        metric (str): Performance metric to analyze
-        decision_year (int): Which decision year (3, 4, 5, or 6)
-        k_values (list): List of K values to test
-        year_weights (dict): Weights by year {0: w0, 1: w1, ...}
-                            Higher weight = more important = stronger influence on distance
-    
-    Returns:
-        dict: Results for each K value
+    Simple KNN with proper year weighting.
+    Year weights are universal (same for all metrics) since they represent
+    importance of each year in payment decisions.
     """
     print("\n" + "="*80)
     print(f"SIMPLE KNN PAYMENT SURFACE: {metric}, Decision Year {decision_year}")
@@ -3738,17 +3729,22 @@ def create_simple_knn_payment_surface(
     payment_df['season'] = pd.to_numeric(payment_df['season'], errors='coerce')
     payment_df['years_since_draft'] = payment_df['season'] - payment_df['draft_year']
     
-    # Only use years BEFORE the decision year (0 to decision_year-1)
-    payment_df = payment_df[payment_df['years_since_draft'] < decision_year]
+    # CRITICAL: Only use years 0 through (decision_year - 1)
+    max_year = decision_year - 1
+    payment_df = payment_df[payment_df['years_since_draft'] <= max_year]
     
-    print(f"Decision Year {decision_year}: Using performance from Years 0-{decision_year-1}")
+    print(f"Decision Year {decision_year}: Using performance from Years 0-{max_year}")
     print(f"Total QB seasons: {len(payment_df)}")
     print(f"Unique QBs: {payment_df['player_id'].nunique()}")
     
     # Load year weights if not provided
+    # NOTE: Weights are universal, not metric-specific
     if year_weights is None:
-        safe_metric_name = metric.replace('/', '_').replace('%', 'pct')
-        weights_file = f'year_weights_{safe_metric_name}.csv'
+        # Try to load from either metric's weights file (they should be the same)
+        weights_file = 'year_weights_total_yards_adj.csv'  # Use yards as canonical source
+        
+        if not os.path.exists(weights_file):
+            weights_file = 'year_weights_Pass_ANY_A_adj.csv'  # Fallback
         
         if os.path.exists(weights_file):
             weights_df = load_csv_safe(weights_file)
@@ -3756,22 +3752,37 @@ def create_simple_knn_payment_surface(
             
             if len(weights_df) == 0:
                 print(f"⚠️  No weights found for decision year {decision_year}, using uniform weights")
-                year_weights = {i: 1.0 for i in range(decision_year)}
+                year_weights = {i: 1.0 / decision_year for i in range(decision_year)}
             else:
                 year_weights = {}
                 for _, row in weights_df.iterrows():
                     year_str = row['Performance_Year']
                     year_num = int(year_str.split()[-1])
+                    # Convert percentage to decimal
                     year_weights[year_num] = row['Weight_%'] / 100.0
                 
-                print(f"✓ Loaded year weights from {weights_file}")
+                print(f"✓ Loaded universal year weights from {weights_file}")
         else:
-            print(f"⚠️  Weights file not found, using uniform weights")
-            year_weights = {i: 1.0 for i in range(decision_year)}
+            print(f"⚠️  No weights file found, using uniform weights")
+            year_weights = {i: 1.0 / decision_year for i in range(decision_year)}
     
-    print(f"\nYear weights for Decision Year {decision_year}:")
-    for year in sorted(year_weights.keys()):
-        print(f"  Year {year}: {year_weights[year]:.3f}")
+    # Verify weights cover all years and normalize
+    print(f"\nYear importance weights for Decision Year {decision_year}:")
+    total_weight = 0
+    for year in range(decision_year):
+        weight = year_weights.get(year, 1.0 / decision_year)
+        year_weights[year] = weight  # Fill in any missing years
+        total_weight += weight
+    
+    # Normalize to sum to 1.0
+    if abs(total_weight - 1.0) > 0.01:
+        print(f"  Normalizing weights (sum was {total_weight:.3f})")
+        year_weights = {k: v/total_weight for k, v in year_weights.items()}
+        total_weight = 1.0
+    
+    for year in range(decision_year):
+        print(f"  Year {year}: {year_weights[year]:.3f} ({year_weights[year]*100:.1f}%)")
+    print(f"  Total: {sum(year_weights.values()):.3f}")
     
     # Prepare data
     payment_df[metric] = pd.to_numeric(payment_df[metric], errors='coerce')
@@ -3785,28 +3796,44 @@ def create_simple_knn_payment_surface(
     X = payment_df[['years_since_draft', metric]].values
     y = payment_df['got_paid'].values.astype(int)
     
-    print(f"\nMetric range: {X[:, 1].min():.0f} to {X[:, 1].max():.0f}")
+    print(f"\nMetric range by year:")
+    for year in range(decision_year):
+        year_data = payment_df[payment_df['years_since_draft'] == year][metric]
+        if len(year_data) > 0:
+            print(f"  Year {year}: {year_data.min():.0f} to {year_data.max():.0f} ({len(year_data)} QBs)")
     
     # Standardize for distance calculation
     from sklearn.preprocessing import StandardScaler
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
     
-    # Apply year weights to scale the importance of the year dimension
-    # Higher weight = more important = larger scaling factor
+    # Apply year weights to scale importance
+    # For each observation, scale its year dimension by that year's importance weight
     X_scaled_weighted = X_scaled.copy()
-    for i in range(len(X_scaled_weighted)):
+    
+    # Create mapping of observation index to its year weight
+    observation_weights = []
+    for i in range(len(X_scaled)):
         year = int(payment_df.iloc[i]['years_since_draft'])
         weight = year_weights.get(year, 1.0)
-        # Scale year dimension by sqrt(weight) so distance contribution is proportional to weight
-        X_scaled_weighted[i, 0] *= np.sqrt(weight)
+        # Scale the year dimension (first dimension) by sqrt(weight)
+        # This makes differences in important years contribute more to distance
+        scale_factor = np.sqrt(weight * decision_year)  # Multiply by decision_year to amplify effect
+        X_scaled_weighted[i, 0] *= scale_factor
+        observation_weights.append(scale_factor)
+    
+    print(f"\nYear dimension scaling factors (applied to distance calculation):")
+    for year in range(decision_year):
+        weight = year_weights[year]
+        scale_factor = np.sqrt(weight * decision_year)
+        print(f"  Year {year}: {scale_factor:.3f} (from weight {weight:.3f})")
     
     # Create fine prediction grid
-    year_grid = np.linspace(0, decision_year - 1, 40)  # 40 points across years
-    metric_grid = np.linspace(X[:, 1].min() * 0.9, X[:, 1].max() * 1.1, 100)  # 100 points across metric
+    year_grid = np.linspace(0, max_year, 40)
+    metric_grid = np.linspace(X[:, 1].min() * 0.9, X[:, 1].max() * 1.1, 100)
     
     print(f"\nCreating prediction grid:")
-    print(f"  Years: {len(year_grid)} points from 0 to {decision_year-1}")
+    print(f"  Years: {len(year_grid)} points from 0.0 to {max_year}")
     print(f"  Metric: {len(metric_grid)} points from {metric_grid.min():.0f} to {metric_grid.max():.0f}")
     print(f"  Total grid points: {len(year_grid) * len(metric_grid)}")
     
@@ -3822,9 +3849,12 @@ def create_simple_knn_payment_surface(
     # Apply same year weighting to grid points
     X_grid_scaled_weighted = X_grid_scaled.copy()
     for i in range(len(X_grid_scaled_weighted)):
-        year_idx = int(X_grid[i, 0])
+        year_float = X_grid[i, 0]
+        year_idx = int(round(year_float))
+        year_idx = max(0, min(year_idx, decision_year - 1))
         weight = year_weights.get(year_idx, 1.0)
-        X_grid_scaled_weighted[i, 0] *= np.sqrt(weight)
+        scale_factor = np.sqrt(weight * decision_year)
+        X_grid_scaled_weighted[i, 0] *= scale_factor
     
     # Run KNN for each K value
     results = {}
@@ -3840,7 +3870,7 @@ def create_simple_knn_payment_surface(
             if i % 500 == 0:
                 print(f"  Processing grid point {i}/{len(X_grid_scaled_weighted)}...", end='\r')
             
-            # Calculate weighted Euclidean distance to all training points
+            # Calculate weighted Euclidean distance
             distances = np.sqrt(np.sum((X_scaled_weighted - grid_point_weighted)**2, axis=1))
             
             # Find K nearest neighbors
@@ -3865,10 +3895,20 @@ def create_simple_knn_payment_surface(
         print(f"\n  Prediction range: {predictions.min():.1f}% to {predictions.max():.1f}%")
         print(f"  Mean probability: {predictions.mean():.1f}%")
         
+        # DEBUG: Show prediction distribution by year
+        print(f"\n  Prediction statistics by year:")
+        for check_year in range(decision_year):
+            year_mask = np.abs(X_grid[:, 0] - check_year) < 0.1
+            if year_mask.sum() > 0:
+                year_preds = predictions[year_mask]
+                print(f"    Year {check_year}: min={year_preds.min():.1f}%, "
+                      f"mean={year_preds.mean():.1f}%, max={year_preds.max():.1f}%")
+        
         results[k] = {
             'predictions_df': results_df,
             'predictions': predictions,
-            'scaler': scaler
+            'scaler': scaler,
+            'year_weights': year_weights
         }
         
         # Save to CSV

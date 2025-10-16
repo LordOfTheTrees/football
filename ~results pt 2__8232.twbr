@@ -966,8 +966,608 @@
         </objects>
       </object-graph>
     </datasource>
+    <datasource caption='simple_knn_decision3_Pass_ANY_A_adj_k20' inline='true' name='federated.0l819300k3onux1f8zrbn1k986dj' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='simple_knn_decision3_Pass_ANY_A_adj_k20' name='textscan.151rtb405oe27d12o8dmx130mg0g'>
+            <connection class='textscan' directory='D:/proton drive/My files/Backup Docs/Personal Coding/football/KNN_surfaces' filename='simple_knn_decision3_Pass_ANY_A_adj_k20.csv' password='' server='' />
+          </named-connection>
+        </named-connections>
+        <relation connection='textscan.151rtb405oe27d12o8dmx130mg0g' name='simple_knn_decision3_Pass_ANY_A_adj_k20.csv' table='[simple_knn_decision3_Pass_ANY_A_adj_k20#csv]' type='table'>
+          <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+            <column datatype='real' name='year' ordinal='0' />
+            <column datatype='real' name='Pass_ANY/A_adj' ordinal='1' />
+            <column datatype='real' name='payment_probability' ordinal='2' />
+            <column datatype='integer' name='decision_year' ordinal='3' />
+            <column datatype='integer' name='k_value' ordinal='4' />
+            <column datatype='string' name='metric_name' ordinal='5' />
+          </columns>
+        </relation>
+        <metadata-records>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[simple_knn_decision3_Pass_ANY_A_adj_k20.csv]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='character-set'>&quot;UTF-8&quot;</attribute>
+              <attribute datatype='string' name='collation'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
+              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
+              <attribute datatype='string' name='locale'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>year</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[year]</local-name>
+            <parent-name>[simple_knn_decision3_Pass_ANY_A_adj_k20.csv]</parent-name>
+            <remote-alias>year</remote-alias>
+            <ordinal>0</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision3_Pass_ANY_A_adj_k20.csv_662EC4166FFA487583D570591A0606C7]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>Pass_ANY/A_adj</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[Pass_ANY/A_adj]</local-name>
+            <parent-name>[simple_knn_decision3_Pass_ANY_A_adj_k20.csv]</parent-name>
+            <remote-alias>Pass_ANY/A_adj</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision3_Pass_ANY_A_adj_k20.csv_662EC4166FFA487583D570591A0606C7]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>payment_probability</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[payment_probability]</local-name>
+            <parent-name>[simple_knn_decision3_Pass_ANY_A_adj_k20.csv]</parent-name>
+            <remote-alias>payment_probability</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision3_Pass_ANY_A_adj_k20.csv_662EC4166FFA487583D570591A0606C7]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>decision_year</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[decision_year]</local-name>
+            <parent-name>[simple_knn_decision3_Pass_ANY_A_adj_k20.csv]</parent-name>
+            <remote-alias>decision_year</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision3_Pass_ANY_A_adj_k20.csv_662EC4166FFA487583D570591A0606C7]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>k_value</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[k_value]</local-name>
+            <parent-name>[simple_knn_decision3_Pass_ANY_A_adj_k20.csv]</parent-name>
+            <remote-alias>k_value</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision3_Pass_ANY_A_adj_k20.csv_662EC4166FFA487583D570591A0606C7]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>metric_name</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[metric_name]</local-name>
+            <parent-name>[simple_knn_decision3_Pass_ANY_A_adj_k20.csv]</parent-name>
+            <remote-alias>metric_name</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RUS' />
+            <object-id>[simple_knn_decision3_Pass_ANY_A_adj_k20.csv_662EC4166FFA487583D570591A0606C7]</object-id>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='Pass ANY/A adj' datatype='real' name='[Pass_ANY/A_adj]' role='measure' type='quantitative' />
+      <column caption='simple_knn_decision3_Pass_ANY_A_adj_k20.csv' datatype='table' name='[__tableau_internal_object_id__].[simple_knn_decision3_Pass_ANY_A_adj_k20.csv_662EC4166FFA487583D570591A0606C7]' role='measure' type='quantitative' />
+      <column caption='Decision Year' datatype='integer' name='[decision_year]' role='dimension' type='quantitative' />
+      <column caption='K Value' datatype='integer' name='[k_value]' role='measure' type='quantitative' />
+      <column caption='Metric Name' datatype='string' name='[metric_name]' role='dimension' type='nominal' />
+      <column caption='Payment Probability' datatype='real' name='[payment_probability]' role='measure' type='quantitative' />
+      <column caption='Year' datatype='real' name='[year]' role='dimension' type='quantitative' />
+      <extract _.fcp.VConnDownstreamExtractsWithWarnings.true...user-specific='false' count='-1' enabled='true' object-id='' units='records'>
+        <connection access_mode='readonly' author-locale='en_US' class='hyper' dbname='C:/Users/Andre/AppData/Local/Temp/TableauTemp/#TableauTemp_1rbt4tz00ozedn143aufe1c0bsez.hyper' default-settings='hyper' schema='Extract' sslmode='' tablename='Extract' update-time='10/16/2025 03:53:45 PM' username='tableau_internal_user'>
+          <relation name='Extract' table='[Extract].[Extract]' type='table' />
+          <metadata-records>
+            <metadata-record class='column'>
+              <remote-name>year</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[year]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>year</remote-alias>
+              <ordinal>0</ordinal>
+              <family>simple_knn_decision3_Pass_ANY_A_adj_k20.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>40</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision3_Pass_ANY_A_adj_k20.csv_662EC4166FFA487583D570591A0606C7]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>Pass_ANY/A_adj</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[Pass_ANY/A_adj]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>Pass_ANY/A_adj</remote-alias>
+              <ordinal>1</ordinal>
+              <family>simple_knn_decision3_Pass_ANY_A_adj_k20.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>100</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision3_Pass_ANY_A_adj_k20.csv_662EC4166FFA487583D570591A0606C7]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>payment_probability</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[payment_probability]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>payment_probability</remote-alias>
+              <ordinal>2</ordinal>
+              <family>simple_knn_decision3_Pass_ANY_A_adj_k20.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>14</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision3_Pass_ANY_A_adj_k20.csv_662EC4166FFA487583D570591A0606C7]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>decision_year</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[decision_year]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>decision_year</remote-alias>
+              <ordinal>3</ordinal>
+              <family>simple_knn_decision3_Pass_ANY_A_adj_k20.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>1</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision3_Pass_ANY_A_adj_k20.csv_662EC4166FFA487583D570591A0606C7]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>k_value</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[k_value]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>k_value</remote-alias>
+              <ordinal>4</ordinal>
+              <family>simple_knn_decision3_Pass_ANY_A_adj_k20.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>1</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision3_Pass_ANY_A_adj_k20.csv_662EC4166FFA487583D570591A0606C7]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>metric_name</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[metric_name]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>metric_name</remote-alias>
+              <ordinal>5</ordinal>
+              <family>simple_knn_decision3_Pass_ANY_A_adj_k20.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>1</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RUS' />
+              <object-id>[simple_knn_decision3_Pass_ANY_A_adj_k20.csv_662EC4166FFA487583D570591A0606C7]</object-id>
+            </metadata-record>
+          </metadata-records>
+        </connection>
+      </extract>
+      <layout dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+      <object-graph>
+        <objects>
+          <object caption='simple_knn_decision3_Pass_ANY_A_adj_k20.csv' id='simple_knn_decision3_Pass_ANY_A_adj_k20.csv_662EC4166FFA487583D570591A0606C7'>
+            <properties context=''>
+              <relation connection='textscan.151rtb405oe27d12o8dmx130mg0g' name='simple_knn_decision3_Pass_ANY_A_adj_k20.csv' table='[simple_knn_decision3_Pass_ANY_A_adj_k20#csv]' type='table'>
+                <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+                  <column datatype='real' name='year' ordinal='0' />
+                  <column datatype='real' name='Pass_ANY/A_adj' ordinal='1' />
+                  <column datatype='real' name='payment_probability' ordinal='2' />
+                  <column datatype='integer' name='decision_year' ordinal='3' />
+                  <column datatype='integer' name='k_value' ordinal='4' />
+                  <column datatype='string' name='metric_name' ordinal='5' />
+                </columns>
+              </relation>
+            </properties>
+            <properties context='extract'>
+              <relation name='Extract' table='[Extract].[Extract]' type='table' />
+            </properties>
+          </object>
+        </objects>
+      </object-graph>
+    </datasource>
+    <datasource caption='simple_knn_decision4_Pass_ANY_A_adj_k20' inline='true' name='federated.07kx83r0jam8g31aoy3th1aj6xty' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='simple_knn_decision4_Pass_ANY_A_adj_k20' name='textscan.0q6v2r31mf0yn41e3phqz196gzhg'>
+            <connection class='textscan' directory='D:/proton drive/My files/Backup Docs/Personal Coding/football/KNN_surfaces' filename='simple_knn_decision4_Pass_ANY_A_adj_k20.csv' password='' server='' />
+          </named-connection>
+        </named-connections>
+        <relation connection='textscan.0q6v2r31mf0yn41e3phqz196gzhg' name='simple_knn_decision4_Pass_ANY_A_adj_k20.csv' table='[simple_knn_decision4_Pass_ANY_A_adj_k20#csv]' type='table'>
+          <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+            <column datatype='real' name='year' ordinal='0' />
+            <column datatype='real' name='Pass_ANY/A_adj' ordinal='1' />
+            <column datatype='real' name='payment_probability' ordinal='2' />
+            <column datatype='integer' name='decision_year' ordinal='3' />
+            <column datatype='integer' name='k_value' ordinal='4' />
+            <column datatype='string' name='metric_name' ordinal='5' />
+          </columns>
+        </relation>
+        <metadata-records>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[simple_knn_decision4_Pass_ANY_A_adj_k20.csv]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='character-set'>&quot;UTF-8&quot;</attribute>
+              <attribute datatype='string' name='collation'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
+              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
+              <attribute datatype='string' name='locale'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>year</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[year]</local-name>
+            <parent-name>[simple_knn_decision4_Pass_ANY_A_adj_k20.csv]</parent-name>
+            <remote-alias>year</remote-alias>
+            <ordinal>0</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision4_Pass_ANY_A_adj_k20.csv_5E77ECEED6F04FD6998BA36A650D2C14]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>Pass_ANY/A_adj</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[Pass_ANY/A_adj]</local-name>
+            <parent-name>[simple_knn_decision4_Pass_ANY_A_adj_k20.csv]</parent-name>
+            <remote-alias>Pass_ANY/A_adj</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision4_Pass_ANY_A_adj_k20.csv_5E77ECEED6F04FD6998BA36A650D2C14]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>payment_probability</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[payment_probability]</local-name>
+            <parent-name>[simple_knn_decision4_Pass_ANY_A_adj_k20.csv]</parent-name>
+            <remote-alias>payment_probability</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision4_Pass_ANY_A_adj_k20.csv_5E77ECEED6F04FD6998BA36A650D2C14]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>decision_year</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[decision_year]</local-name>
+            <parent-name>[simple_knn_decision4_Pass_ANY_A_adj_k20.csv]</parent-name>
+            <remote-alias>decision_year</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision4_Pass_ANY_A_adj_k20.csv_5E77ECEED6F04FD6998BA36A650D2C14]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>k_value</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[k_value]</local-name>
+            <parent-name>[simple_knn_decision4_Pass_ANY_A_adj_k20.csv]</parent-name>
+            <remote-alias>k_value</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision4_Pass_ANY_A_adj_k20.csv_5E77ECEED6F04FD6998BA36A650D2C14]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>metric_name</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[metric_name]</local-name>
+            <parent-name>[simple_knn_decision4_Pass_ANY_A_adj_k20.csv]</parent-name>
+            <remote-alias>metric_name</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RUS' />
+            <object-id>[simple_knn_decision4_Pass_ANY_A_adj_k20.csv_5E77ECEED6F04FD6998BA36A650D2C14]</object-id>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='Pass ANY/A adj' datatype='real' name='[Pass_ANY/A_adj]' role='measure' type='quantitative' />
+      <column caption='simple_knn_decision4_Pass_ANY_A_adj_k20.csv' datatype='table' name='[__tableau_internal_object_id__].[simple_knn_decision4_Pass_ANY_A_adj_k20.csv_5E77ECEED6F04FD6998BA36A650D2C14]' role='measure' type='quantitative' />
+      <column caption='Decision Year' datatype='integer' name='[decision_year]' role='dimension' type='quantitative' />
+      <column caption='K Value' datatype='integer' name='[k_value]' role='measure' type='quantitative' />
+      <column caption='Metric Name' datatype='string' name='[metric_name]' role='dimension' type='nominal' />
+      <column caption='Payment Probability' datatype='real' name='[payment_probability]' role='measure' type='quantitative' />
+      <column caption='Year' datatype='real' name='[year]' role='dimension' type='quantitative' />
+      <extract _.fcp.VConnDownstreamExtractsWithWarnings.true...user-specific='false' count='-1' enabled='true' object-id='' units='records'>
+        <connection access_mode='readonly' author-locale='en_US' class='hyper' dbname='C:/Users/Andre/AppData/Local/Temp/TableauTemp/#TableauTemp_060mgo81r4iusp12035r417wjls9.hyper' default-settings='hyper' schema='Extract' sslmode='' tablename='Extract' update-time='10/16/2025 03:55:10 PM' username='tableau_internal_user'>
+          <relation name='Extract' table='[Extract].[Extract]' type='table' />
+          <metadata-records>
+            <metadata-record class='column'>
+              <remote-name>year</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[year]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>year</remote-alias>
+              <ordinal>0</ordinal>
+              <family>simple_knn_decision4_Pass_ANY_A_adj_k20.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>40</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision4_Pass_ANY_A_adj_k20.csv_5E77ECEED6F04FD6998BA36A650D2C14]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>Pass_ANY/A_adj</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[Pass_ANY/A_adj]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>Pass_ANY/A_adj</remote-alias>
+              <ordinal>1</ordinal>
+              <family>simple_knn_decision4_Pass_ANY_A_adj_k20.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>100</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision4_Pass_ANY_A_adj_k20.csv_5E77ECEED6F04FD6998BA36A650D2C14]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>payment_probability</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[payment_probability]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>payment_probability</remote-alias>
+              <ordinal>2</ordinal>
+              <family>simple_knn_decision4_Pass_ANY_A_adj_k20.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>14</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision4_Pass_ANY_A_adj_k20.csv_5E77ECEED6F04FD6998BA36A650D2C14]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>decision_year</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[decision_year]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>decision_year</remote-alias>
+              <ordinal>3</ordinal>
+              <family>simple_knn_decision4_Pass_ANY_A_adj_k20.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>1</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision4_Pass_ANY_A_adj_k20.csv_5E77ECEED6F04FD6998BA36A650D2C14]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>k_value</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[k_value]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>k_value</remote-alias>
+              <ordinal>4</ordinal>
+              <family>simple_knn_decision4_Pass_ANY_A_adj_k20.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>1</approx-count>
+              <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision4_Pass_ANY_A_adj_k20.csv_5E77ECEED6F04FD6998BA36A650D2C14]</object-id>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>metric_name</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[metric_name]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>metric_name</remote-alias>
+              <ordinal>5</ordinal>
+              <family>simple_knn_decision4_Pass_ANY_A_adj_k20.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>1</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RUS' />
+              <object-id>[simple_knn_decision4_Pass_ANY_A_adj_k20.csv_5E77ECEED6F04FD6998BA36A650D2C14]</object-id>
+            </metadata-record>
+          </metadata-records>
+        </connection>
+      </extract>
+      <layout dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+      <object-graph>
+        <objects>
+          <object caption='simple_knn_decision4_Pass_ANY_A_adj_k20.csv' id='simple_knn_decision4_Pass_ANY_A_adj_k20.csv_5E77ECEED6F04FD6998BA36A650D2C14'>
+            <properties context=''>
+              <relation connection='textscan.0q6v2r31mf0yn41e3phqz196gzhg' name='simple_knn_decision4_Pass_ANY_A_adj_k20.csv' table='[simple_knn_decision4_Pass_ANY_A_adj_k20#csv]' type='table'>
+                <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+                  <column datatype='real' name='year' ordinal='0' />
+                  <column datatype='real' name='Pass_ANY/A_adj' ordinal='1' />
+                  <column datatype='real' name='payment_probability' ordinal='2' />
+                  <column datatype='integer' name='decision_year' ordinal='3' />
+                  <column datatype='integer' name='k_value' ordinal='4' />
+                  <column datatype='string' name='metric_name' ordinal='5' />
+                </columns>
+              </relation>
+            </properties>
+            <properties context='extract'>
+              <relation name='Extract' table='[Extract].[Extract]' type='table' />
+            </properties>
+          </object>
+        </objects>
+      </object-graph>
+    </datasource>
   </datasources>
   <worksheets>
+    <worksheet name='KNN20;ANY;Y3'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='simple_knn_decision3_Pass_ANY_A_adj_k20' name='federated.0l819300k3onux1f8zrbn1k986dj' />
+          </datasources>
+          <datasource-dependencies datasource='federated.0l819300k3onux1f8zrbn1k986dj'>
+            <column caption='Pass ANY/A adj' datatype='real' name='[Pass_ANY/A_adj]' role='measure' type='quantitative' />
+            <column-instance column='[year]' derivation='None' name='[none:year:qk]' pivot='key' type='quantitative' />
+            <column caption='Payment Probability' datatype='real' name='[payment_probability]' role='measure' type='quantitative' />
+            <column-instance column='[Pass_ANY/A_adj]' derivation='Sum' name='[sum:Pass_ANY/A_adj:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[payment_probability]' derivation='Sum' name='[sum:payment_probability:qk]' pivot='key' type='quantitative' />
+            <column caption='Year' datatype='real' name='[year]' role='dimension' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='false' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.0l819300k3onux1f8zrbn1k986dj].[sum:payment_probability:qk]' palette='orange_blue_diverging_10_0' type='interpolated' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Square' />
+            <mark-sizing mark-sizing-setting='marks-scaling-off' />
+            <encodings>
+              <color column='[federated.0l819300k3onux1f8zrbn1k986dj].[sum:payment_probability:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='size' value='6.5326151847839355' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.0l819300k3onux1f8zrbn1k986dj].[sum:Pass_ANY/A_adj:qk]</rows>
+        <cols>[federated.0l819300k3onux1f8zrbn1k986dj].[none:year:qk]</cols>
+      </table>
+      <simple-id uuid='{A889B1E9-CB89-4B84-ABD6-06B0CD6D32EF}' />
+    </worksheet>
+    <worksheet name='KNN20;ANY;Y4'>
+      <table>
+        <view>
+          <datasources>
+            <datasource caption='simple_knn_decision4_Pass_ANY_A_adj_k20' name='federated.07kx83r0jam8g31aoy3th1aj6xty' />
+          </datasources>
+          <datasource-dependencies datasource='federated.07kx83r0jam8g31aoy3th1aj6xty'>
+            <column caption='Pass ANY/A adj' datatype='real' name='[Pass_ANY/A_adj]' role='measure' type='quantitative' />
+            <column-instance column='[year]' derivation='None' name='[none:year:qk]' pivot='key' type='quantitative' />
+            <column caption='Payment Probability' datatype='real' name='[payment_probability]' role='measure' type='quantitative' />
+            <column-instance column='[Pass_ANY/A_adj]' derivation='Sum' name='[sum:Pass_ANY/A_adj:qk]' pivot='key' type='quantitative' />
+            <column-instance column='[payment_probability]' derivation='Sum' name='[sum:payment_probability:qk]' pivot='key' type='quantitative' />
+            <column caption='Year' datatype='real' name='[year]' role='dimension' type='quantitative' />
+          </datasource-dependencies>
+          <aggregation value='false' />
+        </view>
+        <style>
+          <style-rule element='mark'>
+            <encoding attr='color' field='[federated.07kx83r0jam8g31aoy3th1aj6xty].[sum:payment_probability:qk]' palette='orange_blue_diverging_10_0' type='interpolated' />
+          </style-rule>
+        </style>
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Square' />
+            <mark-sizing mark-sizing-setting='marks-scaling-off' />
+            <encodings>
+              <color column='[federated.07kx83r0jam8g31aoy3th1aj6xty].[sum:payment_probability:qk]' />
+            </encodings>
+            <style>
+              <style-rule element='mark'>
+                <format attr='size' value='1.4612706899642944' />
+              </style-rule>
+            </style>
+          </pane>
+        </panes>
+        <rows>[federated.07kx83r0jam8g31aoy3th1aj6xty].[sum:Pass_ANY/A_adj:qk]</rows>
+        <cols>[federated.07kx83r0jam8g31aoy3th1aj6xty].[none:year:qk]</cols>
+      </table>
+      <simple-id uuid='{BE3F7612-6089-485E-88DD-63A3B98E8441}' />
+    </worksheet>
+    <worksheet name='KNN20;ANY;Y5'>
+      <table>
+        <view>
+          <datasources />
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+          </pane>
+        </panes>
+        <rows />
+        <cols />
+      </table>
+      <simple-id uuid='{16B49C8C-6CB6-4066-A44E-9BF8ECAF1A24}' />
+    </worksheet>
+    <worksheet name='KNN20;ANY;Y6'>
+      <table>
+        <view>
+          <datasources />
+          <aggregation value='true' />
+        </view>
+        <style />
+        <panes>
+          <pane selection-relaxation-option='selection-relaxation-allow'>
+            <view>
+              <breakdown value='auto' />
+            </view>
+            <mark class='Automatic' />
+          </pane>
+        </panes>
+        <rows />
+        <cols />
+      </table>
+      <simple-id uuid='{E18DE4A5-A69B-49EF-8D21-5148B22652AB}' />
+    </worksheet>
     <worksheet name='KNN20;yards;Y3'>
       <table>
         <view>
@@ -1141,7 +1741,7 @@
       <simple-id uuid='{0E2C7D0A-3F76-4BDB-AE42-02818F061E38}' />
     </worksheet>
   </worksheets>
-  <windows saved-dpi-scale-factor='1.5' source-height='137'>
+  <windows saved-dpi-scale-factor='1.5' source-height='199'>
     <window class='worksheet' name='KNN20;yards;Y3'>
       <cards>
         <edge name='left'>
@@ -1168,13 +1768,6 @@
           </strip>
         </edge>
       </cards>
-      <viewpoint>
-        <highlight>
-          <color-one-way>
-            <field>[federated.0tgyzep0phsv691g4hlog0uzoxg1].[none:year:qk]</field>
-          </color-one-way>
-        </highlight>
-      </viewpoint>
       <simple-id uuid='{1003F405-E567-46EF-989D-9766345D411A}' />
     </window>
     <window class='worksheet' name='KNN20;yards;Y4'>
@@ -1203,13 +1796,6 @@
           </strip>
         </edge>
       </cards>
-      <viewpoint>
-        <highlight>
-          <color-one-way>
-            <field>[federated.0ojb4uk0w6cmrw195poft1h970m5].[none:year:qk]</field>
-          </color-one-way>
-        </highlight>
-      </viewpoint>
       <simple-id uuid='{2AED7615-6CF5-4768-BDA2-FB6D44D8A8BD}' />
     </window>
     <window class='worksheet' name='KNN20;yards;Y5'>
@@ -1238,16 +1824,9 @@
           </strip>
         </edge>
       </cards>
-      <viewpoint>
-        <highlight>
-          <color-one-way>
-            <field>[federated.0qcjct40xrpiwv1cmvfdx1oci5nd].[none:year:qk]</field>
-          </color-one-way>
-        </highlight>
-      </viewpoint>
       <simple-id uuid='{FE8633FE-DD5E-4F3E-B8D5-C4DC08B90063}' />
     </window>
-    <window class='worksheet' maximized='true' name='KNN20;yards;Y6'>
+    <window class='worksheet' name='KNN20;yards;Y6'>
       <cards>
         <edge name='left'>
           <strip size='160'>
@@ -1273,438 +1852,109 @@
           </strip>
         </edge>
       </cards>
-      <viewpoint>
-        <highlight>
-          <color-one-way>
-            <field>[federated.0uvfe9m1symcuv183n7241j0n514].[none:year:qk]</field>
-          </color-one-way>
-        </highlight>
-      </viewpoint>
       <simple-id uuid='{8A1AE754-53F8-4F55-9046-49D0F9FA6FE5}' />
     </window>
+    <window class='worksheet' name='KNN20;ANY;Y3'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='160'>
+            <card pane-specification-id='0' param='[federated.0l819300k3onux1f8zrbn1k986dj].[sum:payment_probability:qk]' type='color' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{704B4150-504D-4925-B050-F1E831F0406C}' />
+    </window>
+    <window class='worksheet' maximized='true' name='KNN20;ANY;Y4'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+        <edge name='right'>
+          <strip size='160'>
+            <card pane-specification-id='0' param='[federated.07kx83r0jam8g31aoy3th1aj6xty].[sum:payment_probability:qk]' type='color' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{1E418B44-89BB-484F-B950-B7C4F72D81C5}' />
+    </window>
+    <window class='worksheet' name='KNN20;ANY;Y5'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{29A0780F-67AD-4770-8758-1E842DBF7B86}' />
+    </window>
+    <window class='worksheet' name='KNN20;ANY;Y6'>
+      <cards>
+        <edge name='left'>
+          <strip size='160'>
+            <card type='pages' />
+            <card type='filters' />
+            <card type='marks' />
+          </strip>
+        </edge>
+        <edge name='top'>
+          <strip size='2147483647'>
+            <card type='columns' />
+          </strip>
+          <strip size='2147483647'>
+            <card type='rows' />
+          </strip>
+          <strip size='30'>
+            <card type='title' />
+          </strip>
+        </edge>
+      </cards>
+      <simple-id uuid='{073410B8-D78D-4F73-B672-854768E51A5E}' />
+    </window>
   </windows>
-  <thumbnails>
-    <thumbnail height='192' name='KNN20;yards;Y3' width='192'>
-      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
-    </thumbnail>
-    <thumbnail height='192' name='KNN20;yards;Y4' width='192'>
-      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
-    </thumbnail>
-    <thumbnail height='192' name='KNN20;yards;Y5' width='192'>
-      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
-      AgAAAABJRU5ErkJggg==
-    </thumbnail>
-    <thumbnail height='192' name='KNN20;yards;Y6' width='192'>
-      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
-    </thumbnail>
-  </thumbnails>
 </workbook>
