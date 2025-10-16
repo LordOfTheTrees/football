@@ -4222,13 +4222,13 @@ if __name__ == "__main__":
     #train_df, test_df = create_train_test_split(test_size=0.2, split_by='temporal')
     #regression_with_pc1_factors(train_df, test_df)
 
-    train_df, test_df = load_train_test_split()
+    #train_df, test_df = load_train_test_split()
     
     # Test QB name normalization
     # test_name_mapping()
     
     # Create mapping (first time - will process and cache)
-    mapped_contracts = create_contract_player_mapping()
+    #mapped_contracts = create_contract_player_mapping()
     #mapped_contracts = create_contract_player_mapping(force_refresh=True)   
 
     # Debug specific player
@@ -4237,8 +4237,7 @@ if __name__ == "__main__":
     #debug_name_matching("Ben Roethlisberger", contracts, player_ids)
     #mapped_contracts = create_contract_player_mapping(force_refresh=True)
     #now check the number of QBs in contract_player_id_mapping.csv after year 2000, without a match
-    
-    
+        
     # Test the pipeline step by step
     
     # Step 1: Load contracts
@@ -4256,7 +4255,7 @@ if __name__ == "__main__":
     prepared_df = prepare_qb_payment_data()
     
     if prepared_df is not None:
-        report = validate_payment_data(prepared_df)
+        '''report = validate_payment_data(prepared_df)
         #plot_sample_trajectories(prepared_df)
         
         # Create era-adjusted version
@@ -4267,7 +4266,7 @@ if __name__ == "__main__":
 
         if adjusted_df is None:
             print("✗ ERROR: Failed to create era-adjusted data")
-            exit(1)
+            exit(1)'''
 
         '''# REGRESSION 1: What predicts getting paid?
         print("\n\n" + "="*80)
@@ -4298,7 +4297,7 @@ if __name__ == "__main__":
             force_refresh=False
         )'''
 
-    print("\n" + "="*80)
+    '''print("\n" + "="*80)
     print("GENERATING TABLEAU EXPORT FILES")
     print("="*80)
     
@@ -4312,8 +4311,7 @@ if __name__ == "__main__":
         metrics=['total_yards_adj', 'Pass_ANY/A_adj'],
         decision_years=[3, 4, 5, 6],
         k_values=[5, 10, 15, 20]
-    )
-    
+    )'''    
     '''# 2. Export individual QB trajectories (overlay lines)
     print("\n\n[2/3] Exporting QB trajectories...")
     trajectories = export_individual_qb_trajectories(
@@ -4328,7 +4326,3 @@ if __name__ == "__main__":
         metrics=primary_metrics,
         years_range=years_to_include
     )'''
-    
-    print("\n\n" + "="*80)
-    print("TABLEAU EXPORT COMPLETE")
-    print("="*80)
