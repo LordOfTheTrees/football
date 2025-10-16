@@ -850,6 +850,7 @@
               <aggregation>Sum</aggregation>
               <approx-count>40</approx-count>
               <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision3_Pass_ANY_A_adj_k20.csv_662EC4166FFA487583D570591A0606C7]</object-id>
             </metadata-record>
             <metadata-record class='column'>
               <remote-name>Pass_ANY/A_adj</remote-name>
@@ -863,6 +864,7 @@
               <aggregation>Sum</aggregation>
               <approx-count>100</approx-count>
               <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision3_Pass_ANY_A_adj_k20.csv_662EC4166FFA487583D570591A0606C7]</object-id>
             </metadata-record>
             <metadata-record class='column'>
               <remote-name>payment_probability</remote-name>
@@ -876,6 +878,7 @@
               <aggregation>Sum</aggregation>
               <approx-count>14</approx-count>
               <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision3_Pass_ANY_A_adj_k20.csv_662EC4166FFA487583D570591A0606C7]</object-id>
             </metadata-record>
             <metadata-record class='column'>
               <remote-name>decision_year</remote-name>
@@ -889,6 +892,7 @@
               <aggregation>Sum</aggregation>
               <approx-count>1</approx-count>
               <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision3_Pass_ANY_A_adj_k20.csv_662EC4166FFA487583D570591A0606C7]</object-id>
             </metadata-record>
             <metadata-record class='column'>
               <remote-name>k_value</remote-name>
@@ -902,6 +906,7 @@
               <aggregation>Sum</aggregation>
               <approx-count>1</approx-count>
               <contains-null>true</contains-null>
+              <object-id>[simple_knn_decision3_Pass_ANY_A_adj_k20.csv_662EC4166FFA487583D570591A0606C7]</object-id>
             </metadata-record>
             <metadata-record class='column'>
               <remote-name>metric_name</remote-name>
@@ -916,6 +921,7 @@
               <approx-count>1</approx-count>
               <contains-null>true</contains-null>
               <collation flag='0' name='LEN_RUS' />
+              <object-id>[simple_knn_decision3_Pass_ANY_A_adj_k20.csv_662EC4166FFA487583D570591A0606C7]</object-id>
             </metadata-record>
           </metadata-records>
         </connection>
@@ -1639,6 +1645,237 @@
         </objects>
       </object-graph>
     </datasource>
+    <datasource caption='simple_knn_decision6_Pass_ANY_A_adj_k20' inline='true' name='federated.0n9s33g1gubckn0zqiv570coi1al' version='18.1'>
+      <connection class='federated'>
+        <named-connections>
+          <named-connection caption='simple_knn_decision6_Pass_ANY_A_adj_k20' name='textscan.1fdvz3w0v84t0p1h1tdq516m5q75'>
+            <connection class='textscan' directory='D:/proton drive/My files/Backup Docs/Personal Coding/football/KNN_surfaces' filename='simple_knn_decision6_Pass_ANY_A_adj_k20.csv' password='' server='' />
+          </named-connection>
+        </named-connections>
+        <relation connection='textscan.1fdvz3w0v84t0p1h1tdq516m5q75' name='simple_knn_decision6_Pass_ANY_A_adj_k20.csv' table='[simple_knn_decision6_Pass_ANY_A_adj_k20#csv]' type='table'>
+          <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+            <column datatype='real' name='year' ordinal='0' />
+            <column datatype='real' name='Pass_ANY/A_adj' ordinal='1' />
+            <column datatype='real' name='payment_probability' ordinal='2' />
+            <column datatype='integer' name='decision_year' ordinal='3' />
+            <column datatype='integer' name='k_value' ordinal='4' />
+            <column datatype='string' name='metric_name' ordinal='5' />
+          </columns>
+        </relation>
+        <metadata-records>
+          <metadata-record class='capability'>
+            <remote-name />
+            <remote-type>0</remote-type>
+            <parent-name>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv]</parent-name>
+            <remote-alias />
+            <aggregation>Count</aggregation>
+            <contains-null>true</contains-null>
+            <attributes>
+              <attribute datatype='string' name='character-set'>&quot;UTF-8&quot;</attribute>
+              <attribute datatype='string' name='collation'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
+              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
+              <attribute datatype='string' name='locale'>&quot;en_US&quot;</attribute>
+              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
+            </attributes>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>year</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[year]</local-name>
+            <parent-name>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv]</parent-name>
+            <remote-alias>year</remote-alias>
+            <ordinal>0</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv_6B244C3012B84653B092CC36E3F0948C]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>Pass_ANY/A_adj</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[Pass_ANY/A_adj]</local-name>
+            <parent-name>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv]</parent-name>
+            <remote-alias>Pass_ANY/A_adj</remote-alias>
+            <ordinal>1</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv_6B244C3012B84653B092CC36E3F0948C]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>payment_probability</remote-name>
+            <remote-type>5</remote-type>
+            <local-name>[payment_probability]</local-name>
+            <parent-name>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv]</parent-name>
+            <remote-alias>payment_probability</remote-alias>
+            <ordinal>2</ordinal>
+            <local-type>real</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv_6B244C3012B84653B092CC36E3F0948C]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>decision_year</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[decision_year]</local-name>
+            <parent-name>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv]</parent-name>
+            <remote-alias>decision_year</remote-alias>
+            <ordinal>3</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv_6B244C3012B84653B092CC36E3F0948C]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>k_value</remote-name>
+            <remote-type>20</remote-type>
+            <local-name>[k_value]</local-name>
+            <parent-name>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv]</parent-name>
+            <remote-alias>k_value</remote-alias>
+            <ordinal>4</ordinal>
+            <local-type>integer</local-type>
+            <aggregation>Sum</aggregation>
+            <contains-null>true</contains-null>
+            <object-id>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv_6B244C3012B84653B092CC36E3F0948C]</object-id>
+          </metadata-record>
+          <metadata-record class='column'>
+            <remote-name>metric_name</remote-name>
+            <remote-type>129</remote-type>
+            <local-name>[metric_name]</local-name>
+            <parent-name>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv]</parent-name>
+            <remote-alias>metric_name</remote-alias>
+            <ordinal>5</ordinal>
+            <local-type>string</local-type>
+            <aggregation>Count</aggregation>
+            <scale>1</scale>
+            <width>1073741823</width>
+            <contains-null>true</contains-null>
+            <collation flag='0' name='LEN_RUS' />
+            <object-id>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv_6B244C3012B84653B092CC36E3F0948C]</object-id>
+          </metadata-record>
+        </metadata-records>
+      </connection>
+      <aliases enabled='yes' />
+      <column caption='Pass ANY/A adj' datatype='real' name='[Pass_ANY/A_adj]' role='measure' type='quantitative' />
+      <column caption='simple_knn_decision6_Pass_ANY_A_adj_k20.csv' datatype='table' name='[__tableau_internal_object_id__].[simple_knn_decision6_Pass_ANY_A_adj_k20.csv_6B244C3012B84653B092CC36E3F0948C]' role='measure' type='quantitative' />
+      <column caption='Decision Year' datatype='integer' name='[decision_year]' role='dimension' type='quantitative' />
+      <column caption='K Value' datatype='integer' name='[k_value]' role='measure' type='quantitative' />
+      <column caption='Metric Name' datatype='string' name='[metric_name]' role='dimension' type='nominal' />
+      <column caption='Payment Probability' datatype='real' name='[payment_probability]' role='measure' type='quantitative' />
+      <column caption='Year' datatype='real' name='[year]' role='dimension' type='quantitative' />
+      <extract _.fcp.VConnDownstreamExtractsWithWarnings.true...user-specific='false' count='-1' enabled='true' object-id='' units='records'>
+        <connection access_mode='readonly' author-locale='en_US' class='hyper' dbname='C:/Users/Andre/AppData/Local/Temp/TableauTemp/#TableauTemp_1564u5v12zi6kc17nskek1y46ja4.hyper' default-settings='hyper' schema='Extract' sslmode='' tablename='Extract' update-time='10/16/2025 07:54:53 PM' username='tableau_internal_user'>
+          <relation name='Extract' table='[Extract].[Extract]' type='table' />
+          <metadata-records>
+            <metadata-record class='column'>
+              <remote-name>year</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[year]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>year</remote-alias>
+              <ordinal>0</ordinal>
+              <family>simple_knn_decision6_Pass_ANY_A_adj_k20.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>40</approx-count>
+              <contains-null>true</contains-null>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>Pass_ANY/A_adj</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[Pass_ANY/A_adj]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>Pass_ANY/A_adj</remote-alias>
+              <ordinal>1</ordinal>
+              <family>simple_knn_decision6_Pass_ANY_A_adj_k20.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>100</approx-count>
+              <contains-null>true</contains-null>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>payment_probability</remote-name>
+              <remote-type>5</remote-type>
+              <local-name>[payment_probability]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>payment_probability</remote-alias>
+              <ordinal>2</ordinal>
+              <family>simple_knn_decision6_Pass_ANY_A_adj_k20.csv</family>
+              <local-type>real</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>16</approx-count>
+              <contains-null>true</contains-null>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>decision_year</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[decision_year]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>decision_year</remote-alias>
+              <ordinal>3</ordinal>
+              <family>simple_knn_decision6_Pass_ANY_A_adj_k20.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>1</approx-count>
+              <contains-null>true</contains-null>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>k_value</remote-name>
+              <remote-type>20</remote-type>
+              <local-name>[k_value]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>k_value</remote-alias>
+              <ordinal>4</ordinal>
+              <family>simple_knn_decision6_Pass_ANY_A_adj_k20.csv</family>
+              <local-type>integer</local-type>
+              <aggregation>Sum</aggregation>
+              <approx-count>1</approx-count>
+              <contains-null>true</contains-null>
+            </metadata-record>
+            <metadata-record class='column'>
+              <remote-name>metric_name</remote-name>
+              <remote-type>129</remote-type>
+              <local-name>[metric_name]</local-name>
+              <parent-name>[Extract]</parent-name>
+              <remote-alias>metric_name</remote-alias>
+              <ordinal>5</ordinal>
+              <family>simple_knn_decision6_Pass_ANY_A_adj_k20.csv</family>
+              <local-type>string</local-type>
+              <aggregation>Count</aggregation>
+              <approx-count>1</approx-count>
+              <contains-null>true</contains-null>
+              <collation flag='0' name='LEN_RUS' />
+            </metadata-record>
+          </metadata-records>
+        </connection>
+      </extract>
+      <layout dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
+      <semantic-values>
+        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
+      </semantic-values>
+      <object-graph>
+        <objects>
+          <object caption='simple_knn_decision6_Pass_ANY_A_adj_k20.csv' id='simple_knn_decision6_Pass_ANY_A_adj_k20.csv_6B244C3012B84653B092CC36E3F0948C'>
+            <properties context=''>
+              <relation connection='textscan.1fdvz3w0v84t0p1h1tdq516m5q75' name='simple_knn_decision6_Pass_ANY_A_adj_k20.csv' table='[simple_knn_decision6_Pass_ANY_A_adj_k20#csv]' type='table'>
+                <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
+                  <column datatype='real' name='year' ordinal='0' />
+                  <column datatype='real' name='Pass_ANY/A_adj' ordinal='1' />
+                  <column datatype='real' name='payment_probability' ordinal='2' />
+                  <column datatype='integer' name='decision_year' ordinal='3' />
+                  <column datatype='integer' name='k_value' ordinal='4' />
+                  <column datatype='string' name='metric_name' ordinal='5' />
+                </columns>
+              </relation>
+            </properties>
+            <properties context='extract'>
+              <relation name='Extract' table='[Extract].[Extract]' type='table' />
+            </properties>
+          </object>
+        </objects>
+      </object-graph>
+    </datasource>
     <datasource caption='qb_trajectories_for_tableau' inline='true' name='federated.1tqdn9h08cc3kn19bb0g90z3s80t' version='18.1'>
       <connection class='federated'>
         <named-connections>
@@ -1862,8 +2099,11 @@
       <column-instance column='[Pass_ANY/A_adj]' derivation='Sum' name='[sum:Pass_ANY/A_adj:qk]' pivot='key' type='quantitative' />
       <column-instance column='[total_yards_adj]' derivation='Sum' name='[sum:total_yards_adj:qk]' pivot='key' type='quantitative' />
       <extract _.fcp.VConnDownstreamExtractsWithWarnings.true...user-specific='false' count='-1' enabled='true' object-id='' units='records'>
-        <connection access_mode='readonly' author-locale='en_US' class='hyper' dbname='C:/Users/Andre/AppData/Local/Temp/TableauTemp/#TableauTemp_1swda751mdmfxb1dvlodg1vqa8hx.hyper' default-settings='hyper' schema='Extract' sslmode='' tablename='Extract' update-time='10/16/2025 07:47:19 PM' username='tableau_internal_user'>
+        <connection access_mode='readonly' authentication='auth-none' author-locale='en_US' class='hyper' dbname='C:/Users/Andre/AppData/Local/Temp/TableauTemp/#TableauTemp_1swda751mdmfxb1dvlodg1vqa8hx.hyper' default-settings='yes' schema='Extract' sslmode='' update-time='10/16/2025 09:20:08 PM' username='tableau_internal_user'>
           <relation name='Extract' table='[Extract].[Extract]' type='table' />
+          <refresh>
+            <refresh-event add-from-file-path='qb_trajectories_for_tableau' increment-value='%null%' refresh-type='create' rows-inserted='417' timestamp-start='2025-10-16 21:20:07.819' />
+          </refresh>
           <metadata-records>
             <metadata-record class='column'>
               <remote-name>player_id</remote-name>
@@ -1875,7 +2115,7 @@
               <family>qb_trajectories_for_tableau.csv</family>
               <local-type>string</local-type>
               <aggregation>Count</aggregation>
-              <approx-count>71</approx-count>
+              <approx-count>73</approx-count>
               <contains-null>true</contains-null>
               <collation flag='0' name='LEN_RUS' />
               <object-id>[qb_trajectories_for_tableau.csv_448483ADAA8F422CBA5B9D2B54BDB6F8]</object-id>
@@ -1890,7 +2130,7 @@
               <family>qb_trajectories_for_tableau.csv</family>
               <local-type>string</local-type>
               <aggregation>Count</aggregation>
-              <approx-count>71</approx-count>
+              <approx-count>73</approx-count>
               <contains-null>true</contains-null>
               <collation flag='0' name='LEN_RUS' />
               <object-id>[qb_trajectories_for_tableau.csv_448483ADAA8F422CBA5B9D2B54BDB6F8]</object-id>
@@ -1990,7 +2230,7 @@
               <family>qb_trajectories_for_tableau.csv</family>
               <local-type>real</local-type>
               <aggregation>Sum</aggregation>
-              <approx-count>14</approx-count>
+              <approx-count>15</approx-count>
               <contains-null>true</contains-null>
               <object-id>[qb_trajectories_for_tableau.csv_448483ADAA8F422CBA5B9D2B54BDB6F8]</object-id>
             </metadata-record>
@@ -2018,7 +2258,7 @@
               <family>qb_trajectories_for_tableau.csv</family>
               <local-type>real</local-type>
               <aggregation>Sum</aggregation>
-              <approx-count>382</approx-count>
+              <approx-count>393</approx-count>
               <contains-null>true</contains-null>
               <object-id>[qb_trajectories_for_tableau.csv_448483ADAA8F422CBA5B9D2B54BDB6F8]</object-id>
             </metadata-record>
@@ -2032,7 +2272,7 @@
               <family>qb_trajectories_for_tableau.csv</family>
               <local-type>real</local-type>
               <aggregation>Sum</aggregation>
-              <approx-count>364</approx-count>
+              <approx-count>374</approx-count>
               <contains-null>true</contains-null>
               <object-id>[qb_trajectories_for_tableau.csv_448483ADAA8F422CBA5B9D2B54BDB6F8]</object-id>
             </metadata-record>
@@ -2101,243 +2341,6 @@
                   <column datatype='real' name='years_to_payment' ordinal='9' />
                   <column datatype='real' name='total_yards_adj' ordinal='10' />
                   <column datatype='real' name='Pass_ANY/A_adj' ordinal='11' />
-                </columns>
-              </relation>
-            </properties>
-            <properties context='extract'>
-              <relation name='Extract' table='[Extract].[Extract]' type='table' />
-            </properties>
-          </object>
-        </objects>
-      </object-graph>
-    </datasource>
-    <datasource caption='simple_knn_decision6_Pass_ANY_A_adj_k20' inline='true' name='federated.0n9s33g1gubckn0zqiv570coi1al' version='18.1'>
-      <connection class='federated'>
-        <named-connections>
-          <named-connection caption='simple_knn_decision6_Pass_ANY_A_adj_k20' name='textscan.1fdvz3w0v84t0p1h1tdq516m5q75'>
-            <connection class='textscan' directory='D:/proton drive/My files/Backup Docs/Personal Coding/football/KNN_surfaces' filename='simple_knn_decision6_Pass_ANY_A_adj_k20.csv' password='' server='' />
-          </named-connection>
-        </named-connections>
-        <relation connection='textscan.1fdvz3w0v84t0p1h1tdq516m5q75' name='simple_knn_decision6_Pass_ANY_A_adj_k20.csv' table='[simple_knn_decision6_Pass_ANY_A_adj_k20#csv]' type='table'>
-          <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
-            <column datatype='real' name='year' ordinal='0' />
-            <column datatype='real' name='Pass_ANY/A_adj' ordinal='1' />
-            <column datatype='real' name='payment_probability' ordinal='2' />
-            <column datatype='integer' name='decision_year' ordinal='3' />
-            <column datatype='integer' name='k_value' ordinal='4' />
-            <column datatype='string' name='metric_name' ordinal='5' />
-          </columns>
-        </relation>
-        <metadata-records>
-          <metadata-record class='capability'>
-            <remote-name />
-            <remote-type>0</remote-type>
-            <parent-name>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv]</parent-name>
-            <remote-alias />
-            <aggregation>Count</aggregation>
-            <contains-null>true</contains-null>
-            <attributes>
-              <attribute datatype='string' name='character-set'>&quot;UTF-8&quot;</attribute>
-              <attribute datatype='string' name='collation'>&quot;en_US&quot;</attribute>
-              <attribute datatype='string' name='field-delimiter'>&quot;,&quot;</attribute>
-              <attribute datatype='string' name='header-row'>&quot;true&quot;</attribute>
-              <attribute datatype='string' name='locale'>&quot;en_US&quot;</attribute>
-              <attribute datatype='string' name='single-char'>&quot;&quot;</attribute>
-            </attributes>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>year</remote-name>
-            <remote-type>5</remote-type>
-            <local-name>[year]</local-name>
-            <parent-name>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv]</parent-name>
-            <remote-alias>year</remote-alias>
-            <ordinal>0</ordinal>
-            <local-type>real</local-type>
-            <aggregation>Sum</aggregation>
-            <contains-null>true</contains-null>
-            <object-id>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv_6B244C3012B84653B092CC36E3F0948C]</object-id>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>Pass_ANY/A_adj</remote-name>
-            <remote-type>5</remote-type>
-            <local-name>[Pass_ANY/A_adj]</local-name>
-            <parent-name>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv]</parent-name>
-            <remote-alias>Pass_ANY/A_adj</remote-alias>
-            <ordinal>1</ordinal>
-            <local-type>real</local-type>
-            <aggregation>Sum</aggregation>
-            <contains-null>true</contains-null>
-            <object-id>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv_6B244C3012B84653B092CC36E3F0948C]</object-id>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>payment_probability</remote-name>
-            <remote-type>5</remote-type>
-            <local-name>[payment_probability]</local-name>
-            <parent-name>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv]</parent-name>
-            <remote-alias>payment_probability</remote-alias>
-            <ordinal>2</ordinal>
-            <local-type>real</local-type>
-            <aggregation>Sum</aggregation>
-            <contains-null>true</contains-null>
-            <object-id>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv_6B244C3012B84653B092CC36E3F0948C]</object-id>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>decision_year</remote-name>
-            <remote-type>20</remote-type>
-            <local-name>[decision_year]</local-name>
-            <parent-name>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv]</parent-name>
-            <remote-alias>decision_year</remote-alias>
-            <ordinal>3</ordinal>
-            <local-type>integer</local-type>
-            <aggregation>Sum</aggregation>
-            <contains-null>true</contains-null>
-            <object-id>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv_6B244C3012B84653B092CC36E3F0948C]</object-id>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>k_value</remote-name>
-            <remote-type>20</remote-type>
-            <local-name>[k_value]</local-name>
-            <parent-name>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv]</parent-name>
-            <remote-alias>k_value</remote-alias>
-            <ordinal>4</ordinal>
-            <local-type>integer</local-type>
-            <aggregation>Sum</aggregation>
-            <contains-null>true</contains-null>
-            <object-id>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv_6B244C3012B84653B092CC36E3F0948C]</object-id>
-          </metadata-record>
-          <metadata-record class='column'>
-            <remote-name>metric_name</remote-name>
-            <remote-type>129</remote-type>
-            <local-name>[metric_name]</local-name>
-            <parent-name>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv]</parent-name>
-            <remote-alias>metric_name</remote-alias>
-            <ordinal>5</ordinal>
-            <local-type>string</local-type>
-            <aggregation>Count</aggregation>
-            <scale>1</scale>
-            <width>1073741823</width>
-            <contains-null>true</contains-null>
-            <collation flag='0' name='LEN_RUS' />
-            <object-id>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv_6B244C3012B84653B092CC36E3F0948C]</object-id>
-          </metadata-record>
-        </metadata-records>
-      </connection>
-      <aliases enabled='yes' />
-      <column caption='Pass ANY/A adj' datatype='real' name='[Pass_ANY/A_adj]' role='measure' type='quantitative' />
-      <column caption='simple_knn_decision6_Pass_ANY_A_adj_k20.csv' datatype='table' name='[__tableau_internal_object_id__].[simple_knn_decision6_Pass_ANY_A_adj_k20.csv_6B244C3012B84653B092CC36E3F0948C]' role='measure' type='quantitative' />
-      <column caption='Decision Year' datatype='integer' name='[decision_year]' role='dimension' type='quantitative' />
-      <column caption='K Value' datatype='integer' name='[k_value]' role='measure' type='quantitative' />
-      <column caption='Metric Name' datatype='string' name='[metric_name]' role='dimension' type='nominal' />
-      <column caption='Payment Probability' datatype='real' name='[payment_probability]' role='measure' type='quantitative' />
-      <column caption='Year' datatype='real' name='[year]' role='dimension' type='quantitative' />
-      <extract _.fcp.VConnDownstreamExtractsWithWarnings.true...user-specific='false' count='-1' enabled='true' object-id='' units='records'>
-        <connection access_mode='readonly' author-locale='en_US' class='hyper' dbname='C:/Users/Andre/AppData/Local/Temp/TableauTemp/#TableauTemp_1564u5v12zi6kc17nskek1y46ja4.hyper' default-settings='hyper' schema='Extract' sslmode='' tablename='Extract' update-time='10/16/2025 07:54:53 PM' username='tableau_internal_user'>
-          <relation name='Extract' table='[Extract].[Extract]' type='table' />
-          <metadata-records>
-            <metadata-record class='column'>
-              <remote-name>year</remote-name>
-              <remote-type>5</remote-type>
-              <local-name>[year]</local-name>
-              <parent-name>[Extract]</parent-name>
-              <remote-alias>year</remote-alias>
-              <ordinal>0</ordinal>
-              <family>simple_knn_decision6_Pass_ANY_A_adj_k20.csv</family>
-              <local-type>real</local-type>
-              <aggregation>Sum</aggregation>
-              <approx-count>40</approx-count>
-              <contains-null>true</contains-null>
-              <object-id>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv_6B244C3012B84653B092CC36E3F0948C]</object-id>
-            </metadata-record>
-            <metadata-record class='column'>
-              <remote-name>Pass_ANY/A_adj</remote-name>
-              <remote-type>5</remote-type>
-              <local-name>[Pass_ANY/A_adj]</local-name>
-              <parent-name>[Extract]</parent-name>
-              <remote-alias>Pass_ANY/A_adj</remote-alias>
-              <ordinal>1</ordinal>
-              <family>simple_knn_decision6_Pass_ANY_A_adj_k20.csv</family>
-              <local-type>real</local-type>
-              <aggregation>Sum</aggregation>
-              <approx-count>100</approx-count>
-              <contains-null>true</contains-null>
-              <object-id>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv_6B244C3012B84653B092CC36E3F0948C]</object-id>
-            </metadata-record>
-            <metadata-record class='column'>
-              <remote-name>payment_probability</remote-name>
-              <remote-type>5</remote-type>
-              <local-name>[payment_probability]</local-name>
-              <parent-name>[Extract]</parent-name>
-              <remote-alias>payment_probability</remote-alias>
-              <ordinal>2</ordinal>
-              <family>simple_knn_decision6_Pass_ANY_A_adj_k20.csv</family>
-              <local-type>real</local-type>
-              <aggregation>Sum</aggregation>
-              <approx-count>16</approx-count>
-              <contains-null>true</contains-null>
-              <object-id>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv_6B244C3012B84653B092CC36E3F0948C]</object-id>
-            </metadata-record>
-            <metadata-record class='column'>
-              <remote-name>decision_year</remote-name>
-              <remote-type>20</remote-type>
-              <local-name>[decision_year]</local-name>
-              <parent-name>[Extract]</parent-name>
-              <remote-alias>decision_year</remote-alias>
-              <ordinal>3</ordinal>
-              <family>simple_knn_decision6_Pass_ANY_A_adj_k20.csv</family>
-              <local-type>integer</local-type>
-              <aggregation>Sum</aggregation>
-              <approx-count>1</approx-count>
-              <contains-null>true</contains-null>
-              <object-id>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv_6B244C3012B84653B092CC36E3F0948C]</object-id>
-            </metadata-record>
-            <metadata-record class='column'>
-              <remote-name>k_value</remote-name>
-              <remote-type>20</remote-type>
-              <local-name>[k_value]</local-name>
-              <parent-name>[Extract]</parent-name>
-              <remote-alias>k_value</remote-alias>
-              <ordinal>4</ordinal>
-              <family>simple_knn_decision6_Pass_ANY_A_adj_k20.csv</family>
-              <local-type>integer</local-type>
-              <aggregation>Sum</aggregation>
-              <approx-count>1</approx-count>
-              <contains-null>true</contains-null>
-              <object-id>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv_6B244C3012B84653B092CC36E3F0948C]</object-id>
-            </metadata-record>
-            <metadata-record class='column'>
-              <remote-name>metric_name</remote-name>
-              <remote-type>129</remote-type>
-              <local-name>[metric_name]</local-name>
-              <parent-name>[Extract]</parent-name>
-              <remote-alias>metric_name</remote-alias>
-              <ordinal>5</ordinal>
-              <family>simple_knn_decision6_Pass_ANY_A_adj_k20.csv</family>
-              <local-type>string</local-type>
-              <aggregation>Count</aggregation>
-              <approx-count>1</approx-count>
-              <contains-null>true</contains-null>
-              <collation flag='0' name='LEN_RUS' />
-              <object-id>[simple_knn_decision6_Pass_ANY_A_adj_k20.csv_6B244C3012B84653B092CC36E3F0948C]</object-id>
-            </metadata-record>
-          </metadata-records>
-        </connection>
-      </extract>
-      <layout dim-ordering='alphabetic' measure-ordering='alphabetic' show-structure='true' />
-      <semantic-values>
-        <semantic-value key='[Country].[Name]' value='&quot;United States&quot;' />
-      </semantic-values>
-      <object-graph>
-        <objects>
-          <object caption='simple_knn_decision6_Pass_ANY_A_adj_k20.csv' id='simple_knn_decision6_Pass_ANY_A_adj_k20.csv_6B244C3012B84653B092CC36E3F0948C'>
-            <properties context=''>
-              <relation connection='textscan.1fdvz3w0v84t0p1h1tdq516m5q75' name='simple_knn_decision6_Pass_ANY_A_adj_k20.csv' table='[simple_knn_decision6_Pass_ANY_A_adj_k20#csv]' type='table'>
-                <columns character-set='UTF-8' header='yes' locale='en_US' separator=','>
-                  <column datatype='real' name='year' ordinal='0' />
-                  <column datatype='real' name='Pass_ANY/A_adj' ordinal='1' />
-                  <column datatype='real' name='payment_probability' ordinal='2' />
-                  <column datatype='integer' name='decision_year' ordinal='3' />
-                  <column datatype='integer' name='k_value' ordinal='4' />
-                  <column datatype='string' name='metric_name' ordinal='5' />
                 </columns>
               </relation>
             </properties>
@@ -3145,7 +3148,7 @@
         </view>
         <style>
           <style-rule element='axis'>
-            <encoding attr='space' class='0' field='[federated.0n9s33g1gubckn0zqiv570coi1al].[none:year:qk]' field-type='quantitative' major-origin='0.0' major-spacing='1.0' max='5.05' min='0.0' range-type='fixed' scope='cols' type='space' />
+            <encoding attr='space' class='0' field='[federated.0n9s33g1gubckn0zqiv570coi1al].[none:year:qk]' field-type='quantitative' major-origin='0.0' major-spacing='1.0' max='5.0499999999999998' min='0.0' range-type='fixed' scope='cols' type='space' />
             <encoding attr='space' class='0' field='[federated.0n9s33g1gubckn0zqiv570coi1al].[sum:Pass_ANY/A_adj:qk]' field-type='quantitative' major-origin='0.0' major-spacing='0.5' max='16.0' min='0.0' range-type='fixed' scope='rows' type='space' />
           </style-rule>
           <style-rule element='mark'>
@@ -3353,7 +3356,7 @@
         </view>
         <style>
           <style-rule element='axis'>
-            <encoding attr='space' class='0' field='[federated.0uvfe9m1symcuv183n7241j0n514].[none:year:qk]' field-type='quantitative' major-origin='0.0' major-spacing='1.0' max='5.05' min='0.0' range-type='fixed' scope='cols' type='space' />
+            <encoding attr='space' class='0' field='[federated.0uvfe9m1symcuv183n7241j0n514].[none:year:qk]' field-type='quantitative' major-origin='0.0' major-spacing='1.0' max='5.0499999999999998' min='0.0' range-type='fixed' scope='cols' type='space' />
             <encoding attr='space' class='0' field='[federated.0uvfe9m1symcuv183n7241j0n514].[sum:total_yards_adj:qk]' field-type='quantitative' major-origin='0.0' major-spacing='500.0' max='6000.0' min='0.0' range-type='fixed' scope='rows' type='space' />
           </style-rule>
           <style-rule element='mark'>
@@ -3417,6 +3420,7 @@
               <groupfilter function='member' level='[none:player_name:nk]' member='&quot;Caleb Williams&quot;' />
               <groupfilter function='member' level='[none:player_name:nk]' member='&quot;Drake Maye&quot;' />
               <groupfilter function='member' level='[none:player_name:nk]' member='&quot;Jared Goff&quot;' />
+              <groupfilter function='member' level='[none:player_name:nk]' member='&quot;Josh Allen&quot;' />
               <groupfilter function='member' level='[none:player_name:nk]' member='&quot;Mac Jones&quot;' />
               <groupfilter function='member' level='[none:player_name:nk]' member='&quot;Michael Penix&quot;' />
               <groupfilter function='member' level='[none:player_name:nk]' member='&quot;Mitchell Trubisky&quot;' />
@@ -3990,8 +3994,8 @@
         <devicelayout auto-generated='true' name='Phone'>
           <size maxheight='700' minheight='700' sizing-mode='vscroll' />
           <zones>
-            <zone h='100000' id='27' type-v2='layout-basic' w='100000' x='0' y='0'>
-              <zone h='98118' id='26' param='vert' type-v2='layout-flow' w='98546' x='727' y='941'>
+            <zone h='100000' id='29' type-v2='layout-basic' w='100000' x='0' y='0'>
+              <zone h='98118' id='28' param='vert' type-v2='layout-flow' w='98546' x='727' y='941'>
                 <zone fixed-size='280' h='98118' id='3' is-fixed='true' name='KNN20;ANY;Y3' w='84001' x='727' y='941'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
@@ -4072,8 +4076,8 @@
         <devicelayout auto-generated='true' name='Phone'>
           <size maxheight='700' minheight='700' sizing-mode='vscroll' />
           <zones>
-            <zone h='100000' id='27' type-v2='layout-basic' w='100000' x='0' y='0'>
-              <zone h='98118' id='26' param='vert' type-v2='layout-flow' w='98546' x='727' y='941'>
+            <zone h='100000' id='29' type-v2='layout-basic' w='100000' x='0' y='0'>
+              <zone h='84000' id='28' param='vert' type-v2='layout-flow' w='84000' x='8000' y='8000'>
                 <zone fixed-size='280' h='98118' id='3' is-fixed='true' name='KNN20;yards;Y3' w='84001' x='727' y='941'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
@@ -4154,8 +4158,8 @@
         <devicelayout auto-generated='true' name='Phone'>
           <size maxheight='700' minheight='700' sizing-mode='vscroll' />
           <zones>
-            <zone h='100000' id='27' type-v2='layout-basic' w='100000' x='0' y='0'>
-              <zone h='98118' id='26' param='vert' type-v2='layout-flow' w='98546' x='727' y='941'>
+            <zone h='100000' id='29' type-v2='layout-basic' w='100000' x='0' y='0'>
+              <zone h='84000' id='28' param='vert' type-v2='layout-flow' w='84000' x='8000' y='8000'>
                 <zone fixed-size='280' h='98118' id='3' is-fixed='true' name='KNN20;ANY;Y4' w='84001' x='727' y='941'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
@@ -4236,8 +4240,8 @@
         <devicelayout auto-generated='true' name='Phone'>
           <size maxheight='700' minheight='700' sizing-mode='vscroll' />
           <zones>
-            <zone h='100000' id='27' type-v2='layout-basic' w='100000' x='0' y='0'>
-              <zone h='98118' id='26' param='vert' type-v2='layout-flow' w='98546' x='727' y='941'>
+            <zone h='100000' id='29' type-v2='layout-basic' w='100000' x='0' y='0'>
+              <zone h='84000' id='28' param='vert' type-v2='layout-flow' w='84000' x='8000' y='8000'>
                 <zone fixed-size='280' h='98118' id='3' is-fixed='true' name='KNN20;yards;Y4' w='84001' x='727' y='941'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
@@ -4318,8 +4322,8 @@
         <devicelayout auto-generated='true' name='Phone'>
           <size maxheight='700' minheight='700' sizing-mode='vscroll' />
           <zones>
-            <zone h='100000' id='27' type-v2='layout-basic' w='100000' x='0' y='0'>
-              <zone h='98118' id='26' param='vert' type-v2='layout-flow' w='98546' x='727' y='941'>
+            <zone h='100000' id='29' type-v2='layout-basic' w='100000' x='0' y='0'>
+              <zone h='84000' id='28' param='vert' type-v2='layout-flow' w='84000' x='8000' y='8000'>
                 <zone fixed-size='280' h='98118' id='3' is-fixed='true' name='KNN20;ANY;Y5' w='84001' x='727' y='941'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
@@ -4400,8 +4404,8 @@
         <devicelayout auto-generated='true' name='Phone'>
           <size maxheight='700' minheight='700' sizing-mode='vscroll' />
           <zones>
-            <zone h='100000' id='27' type-v2='layout-basic' w='100000' x='0' y='0'>
-              <zone h='98118' id='26' param='vert' type-v2='layout-flow' w='98546' x='727' y='941'>
+            <zone h='100000' id='29' type-v2='layout-basic' w='100000' x='0' y='0'>
+              <zone h='84000' id='28' param='vert' type-v2='layout-flow' w='84000' x='8000' y='8000'>
                 <zone fixed-size='280' h='98118' id='3' is-fixed='true' name='KNN20;yards;Y5' w='84001' x='727' y='941'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
@@ -4482,8 +4486,8 @@
         <devicelayout auto-generated='true' name='Phone'>
           <size maxheight='700' minheight='700' sizing-mode='vscroll' />
           <zones>
-            <zone h='100000' id='9' type-v2='layout-basic' w='100000' x='0' y='0'>
-              <zone h='98118' id='8' param='vert' type-v2='layout-flow' w='98546' x='727' y='941'>
+            <zone h='100000' id='11' type-v2='layout-basic' w='100000' x='0' y='0'>
+              <zone h='84000' id='10' param='vert' type-v2='layout-flow' w='84000' x='8000' y='8000'>
                 <zone fixed-size='280' h='98118' id='1' is-fixed='true' name='KNN20;ANY;Y6' w='84001' x='727' y='941'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
@@ -4564,8 +4568,8 @@
         <devicelayout auto-generated='true' name='Phone'>
           <size maxheight='700' minheight='700' sizing-mode='vscroll' />
           <zones>
-            <zone h='100000' id='9' type-v2='layout-basic' w='100000' x='0' y='0'>
-              <zone h='98118' id='8' param='vert' type-v2='layout-flow' w='98546' x='727' y='941'>
+            <zone h='100000' id='11' type-v2='layout-basic' w='100000' x='0' y='0'>
+              <zone h='84000' id='10' param='vert' type-v2='layout-flow' w='84000' x='8000' y='8000'>
                 <zone fixed-size='280' h='98118' id='1' is-fixed='true' name='KNN20;yards;Y6' w='84001' x='727' y='941'>
                   <zone-style>
                     <format attr='border-color' value='#000000' />
@@ -4848,7 +4852,7 @@
       </viewpoint>
       <simple-id uuid='{604204EC-84DA-4317-B19A-0F1EA3EAB94E}' />
     </window>
-    <window class='worksheet' name='Misc Yards 6+'>
+    <window class='worksheet' maximized='true' name='Misc Yards 6+'>
       <cards>
         <edge name='left'>
           <strip size='160'>
@@ -4908,7 +4912,7 @@
       </viewpoint>
       <simple-id uuid='{7FA7A419-1C93-44CB-B9CA-664C9ECECD7D}' />
     </window>
-    <window class='dashboard' maximized='true' name='3Y Double ANY'>
+    <window class='dashboard' name='3Y Double ANY'>
       <viewpoints>
         <viewpoint name='ANY Traj 2'>
           <zoom type='entire-view' />
@@ -4941,7 +4945,7 @@
           <zoom type='entire-view' />
         </viewpoint>
       </viewpoints>
-      <active id='25' />
+      <active id='-1' />
       <simple-id uuid='{1D4855D2-B6C4-41B8-B916-1BA4F6CAB6B5}' />
     </window>
     <window class='dashboard' name='4Y Double Yards'>
@@ -4965,7 +4969,7 @@
           <zoom type='entire-view' />
         </viewpoint>
       </viewpoints>
-      <active id='25' />
+      <active id='-1' />
       <simple-id uuid='{59F19005-12A6-4366-A532-B4F8FBFA7443}' />
     </window>
     <window class='dashboard' name='5Y Double Yds'>
@@ -4989,7 +4993,7 @@
           <zoom type='entire-view' />
         </viewpoint>
       </viewpoints>
-      <active id='7' />
+      <active id='-1' />
       <simple-id uuid='{7EBBA9FD-4301-48A0-A67B-E2BC770CA7D9}' />
     </window>
     <window class='dashboard' name='6Y Double Yds'>
@@ -7921,158 +7925,181 @@
     </thumbnail>
     <thumbnail height='192' name='Misc Yards 6+' width='192'>
       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
-      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
-      u2058jJ35ZUAAAAASUVORK5CYII=
+      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
+      +j89hpRoXWZq5QAAAABJRU5ErkJggg==
     </thumbnail>
     <thumbnail height='192' name='Yards Traj 2' width='192'>
       iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAYAAABS3GwHAAAACXBIWXMAABYlAAAWJQFJUiTw
