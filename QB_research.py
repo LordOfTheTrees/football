@@ -3996,7 +3996,7 @@ def export_individual_qb_trajectories(
     qb_list=None,
     years_range=(0, 6),
     include_recent_drafts=True,
-    recent_draft_cutoff=2021
+    recent_draft_cutoff=2024
 ):
     """
     Exports year-by-year performance trajectories for individual QBs.
@@ -4546,8 +4546,8 @@ if __name__ == "__main__":
     test_name_mapping()
     
     # Create mapping (first time - will process and cache)
-    #mapped_contracts = create_contract_player_mapping()
-    mapped_contracts = create_contract_player_mapping(force_refresh=True)   
+    mapped_contracts = create_contract_player_mapping()
+    #mapped_contracts = create_contract_player_mapping(force_refresh=True)   
 
     # Debug specific player
     contracts = load_csv_safe("QB_contract_data.csv")
@@ -4580,7 +4580,7 @@ if __name__ == "__main__":
     fix_individual_qb_files()
 
     if prepared_df is not None:
-        '''report = validate_payment_data(prepared_df)
+        report = validate_payment_data(prepared_df)
         #plot_sample_trajectories(prepared_df)
         
         # Create era-adjusted version
@@ -4591,38 +4591,9 @@ if __name__ == "__main__":
 
         if adjusted_df is None:
             print("✗ ERROR: Failed to create era-adjusted data")
-            exit(1)'''
+            exit(1)
 
-        '''# REGRESSION 1: What predicts getting paid?
-        print("\n\n" + "="*80)
-        print("REGRESSION 1: IDENTIFYING MOST IMPORTANT PREDICTOR (ERA-ADJUSTED)")
-        print("="*80)
-        
-        payment_results = ridge_regression_payment_prediction()
-        
-        if payment_results:
-            print(f"\n\n🏆 TOP PREDICTOR: {payment_results['top_predictor']}")
-            
-            # REGRESSION 2: Year-by-year weighting
-            print("\n\n" + "="*80)
-            print("REGRESSION 2: YEAR-BY-YEAR WEIGHTING ANALYSIS")
-            print("="*80)
-            
-            yards_weights = year_weighting_regression(metric='total_yards_adj', max_decision_year=6)
-            wins_weights = year_weighting_regression(metric='W-L%', max_decision_year=6)
-            '''
-        '''results = run_trajectory_visualization_pipeline(
-            metric='total_yards_adj',
-            n_sample_qbs=3,
-            force_refresh=False  # Change to True to regenerate all files
-        )'''
-        '''results = run_trajectory_visualization_pipeline(
-            metric='Pass_ANY/A_adj',
-            n_sample_qbs=3,
-            force_refresh=False
-        )'''
-
-    '''print("\n" + "="*80)
+    print("\n" + "="*80)
     print("GENERATING TABLEAU EXPORT FILES")
     print("="*80)
     
@@ -4631,22 +4602,23 @@ if __name__ == "__main__":
     years_to_include = (0, 6)  # Y0 through Y6
     
     # 1. Create payment probability surface (KNN)
-    print("\n\n[1/3] Creating payment probability surfaces...")
+    '''print("\n\n[1/3] Creating payment probability surfaces...")
     all_knn_results = run_all_simple_knn_surfaces(
         metrics=['total_yards_adj', 'Pass_ANY/A_adj'],
         decision_years=[3, 4, 5, 6],
         k_values=[5, 10, 15, 20]
-    )'''    
-    '''# 2. Export individual QB trajectories (overlay lines)
+    )'''
+    # 2. Export individual QB trajectories (overlay lines)
     print("\n\n[2/3] Exporting QB trajectories...")
     trajectories = export_individual_qb_trajectories(
         metrics=primary_metrics,
         qb_list=None,  # None = all QBs, or pass list of player_ids
-        years_range=years_to_include
-    )'''
+        years_range=years_to_include,
+        include_recent_drafts=True  # Include recent drafts for complete visualization
+    )
     
-    '''# 3. Export cohort summary stats (reference lines/ranges)
-    print("\n\n[3/3] Exporting cohort summary statistics...")
+    # 3. Export cohort summary stats (reference lines/ranges)
+    '''print("\n\n[3/3] Exporting cohort summary statistics...")
     summary = export_cohort_summary_stats(
         metrics=primary_metrics,
         years_range=years_to_include
