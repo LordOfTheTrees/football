@@ -1,5 +1,20 @@
+to reformat:
+//////////////////////////////////////////
+
+organize, group, and sanitize the workflow of my code to be more comprehensible to others
+
+create more data validation functions
+
+set up scripts to auto run
+
 to investigate:
 //////////////////////////////////////////later//////////////////////////////////
+
+What is the probability for payment of the unsigned QBs in their last year at the team (year0-6)
+
+Who are the most similar profiles from the data set of all QBs?
+
+Add in all the other rounds of QBs
 
 What is the most predictive with % of salary cap at signing
     what is second beyond year of signing? (assuming this is nr 1)
@@ -11,7 +26,6 @@ get_draft_slot_average_trajectory(draft_position, metric='Pass_ANY/A')
 Calculates average trajectory for QBs drafted at similar position
 Groups by draft slot (e.g., picks 1-5, 6-10, 11-20, 21-32)
 Returns: Average trajectory + confidence intervals
-
 
 compare_qb_to_slot_average(qb_trajectory, slot_average)
 

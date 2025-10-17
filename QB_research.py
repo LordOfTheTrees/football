@@ -2668,75 +2668,6 @@ def prepare_qb_payment_data(
     
     return final_df
 
-def validate_payment_data(df):
-    """Validates the payment-labeled dataset."""
-    print("\n" + "="*80)
-    print("PAYMENT DATA VALIDATION REPORT")
-    print("="*80)
-    
-    report = {
-        'total_seasons': len(df),
-        'unique_players': df['player_id'].nunique(),
-        'qbs_who_got_paid': len(df[df['got_paid'] == True]['player_id'].unique()),
-        'qbs_who_did_not_get_paid': len(df[df['got_paid'] == False]['player_id'].unique()),
-        'issues': []
-    }
-    
-    print(f"\n📊 BASIC STATISTICS")
-    print(f"   Total seasons: {report['total_seasons']:,}")
-    print(f"   Unique players: {report['unique_players']}")
-    print(f"   QBs who got paid: {report['qbs_who_got_paid']}")
-    print(f"   QBs who did not get paid: {report['qbs_who_did_not_get_paid']}")
-    
-    paid_seasons = df[df['got_paid'] == True]
-    if len(paid_seasons) > 0:
-        print(f"\n💰 PAYMENT DISTRIBUTION")
-        print(f"   Seasons from paid QBs: {len(paid_seasons):,}")
-        print(f"   Payment years range: {int(paid_seasons['payment_year'].min())}-{int(paid_seasons['payment_year'].max())}")
-        
-        print(f"\n📅 YEARS RELATIVE TO PAYMENT")
-        year_dist = paid_seasons['years_to_payment'].value_counts().sort_index()
-        for year, count in year_dist.items():
-            if pd.notna(year):
-                print(f"   Y{int(year):+d}: {count:>4} seasons")
-    
-    print(f"\n🔍 LOOKBACK FEATURES")
-    lag_cols = [col for col in df.columns if '_lag' in col]
-    if lag_cols:
-        for col in lag_cols[:6]:
-            non_null = df[col].notna().sum()
-            pct = non_null / len(df) * 100
-            print(f"   {col}: {non_null:>5} ({pct:>5.1f}%)")
-        if len(lag_cols) > 6:
-            print(f"   ... and {len(lag_cols)-6} more")
-    else:
-        report['issues'].append("No lag features found!")
-    
-    print(f"\n👥 SAMPLE QBs WHO GOT PAID")
-    paid_qbs = df[df['got_paid'] == True].groupby('player_id').agg({
-        'player_name': 'first',
-        'payment_year': 'first',
-        'draft_year': 'first',
-        'pick_number': 'first'
-    }).sort_values('payment_year', ascending=False).head(10)
-    
-    for idx, row in paid_qbs.iterrows():
-        years_to_pay = int(row['payment_year'] - row['draft_year'])
-        print(f"   {row['player_name']}: Drafted {int(row['draft_year'])} (#{int(row['pick_number'])}), Paid {int(row['payment_year'])} ({years_to_pay} yrs)")
-    
-    print(f"\n👥 SAMPLE QBs WHO DID NOT GET PAID")
-    unpaid_qbs = df[df['got_paid'] == False].groupby('player_id').agg({
-        'player_name': 'first',
-        'draft_year': 'first',
-        'pick_number': 'first',
-        'season': 'max'
-    }).sort_values('draft_year', ascending=False).head(10)
-    
-    for idx, row in unpaid_qbs.iterrows():
-        print(f"   {row['player_name']}: Drafted {int(row['draft_year'])} (#{int(row['pick_number'])}), Last season {int(row['season'])}")
-    
-    return report
-
 def ridge_regression_payment_prediction(alpha_range=None, exclude_recent_drafts=True):
     """
     Ridge regression to identify what predicts getting paid.
@@ -4610,16 +4541,16 @@ def create_player_ids_from_qb_data():
 
 if __name__ == "__main__":
     print("="*80)
-    print("CLEAN QB DATA REBUILD WORKFLOW")
+    print("QB DATA REBUILD WORKFLOW")
     print("="*80)
     
     # STEP 1: Fix individual QB files FIRST (before any data processing)
     fix_individual_qb_files()
     
     print("\n" + "="*80)
-    print("CREATING CORE FILES FROM EXISTING QB_DATA (WEB-FREE)")
+    print("CREATING CORE FILES FROM EXISTING SCRAPED QB_DATA")
     print("="*80)
-    
+
     # Check what files exist
     core_files = {
         'all_seasons_df.csv': os.path.exists('all_seasons_df.csv'),
@@ -4647,34 +4578,28 @@ if __name__ == "__main__":
     else:
         print("✓ Core files already exist")
     
-    # STEP 3: Continue with rest of your workflow...
-    print("\n" + "="*80)
-    print("CREATING CONTRACT MAPPING")
-    print("="*80)
-    mapped_contracts = create_contract_player_mapping(force_refresh=True)
-    
     # STEP 3: Create contract mapping (force refresh to clear any corruption)
     print("\n" + "="*80)
     print("CREATING CONTRACT MAPPING")
     print("="*80)
-    mapped_contracts = create_contract_player_mapping(force_refresh=True)
-    
+    mapped_contracts = create_contract_player_mapping(force_refresh=True) # can remove this force_refresh later if you want to save CPU time and trust the data
+
     if mapped_contracts is None:
         print("✗ ERROR: Failed to create contract mapping")
         exit(1)
-    
+        
     # STEP 4: Test name matching for debugging
     print("\n" + "="*80)
     print("TESTING NAME MATCHING")
     print("="*80)
     test_name_mapping()
-    
+        
     # Debug specific players
-    contracts_raw = load_csv_safe("QB_contract_data.csv")
-    player_ids = load_csv_safe("player_ids.csv")
-    if contracts_raw is not None and player_ids is not None:
-        debug_name_matching("Josh Allen", contracts_raw, player_ids)
-        debug_name_matching("Justin Fields", contracts_raw, player_ids)
+    #contracts_raw = load_csv_safe("QB_contract_data.csv") # Uncomment if you want to debug specific players
+    #player_ids = load_csv_safe("player_ids.csv") # Uncomment if you want to debug specific players
+    #if contracts_raw is not None and player_ids is not None:
+    #    debug_name_matching("Josh Allen", contracts_raw, player_ids)
+    #    debug_name_matching("Justin Fields", contracts_raw, player_ids)
     
     # STEP 5: Create payment mapping
     print("\n" + "="*80)
