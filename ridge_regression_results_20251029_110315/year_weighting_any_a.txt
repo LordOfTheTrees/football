@@ -1,0 +1,111 @@
+================================================================================
+Year Weighting Analysis: Pass ANY/A (Era Adjusted)
+Generated: 2025-10-29 11:03:16
+================================================================================
+
+
+================================================================================
+YEAR-BY-YEAR WEIGHTING ANALYSIS: Pass_ANY/A_adj
+================================================================================
+✓ Loaded 562 records from file
+✓ Loaded 562 seasons with era-adjusted payment labels
+Analyzing metric: Pass_ANY/A_adj
+QBs in dataset: 59
+
+================================================================================
+DECISION YEAR 3 (payment in Year 3)
+Using performance from Years 0 to 2
+================================================================================
+Players with data: 59
+Complete cases: 51
+Payment distribution: 20 paid, 31 not paid
+
+Year-by-year coefficients:
+     Year  Coefficient   Weight_%
+0  Year 0     0.039893  15.120975
+1  Year 1     0.084441  32.005988
+2  Year 2     0.139494  52.873037
+
+Model R²: 0.2047
+
+================================================================================
+DECISION YEAR 4 (payment in Year 4)
+Using performance from Years 0 to 3
+================================================================================
+Players with data: 59
+Complete cases: 47
+Payment distribution: 20 paid, 27 not paid
+
+Year-by-year coefficients:
+     Year  Coefficient   Weight_%
+0  Year 0     0.053885  16.929773
+1  Year 1     0.072614  22.814111
+2  Year 2     0.118603  37.263398
+3  Year 3     0.073182  22.992719
+
+Model R²: 0.2055
+
+================================================================================
+DECISION YEAR 5 (payment in Year 5)
+Using performance from Years 0 to 4
+================================================================================
+Players with data: 59
+Complete cases: 40
+Payment distribution: 18 paid, 22 not paid
+
+Year-by-year coefficients:
+     Year  Coefficient   Weight_%
+0  Year 0     0.055127  14.169091
+1  Year 1     0.053113  13.651417
+2  Year 2     0.105370  27.082837
+3  Year 3     0.053978  13.873860
+4  Year 4     0.121477  31.222795
+
+Model R²: 0.2838
+
+================================================================================
+DECISION YEAR 6 (payment in Year 6)
+Using performance from Years 0 to 5
+================================================================================
+Players with data: 59
+Complete cases: 32
+Payment distribution: 13 paid, 19 not paid
+
+Year-by-year coefficients:
+     Year  Coefficient   Weight_%
+0  Year 0     0.057621  13.734658
+1  Year 1     0.048919  11.660334
+2  Year 2     0.092519  22.053036
+3  Year 3     0.072730  17.335942
+4  Year 4     0.098482  23.474310
+5  Year 5    -0.049260  11.741720
+
+Model R²: 0.2226
+
+================================================================================
+SUMMARY: YEAR WEIGHTS ACROSS DECISION YEARS (Pass_ANY/A_adj)
+================================================================================
+
+Weight Matrix (% importance of each year):
+Rows = Performance year, Columns = Decision year
+Decision_Year             3          4          5          6
+Performance_Year                                            
+Year 0            15.120975  16.929773  14.169091  13.734658
+Year 1            32.005988  22.814111  13.651417  11.660334
+Year 2            52.873037  37.263398  27.082837  22.053036
+Year 3                  NaN  22.992719  13.873860  17.335942
+Year 4                  NaN        NaN  31.222795  23.474310
+Year 5                  NaN        NaN        NaN  11.741720
+
+================================================================================
+AVERAGE WEIGHTS ACROSS ALL DECISION YEARS
+================================================================================
+
+Average importance of each performance year:
+  Year 0: 15.0%
+  Year 1: 20.0%
+  Year 2: 34.8%
+  Year 3: 18.1%
+  Year 4: 27.3%
+  Year 5: 11.7%
+Error running function: Cannot save file into a non-existent directory: 'year_weights_Pass_ANY'

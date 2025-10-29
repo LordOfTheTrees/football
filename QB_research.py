@@ -4538,6 +4538,505 @@ def create_player_ids_from_qb_data():
     
     return True
 
+def ridge_regression_with_significance_testing(train_df=None, test_df=None, use_extended_features=True, n_bootstrap=1000):
+    """
+    Enhanced ridge regression for wins prediction with bootstrap-based statistical significance testing.
+    
+    Args:
+        train_df: Training data
+        test_df: Test data  
+        use_extended_features: Use extended (10) vs original (5) feature set
+        n_bootstrap: Number of bootstrap samples for significance testing
+    
+    Returns:
+        dict: Results including significance tests and confidence intervals
+    """
+    print("\n" + "="*80)
+    print("RIDGE REGRESSION WITH STATISTICAL SIGNIFICANCE TESTING")
+    print("="*80)
+    
+    # Run the existing ridge regression first
+    base_results = ridge_regression_with_cv(train_df, test_df, use_extended_features=use_extended_features)
+    
+    if base_results is None:
+        return None
+    
+    print("\n" + "="*80)
+    print("BOOTSTRAP STATISTICAL SIGNIFICANCE TESTING")
+    print("="*80)
+    
+    # Get the training data used in the original analysis
+    if train_df is None or test_df is None:
+        train_df, test_df = load_train_test_split()
+        if train_df is None or test_df is None:
+            return None
+    
+    # Load season records
+    season_records = load_csv_safe("season_records.csv")
+    if season_records is None:
+        return None
+    
+    season_records['Season'] = pd.to_numeric(season_records['Season'], errors='coerce')
+    season_records = season_records.dropna(subset=['Season'])
+    season_records['Season'] = season_records['Season'].astype(int)
+    
+    # Process training data (same as in original function)
+    train_df['season'] = pd.to_numeric(train_df['season'], errors='coerce')
+    train_df = train_df.dropna(subset=['season'])
+    train_df['season'] = train_df['season'].astype(int)
+    
+    train_merged = pd.merge(
+        train_df,
+        season_records,
+        left_on=['season', 'Team'],
+        right_on=['Season', 'Team'],
+        how='inner'
+    )
+    
+    train_merged['GS_numeric'] = pd.to_numeric(train_merged['GS'], errors='coerce')
+    train_merged = train_merged[train_merged['GS_numeric'] >= 8]
+    train_merged['Wins'] = pd.to_numeric(train_merged['W'], errors='coerce')
+    train_merged = train_merged.dropna(subset=['Wins'])
+    
+    # Define features (same logic as original)
+    if use_extended_features:
+        performance_factors = [
+            'Pass_TD', 'Pass_ANY/A', 'Rush_Rushing_Succ%', 'Pass_Int%', 'Pass_Sk%',
+            'total_yards', 'Pass_4QC', 'Pass_GWD', 'Rush_Rushing_TD', 'Rush_Rushing_Yds'
+        ]
+    else:
+        performance_factors = [
+            'Pass_TD', 'Pass_ANY/A', 'Rush_Rushing_Succ%', 'Pass_Int%', 'Pass_Sk%'
+        ]
+    
+    available_factors = [f for f in performance_factors if f in train_merged.columns]
+    
+    # Build training dataset
+    train_features = train_merged[available_factors + ['Wins']].copy()
+    for col in available_factors:
+        train_features[col] = pd.to_numeric(train_features[col], errors='coerce')
+    train_features = train_features.dropna()
+    
+    X_train = train_features[available_factors].values
+    y_train = train_features['Wins'].values
+    
+    # Standardize features
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    
+    # Get the optimal alpha from base results
+    optimal_alpha = base_results['best_alpha'] if 'best_alpha' in base_results else 1.0
+    
+    print(f"Running {n_bootstrap} bootstrap samples for significance testing...")
+    print(f"Training samples: {len(X_train_scaled)}")
+    print(f"Features: {len(available_factors)}")
+    print(f"Optimal alpha: {optimal_alpha}")
+    
+    # Bootstrap resampling
+    bootstrap_coefs = []
+    bootstrap_r2s = []
+    
+    for i in range(n_bootstrap):
+        if i % 200 == 0:
+            print(f"  Bootstrap sample {i}/{n_bootstrap}...")
+        
+        # Sample with replacement
+        indices = np.random.choice(len(X_train_scaled), len(X_train_scaled), replace=True)
+        X_boot = X_train_scaled[indices]
+        y_boot = y_train[indices]
+        
+        # Fit model on bootstrap sample
+        model_boot = Ridge(alpha=optimal_alpha)
+        model_boot.fit(X_boot, y_boot)
+        
+        # Store coefficients and R²
+        bootstrap_coefs.append(model_boot.coef_)
+        r2_boot = model_boot.score(X_boot, y_boot)
+        bootstrap_r2s.append(r2_boot)
+    
+    bootstrap_coefs = np.array(bootstrap_coefs)
+    bootstrap_r2s = np.array(bootstrap_r2s)
+    
+    print(f"\nBootstrap complete!")
+    
+    # Calculate significance statistics
+    print("\n" + "="*80)
+    print("STATISTICAL SIGNIFICANCE RESULTS")
+    print("="*80)
+    
+    # Original model for comparison
+    original_model = Ridge(alpha=optimal_alpha)
+    original_model.fit(X_train_scaled, y_train)
+    
+    significance_results = []
+    
+    for i, feature in enumerate(available_factors):
+        coef_dist = bootstrap_coefs[:, i]
+        original_coef = original_model.coef_[i]
+        
+        # Calculate confidence intervals (95%)
+        ci_lower = np.percentile(coef_dist, 2.5)
+        ci_upper = np.percentile(coef_dist, 97.5)
+        
+        # Statistical significance test: CI doesn't include zero
+        is_significant = not (ci_lower <= 0 <= ci_upper)
+        
+        # Calculate p-value approximation (two-tailed)
+        if original_coef > 0:
+            p_value_approx = 2 * np.mean(coef_dist <= 0)
+        else:
+            p_value_approx = 2 * np.mean(coef_dist >= 0)
+        p_value_approx = min(p_value_approx, 1.0)
+        
+        # Standard error
+        se = np.std(coef_dist)
+        
+        # T-statistic approximation
+        t_stat = original_coef / se if se > 0 else 0
+        
+        significance_results.append({
+            'Feature': feature,
+            'Coefficient': original_coef,
+            'Std_Error': se,
+            'T_Statistic': t_stat,
+            'P_Value_Bootstrap': p_value_approx,
+            'CI_Lower_95': ci_lower,
+            'CI_Upper_95': ci_upper,
+            'Significant_95': is_significant,
+            'Coefficient_Mean_Bootstrap': np.mean(coef_dist),
+            'Coefficient_Std_Bootstrap': np.std(coef_dist)
+        })
+    
+    significance_df = pd.DataFrame(significance_results)
+    significance_df = significance_df.sort_values('T_Statistic', key=abs, ascending=False)
+    
+    print("\nStatistical Significance Test Results:")
+    print("(Bootstrap method with 95% confidence intervals)")
+    print("\nInterpretation:")
+    print("  - Significant_95 = True: 95% CI doesn't include zero (statistically significant)")
+    print("  - P_Value_Bootstrap: Approximate two-tailed p-value")
+    print("  - T_Statistic: Coefficient / Standard Error")
+    
+    display(significance_df[['Feature', 'Coefficient', 'Std_Error', 'T_Statistic', 
+                            'P_Value_Bootstrap', 'CI_Lower_95', 'CI_Upper_95', 'Significant_95']])
+    
+    # Model stability analysis
+    print(f"\n" + "="*80)
+    print("MODEL STABILITY ANALYSIS")
+    print("="*80)
+    
+    print(f"Bootstrap R² statistics:")
+    print(f"  Mean R²: {np.mean(bootstrap_r2s):.4f}")
+    print(f"  Std R²: {np.std(bootstrap_r2s):.4f}")
+    print(f"  95% CI R²: [{np.percentile(bootstrap_r2s, 2.5):.4f}, {np.percentile(bootstrap_r2s, 97.5):.4f}]")
+    print(f"  Original R²: {original_model.score(X_train_scaled, y_train):.4f}")
+    
+    # Identify most stable predictors
+    significant_predictors = significance_df[significance_df['Significant_95']]
+    
+    print(f"\n🔍 SIGNIFICANT PREDICTORS ({len(significant_predictors)} of {len(significance_df)}):")
+    for _, row in significant_predictors.iterrows():
+        direction = "increases" if row['Coefficient'] > 0 else "decreases"
+        print(f"  ✓ {row['Feature']}: {direction} wins (p ≈ {row['P_Value_Bootstrap']:.4f})")
+    
+    # Save results
+    significance_df.to_csv('ridge_regression_significance_tests.csv', index=False)
+    
+    # Combine with base results
+    enhanced_results = base_results.copy()
+    enhanced_results.update({
+        'significance_tests': significance_df,
+        'bootstrap_coefficients': bootstrap_coefs,
+        'bootstrap_r2s': bootstrap_r2s,
+        'significant_predictors': significant_predictors,
+        'model_stability': {
+            'r2_mean': np.mean(bootstrap_r2s),
+            'r2_std': np.std(bootstrap_r2s),
+            'r2_ci_lower': np.percentile(bootstrap_r2s, 2.5),
+            'r2_ci_upper': np.percentile(bootstrap_r2s, 97.5)
+        }
+    })
+    
+    print(f"\n✓ Significance test results saved to: ridge_regression_significance_tests.csv")
+    
+    return enhanced_results
+
+def payment_prediction_with_confusion_matrix(alpha_range=None, exclude_recent_drafts=True, probability_thresholds=None):
+    """
+    Enhanced payment prediction with comprehensive confusion matrix analysis and classification metrics.
+    
+    Args:
+        alpha_range: Alpha values for ridge regression
+        exclude_recent_drafts: Whether to exclude recent draft classes
+        probability_thresholds: List of probability thresholds to test (default: [0.3, 0.4, 0.5, 0.6, 0.7])
+    
+    Returns:
+        dict: Results including confusion matrices, ROC curves, and optimal thresholds
+    """
+    print("\n" + "="*80)
+    print("PAYMENT PREDICTION WITH CONFUSION MATRIX ANALYSIS")
+    print("="*80)
+    
+    # Run the base payment prediction first
+    base_results = ridge_regression_payment_prediction(alpha_range, exclude_recent_drafts)
+    
+    if base_results is None:
+        return None
+    
+    print("\n" + "="*80)
+    print("CONFUSION MATRIX AND CLASSIFICATION ANALYSIS")
+    print("="*80)
+    
+    # We need to rebuild the data and model to get predictions
+    # (This duplicates some logic from the original function, but ensures we get the exact same data)
+    
+    # Load data (same as original function)
+    if not os.path.exists('qb_seasons_payment_labeled_era_adjusted.csv'):
+        print("✗ ERROR: qb_seasons_payment_labeled_era_adjusted.csv not found")
+        return None
+    
+    payment_df = load_csv_safe('qb_seasons_payment_labeled_era_adjusted.csv')
+    
+    # Filter to eligible QBs
+    if exclude_recent_drafts:
+        cutoff_year = 2020
+        payment_df['draft_year'] = pd.to_numeric(payment_df['draft_year'], errors='coerce')
+        payment_df = payment_df[payment_df['draft_year'] <= cutoff_year]
+    
+    # Load and merge season records (same as original)
+    season_records = load_csv_safe("season_records.csv")
+    if season_records is None:
+        return None
+    
+    season_records['Season'] = pd.to_numeric(season_records['Season'], errors='coerce')
+    season_records = season_records.dropna(subset=['Season'])
+    season_records['Season'] = season_records['Season'].astype(int)
+    
+    payment_df['season'] = pd.to_numeric(payment_df['season'], errors='coerce')
+    payment_df = payment_df.dropna(subset=['season'])
+    payment_df['season'] = payment_df['season'].astype(int)
+    
+    merged_df = pd.merge(
+        payment_df,
+        season_records[['Season', 'Team', 'W-L%', 'Pts']],
+        left_on=['season', 'Team'],
+        right_on=['Season', 'Team'],
+        how='inner'
+    )
+    
+    # Create adjusted Pts (same as original)
+    if os.path.exists('era_adjustment_factors.csv'):
+        factor_df = pd.read_csv('era_adjustment_factors.csv')
+        pts_factors = factor_df[factor_df['stat'] == 'Pts'].set_index('year')['adjustment_factor'].to_dict()
+        merged_df['Pts_adj'] = merged_df['Pts'] * merged_df['season'].map(pts_factors)
+    else:
+        merged_df['Pts_adj'] = merged_df['Pts']
+    
+    # Create features (same as original)
+    qb_metrics = ['total_yards_adj', 'Pass_TD_adj', 'Pass_ANY/A_adj', 'Rush_Rushing_Succ%_adj']
+    team_metrics = ['W-L%', 'Pts_adj']
+    all_metrics = qb_metrics + team_metrics
+    
+    # Create lags and averages (simplified version)
+    merged_df = merged_df.sort_values(['player_id', 'season'])
+    
+    for metric in all_metrics:
+        merged_df[metric] = pd.to_numeric(merged_df[metric], errors='coerce')
+        for lag in [1, 2, 3]:
+            lag_col = f"{metric}_lag{lag}"
+            merged_df[lag_col] = merged_df.groupby('player_id')[metric].shift(lag)
+    
+    # Create averaged features
+    features = []
+    for metric in all_metrics:
+        avg_col = f"{metric}_avg"
+        merged_df[avg_col] = merged_df[[f"{metric}_lag1", f"{metric}_lag2", f"{metric}_lag3"]].mean(axis=1)
+        features.append(avg_col)
+    
+    # Prepare final dataset
+    X_full = merged_df[features + ['got_paid', 'player_id']].copy()
+    X_full = X_full.dropna(subset=features)
+    
+    y_full = X_full['got_paid'].astype(int)
+    X_full_features = X_full[features]
+    
+    # Train/test split (80/20)
+    split_idx = int(len(X_full_features) * 0.8)
+    X_train = X_full_features.iloc[:split_idx]
+    X_test = X_full_features.iloc[split_idx:]
+    y_train = y_full.iloc[:split_idx]
+    y_test = y_full.iloc[split_idx:]
+    
+    print(f"Dataset for confusion matrix analysis:")
+    print(f"  Total samples: {len(X_full_features)}")
+    print(f"  Train: {len(X_train)} (paid: {y_train.sum()})")
+    print(f"  Test: {len(X_test)} (paid: {y_test.sum()})")
+    
+    # Standardize and train model
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+    
+    # Use the best alpha from base results
+    best_alpha = base_results.get('best_alpha', 100.0)
+    model = Ridge(alpha=best_alpha)
+    model.fit(X_train_scaled, y_train)
+    
+    # Get probability predictions
+    y_train_prob = model.predict(X_train_scaled)
+    y_test_prob = model.predict(X_test_scaled)
+    
+    # Clip probabilities to [0, 1] range
+    y_train_prob = np.clip(y_train_prob, 0, 1)
+    y_test_prob = np.clip(y_test_prob, 0, 1)
+    
+    print(f"\nPredicted probability range:")
+    print(f"  Train: {y_train_prob.min():.3f} to {y_train_prob.max():.3f}")
+    print(f"  Test: {y_test_prob.min():.3f} to {y_test_prob.max():.3f}")
+    
+    # Test multiple probability thresholds
+    if probability_thresholds is None:
+        probability_thresholds = [0.3, 0.4, 0.5, 0.6, 0.7]
+    
+    print(f"\n" + "="*80)
+    print("CONFUSION MATRIX ANALYSIS AT DIFFERENT THRESHOLDS")
+    print("="*80)
+    
+    threshold_results = []
+    
+    for threshold in probability_thresholds:
+        print(f"\n📊 THRESHOLD = {threshold}")
+        print("-" * 40)
+        
+        # Convert probabilities to binary predictions
+        y_train_pred = (y_train_prob >= threshold).astype(int)
+        y_test_pred = (y_test_prob >= threshold).astype(int)
+        
+        # Training set confusion matrix
+        cm_train = confusion_matrix(y_train, y_train_pred)
+        print(f"\nTraining Set Confusion Matrix:")
+        print(f"                Predicted")
+        print(f"              No Pay  Pay")
+        print(f"Actual No Pay    {cm_train[0,0]:3d}  {cm_train[0,1]:3d}")
+        print(f"Actual Pay       {cm_train[1,0]:3d}  {cm_train[1,1]:3d}")
+        
+        # Test set confusion matrix  
+        cm_test = confusion_matrix(y_test, y_test_pred)
+        print(f"\nTest Set Confusion Matrix:")
+        print(f"                Predicted")
+        print(f"              No Pay  Pay")
+        print(f"Actual No Pay    {cm_test[0,0]:3d}  {cm_test[0,1]:3d}")
+        print(f"Actual Pay       {cm_test[1,0]:3d}  {cm_test[1,1]:3d}")
+        
+        # Calculate metrics for test set
+        tn, fp, fn, tp = cm_test.ravel()
+        
+        accuracy = (tp + tn) / (tp + tn + fp + fn)
+        precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+        recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+        specificity = tn / (tn + fp) if (tn + fp) > 0 else 0
+        f1_score = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+        
+        print(f"\nTest Set Classification Metrics:")
+        print(f"  Accuracy:    {accuracy:.3f} ({tp + tn}/{len(y_test)} correct)")
+        print(f"  Precision:   {precision:.3f} ({tp}/{tp + fp} predicted pays were correct)")
+        print(f"  Recall:      {recall:.3f} ({tp}/{tp + fn} actual pays were caught)")
+        print(f"  Specificity: {specificity:.3f} ({tn}/{tn + fp} actual no-pays were caught)")
+        print(f"  F1-Score:    {f1_score:.3f}")
+        
+        # Store results
+        threshold_results.append({
+            'threshold': threshold,
+            'test_accuracy': accuracy,
+            'test_precision': precision,
+            'test_recall': recall,
+            'test_specificity': specificity,
+            'test_f1_score': f1_score,
+            'test_tp': tp,
+            'test_fp': fp,
+            'test_tn': tn,
+            'test_fn': fn,
+            'confusion_matrix_test': cm_test,
+            'confusion_matrix_train': cm_train
+        })
+    
+    threshold_df = pd.DataFrame(threshold_results)
+    
+    # Find optimal threshold
+    print(f"\n" + "="*80)
+    print("OPTIMAL THRESHOLD ANALYSIS")
+    print("="*80)
+    
+    print("\nPerformance Summary Across Thresholds:")
+    display(threshold_df[['threshold', 'test_accuracy', 'test_precision', 'test_recall', 'test_f1_score']])
+    
+    # Find best threshold by F1 score
+    best_f1_idx = threshold_df['test_f1_score'].idxmax()
+    best_threshold = threshold_df.iloc[best_f1_idx]
+    
+    print(f"\n🎯 OPTIMAL THRESHOLD (by F1-score): {best_threshold['threshold']}")
+    print(f"   F1-Score: {best_threshold['test_f1_score']:.3f}")
+    print(f"   Accuracy: {best_threshold['test_accuracy']:.3f}")
+    print(f"   Precision: {best_threshold['test_precision']:.3f}")
+    print(f"   Recall: {best_threshold['test_recall']:.3f}")
+    
+    # ROC Analysis
+    try:
+        auc_score = roc_auc_score(y_test, y_test_prob)
+        print(f"\n📈 ROC AUC Score: {auc_score:.3f}")
+        
+        if auc_score > 0.7:
+            print("   → Good discriminative ability")
+        elif auc_score > 0.6:
+            print("   → Moderate discriminative ability")  
+        else:
+            print("   → Limited discriminative ability")
+            
+    except Exception as e:
+        print(f"\n⚠️  Could not calculate ROC AUC: {e}")
+        auc_score = None
+    
+    # Feature importance in classification context
+    print(f"\n" + "="*80)
+    print("FEATURE IMPORTANCE FOR CLASSIFICATION")
+    print("="*80)
+    
+    feature_importance = pd.DataFrame({
+        'Feature': features,
+        'Coefficient': model.coef_,
+        'Abs_Coefficient': np.abs(model.coef_)
+    }).sort_values('Abs_Coefficient', ascending=False)
+    
+    print("\nTop predictors of getting paid:")
+    for i, (_, row) in enumerate(feature_importance.head(3).iterrows()):
+        direction = "increases" if row['Coefficient'] > 0 else "decreases"
+        print(f"  {i+1}. {row['Feature']}: {direction} payment probability")
+    
+    # Save results
+    threshold_df.to_csv('payment_prediction_confusion_matrix_analysis.csv', index=False)
+    feature_importance.to_csv('payment_prediction_classification_importance.csv', index=False)
+    
+    # Combine with base results
+    enhanced_results = base_results.copy()
+    enhanced_results.update({
+        'confusion_matrix_analysis': threshold_df,
+        'optimal_threshold': best_threshold['threshold'],
+        'optimal_metrics': {
+            'f1_score': best_threshold['test_f1_score'],
+            'accuracy': best_threshold['test_accuracy'],
+            'precision': best_threshold['test_precision'],
+            'recall': best_threshold['test_recall']
+        },
+        'roc_auc': auc_score,
+        'classification_feature_importance': feature_importance,
+        'test_probabilities': y_test_prob,
+        'test_actual': y_test.values
+    })
+    
+    print(f"\n✓ Confusion matrix analysis saved to: payment_prediction_confusion_matrix_analysis.csv")
+    print(f"✓ Classification feature importance saved to: payment_prediction_classification_importance.csv")
+    
+    return enhanced_results
 
 if __name__ == "__main__":
     print("="*80)

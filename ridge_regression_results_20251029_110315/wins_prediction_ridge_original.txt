@@ -1,0 +1,114 @@
+================================================================================
+Ridge Regression: Wins Prediction (Original Features)
+Generated: 2025-10-29 11:03:16
+================================================================================
+
+
+================================================================================
+RIDGE REGRESSION WITH 5-FOLD CROSS-VALIDATION
+================================================================================
+
+Loading train/test split from files...
+✓ Loaded 447 records from file
+✓ Loaded 112 records from file
+Loaded train set: 447 records
+Loaded test set: 112 records
+✓ Loaded 798 records from season records
+
+================================================================================
+PROCESSING TRAINING DATA
+================================================================================
+Training set: 442 QB season-team records
+After filtering (8+ GS): 292 records
+
+================================================================================
+PROCESSING TEST DATA
+================================================================================
+Test set: 103 QB season-team records
+After filtering (8+ GS): 57 records
+
+Using ORIGINAL feature set (manual selection)
+
+================================================================================
+FEATURE SELECTION
+================================================================================
+
+Using 5 performance factors:
+  - Pass_TD
+  - Pass_ANY/A
+  - Rush_Rushing_Succ%
+  - Pass_Int%
+  - Pass_Sk%
+
+Proceeding with 5 available factors
+
+Training set complete cases: 292
+Test set complete cases: 57
+
+================================================================================
+CROSS-VALIDATION TO SELECT OPTIMAL ALPHA
+================================================================================
+
+Testing 7 alpha values with 5-fold CV:
+Alpha range: [0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
+
+Best alpha (regularization strength): 10.0
+
+================================================================================
+5-FOLD CROSS-VALIDATION PERFORMANCE
+================================================================================
+
+Cross-Validation R² Scores (5 folds):
+  Fold 1: 0.0759
+  Fold 2: 0.4484
+  Fold 3: 0.2534
+  Fold 4: 0.2516
+  Fold 5: 0.4076
+
+Mean CV R²: 0.2874 (+/- 0.2646)
+
+Cross-Validation RMSE Scores (5 folds):
+  Fold 1: 2.735 wins
+  Fold 2: 2.284 wins
+  Fold 3: 2.415 wins
+  Fold 4: 2.344 wins
+  Fold 5: 2.462 wins
+
+Mean CV RMSE: 2.448 (+/- 0.312) wins
+
+================================================================================
+TRAINING SET PERFORMANCE
+================================================================================
+
+  R² = 0.3482
+  RMSE = 2.372 wins
+
+================================================================================
+TEST SET PERFORMANCE (HELD-OUT DATA)
+================================================================================
+
+  R² = 0.4832
+  RMSE = 2.307 wins
+
+  R² drop (train→test) = -0.1349
+  ✓ Model generalizes well
+
+================================================================================
+VARIABLE IMPORTANCE (Ridge Regression)
+================================================================================
+
+Ridge Regression Coefficients (standardized):
+  Interpretation: Effect on wins for 1 std dev change in predictor
+  (controlling for other variables)
+             Variable  Ridge_Coefficient  Abs_Coefficient
+1          Pass_ANY/A           1.158541         1.158541
+0             Pass_TD           0.536122         0.536122
+2  Rush_Rushing_Succ%          -0.266681         0.266681
+3           Pass_Int%          -0.050401         0.050401
+4            Pass_Sk%          -0.043037         0.043037
+
+================================================================================
+COMPARISON: Ridge vs OLS
+================================================================================
+
+✓ Results saved to: ridge_regression_variable_importance.csv

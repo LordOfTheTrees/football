@@ -1,0 +1,124 @@
+================================================================================
+Ridge Regression: Wins Prediction (Extended Features)
+Generated: 2025-10-29 11:03:15
+================================================================================
+
+
+================================================================================
+RIDGE REGRESSION WITH 5-FOLD CROSS-VALIDATION
+================================================================================
+
+Loading train/test split from files...
+✓ Loaded 447 records from file
+✓ Loaded 112 records from file
+Loaded train set: 447 records
+Loaded test set: 112 records
+✓ Loaded 798 records from season records
+
+================================================================================
+PROCESSING TRAINING DATA
+================================================================================
+Training set: 442 QB season-team records
+After filtering (8+ GS): 292 records
+
+================================================================================
+PROCESSING TEST DATA
+================================================================================
+Test set: 103 QB season-team records
+After filtering (8+ GS): 57 records
+
+Using EXTENDED feature set (top PC1 loadings)
+
+================================================================================
+FEATURE SELECTION
+================================================================================
+
+Using 10 performance factors:
+  - Pass_TD
+  - Pass_ANY/A
+  - Rush_Rushing_Succ%
+  - Pass_Int%
+  - Pass_Sk%
+  - total_yards
+  - Pass_4QC
+  - Pass_GWD
+  - Rush_Rushing_TD
+  - Rush_Rushing_Yds
+
+Proceeding with 10 available factors
+
+Training set complete cases: 292
+Test set complete cases: 57
+
+================================================================================
+CROSS-VALIDATION TO SELECT OPTIMAL ALPHA
+================================================================================
+
+Testing 7 alpha values with 5-fold CV:
+Alpha range: [0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
+
+Best alpha (regularization strength): 1.0
+
+================================================================================
+5-FOLD CROSS-VALIDATION PERFORMANCE
+================================================================================
+
+Cross-Validation R² Scores (5 folds):
+  Fold 1: 0.2523
+  Fold 2: 0.5087
+  Fold 3: 0.3825
+  Fold 4: 0.3724
+  Fold 5: 0.5396
+
+Mean CV R²: 0.4111 (+/- 0.2070)
+
+Cross-Validation RMSE Scores (5 folds):
+  Fold 1: 2.461 wins
+  Fold 2: 2.156 wins
+  Fold 3: 2.196 wins
+  Fold 4: 2.146 wins
+  Fold 5: 2.171 wins
+
+Mean CV RMSE: 2.226 (+/- 0.237) wins
+
+================================================================================
+TRAINING SET PERFORMANCE
+================================================================================
+
+  R² = 0.4666
+  RMSE = 2.146 wins
+
+================================================================================
+TEST SET PERFORMANCE (HELD-OUT DATA)
+================================================================================
+
+  R² = 0.5620
+  RMSE = 2.124 wins
+
+  R² drop (train→test) = -0.0954
+  ✓ Model generalizes well
+
+================================================================================
+VARIABLE IMPORTANCE (Ridge Regression)
+================================================================================
+
+Ridge Regression Coefficients (standardized):
+  Interpretation: Effect on wins for 1 std dev change in predictor
+  (controlling for other variables)
+             Variable  Ridge_Coefficient  Abs_Coefficient
+1          Pass_ANY/A           1.159028         1.159028
+0             Pass_TD           1.031507         1.031507
+5         total_yards          -0.984986         0.984986
+7            Pass_GWD           0.803984         0.803984
+2  Rush_Rushing_Succ%          -0.612123         0.612123
+9    Rush_Rushing_Yds           0.558470         0.558470
+8     Rush_Rushing_TD           0.264493         0.264493
+4            Pass_Sk%          -0.209736         0.209736
+3           Pass_Int%          -0.046670         0.046670
+6            Pass_4QC          -0.044834         0.044834
+
+================================================================================
+COMPARISON: Ridge vs OLS
+================================================================================
+
+✓ Results saved to: ridge_regression_variable_importance.csv

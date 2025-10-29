@@ -1,0 +1,38 @@
+RIDGE REGRESSION ANALYSES SUMMARY
+Generated: 2025-10-29 11:03:16
+================================================================================
+
+ANALYSES COMPLETED:
+
+1. WINS PREDICTION (Extended Features)
+   - File: wins_prediction_ridge_extended.txt
+   - Features: 10 performance factors (top PC1 loadings)
+   - Output: R², RMSE, variable importance, test performance
+
+2. WINS PREDICTION (Original Features) 
+   - File: wins_prediction_ridge_original.txt
+   - Features: 5 core performance factors (manual selection)
+   - Output: R², RMSE, variable importance, test performance
+
+3. PAYMENT PROBABILITY PREDICTION
+   - File: payment_probability_ridge.txt
+   - Features: Averaged performance (Years 1-3)
+   - Output: R², classification metrics, variable importance
+   - Note: Uses eligible QBs (drafted ≤2020)
+
+4. YEAR WEIGHTING ANALYSIS
+   - Files: year_weighting_total_yards.txt, year_weighting_any_a.txt
+   - Analysis: How each prior year is weighted in payment decisions
+   - Output: Year-by-year coefficients and importance weights
+
+KEY FILES TO CHECK:
+- Variable importance CSVs are automatically saved by the functions
+- Look for files like: ridge_regression_variable_importance.csv
+- Payment prediction importance: payment_prediction_importance.csv
+- Year weights: year_weights_*.csv
+
+NOTES:
+- All functions use proper train/test splits for unbiased evaluation
+- Ridge regression includes cross-validation for alpha selection
+- Statistical significance testing is built into the functions
+- Payment probability analysis includes confusion matrix-like metrics

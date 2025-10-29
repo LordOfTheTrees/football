@@ -1,0 +1,158 @@
+================================================================================
+Ridge Regression: Payment Probability Prediction
+Generated: 2025-10-29 11:03:16
+================================================================================
+
+
+================================================================================
+RIDGE REGRESSION: WHAT PREDICTS GETTING PAID?
+Using AVERAGED performance (Years 1-3)
+================================================================================
+✓ Loaded 562 records from file
+✓ Loaded 562 seasons with payment labels
+
+================================================================================
+EXCLUDING RECENT DRAFT CLASSES
+================================================================================
+Excluding QBs drafted after 2020
+  Before: 73 unique QBs
+  After: 59 unique QBs
+  Removed: 14 QBs (2021-2024 classes)
+✓ Loaded 798 records from season records
+✓ Merged with team metrics: 513 seasons
+
+================================================================================
+ADJUSTING TEAM METRICS
+================================================================================
+✓ Created Pts_adj: 513 values
+
+================================================================================
+CHECKING EXISTING LAGS
+================================================================================
+✗ total_yards_adj: missing lag features, will create
+✗ Pass_TD_adj: missing lag features, will create
+✗ Pass_ANY/A_adj: missing lag features, will create
+✗ Rush_Rushing_Succ%_adj: missing lag features, will create
+
+================================================================================
+CREATING MISSING QB METRIC LAGS
+================================================================================
+  total_yards_adj_lag1: 454 non-null values
+  total_yards_adj_lag2: 395 non-null values
+  total_yards_adj_lag3: 339 non-null values
+  Pass_TD_adj_lag1: 454 non-null values
+  Pass_TD_adj_lag2: 395 non-null values
+  Pass_TD_adj_lag3: 339 non-null values
+  Pass_ANY/A_adj_lag1: 453 non-null values
+  Pass_ANY/A_adj_lag2: 395 non-null values
+  Pass_ANY/A_adj_lag3: 339 non-null values
+  Rush_Rushing_Succ%_adj_lag1: 445 non-null values
+  Rush_Rushing_Succ%_adj_lag2: 391 non-null values
+  Rush_Rushing_Succ%_adj_lag3: 337 non-null values
+
+================================================================================
+CREATING TEAM METRIC LAGS
+================================================================================
+  W-L%_lag1: 454 non-null values
+  W-L%_lag2: 395 non-null values
+  W-L%_lag3: 339 non-null values
+  Pts_adj_lag1: 454 non-null values
+  Pts_adj_lag2: 395 non-null values
+  Pts_adj_lag3: 339 non-null values
+
+================================================================================
+CREATING AVERAGED FEATURES (lag1, lag2, lag3)
+================================================================================
+  total_yards_adj_avg: 454 non-null values
+  Pass_TD_adj_avg: 454 non-null values
+  Pass_ANY/A_adj_avg: 454 non-null values
+  Rush_Rushing_Succ%_adj_avg: 453 non-null values
+  W-L%_avg: 454 non-null values
+  Pts_adj_avg: 454 non-null values
+
+✓ Total features: 6 (reduced from 18)
+
+Complete cases: 453
+
+================================================================================
+ELIGIBLE QB PAYMENT DISTRIBUTION
+================================================================================
+Total eligible QBs (drafted ≤2020): 59
+  Got paid: 23 (39.0%)
+  Not paid: 36 (61.0%)
+
+Payment outcome in dataset (season-level):
+  Got paid: 196 (43.3%)
+  Not paid: 257 (56.7%)
+
+Sample size ratio:
+  Observations per feature: 75.5
+  ✓ Good ratio for modeling
+
+Train/test split:
+  Train: 362 samples (160 paid)
+  Test: 91 samples (36 paid)
+
+================================================================================
+RIDGE REGRESSION WITH 5-FOLD CV
+================================================================================
+
+✓ Best alpha: 100.0
+
+Cross-validation R² scores:
+  Fold 1: 0.1332
+  Fold 2: 0.2925
+  Fold 3: -0.1474
+  Fold 4: 0.2477
+  Fold 5: -0.0891
+Mean CV R²: 0.0874 (+/- 0.3534)
+
+================================================================================
+TRAINING PERFORMANCE
+================================================================================
+  R² = 0.2853
+  RMSE = 0.4198
+
+================================================================================
+TEST PERFORMANCE
+================================================================================
+  R² = 0.0898
+  RMSE = 0.4665
+
+================================================================================
+VARIABLE IMPORTANCE
+================================================================================
+
+All features ranked by importance:
+                      Feature  Coefficient  Abs_Coefficient
+4                    W-L%_avg     0.088076         0.088076
+3  Rush_Rushing_Succ%_adj_avg     0.082261         0.082261
+0         total_yards_adj_avg     0.077780         0.077780
+2          Pass_ANY/A_adj_avg     0.072055         0.072055
+1             Pass_TD_adj_avg     0.043416         0.043416
+5                 Pts_adj_avg     0.012856         0.012856
+
+================================================================================
+MOST IMPORTANT PREDICTOR
+================================================================================
+
+🏆 WINNER: W-L%
+   Feature: W-L%_avg
+   Coefficient: 0.0881
+
+================================================================================
+QB METRICS vs TEAM METRICS
+================================================================================
+
+QB metric features:
+               Feature  Coefficient  Abs_Coefficient
+0  total_yards_adj_avg     0.077780         0.077780
+2   Pass_ANY/A_adj_avg     0.072055         0.072055
+1      Pass_TD_adj_avg     0.043416         0.043416
+
+Team metric features:
+       Feature  Coefficient  Abs_Coefficient
+4     W-L%_avg     0.088076         0.088076
+5  Pts_adj_avg     0.012856         0.012856
+
+✓ Results saved to: payment_prediction_importance.csv

@@ -1,0 +1,112 @@
+================================================================================
+Year Weighting Analysis: Total Yards (Era Adjusted)
+Generated: 2025-10-29 11:03:16
+================================================================================
+
+
+================================================================================
+YEAR-BY-YEAR WEIGHTING ANALYSIS: total_yards_adj
+================================================================================
+✓ Loaded 562 records from file
+✓ Loaded 562 seasons with era-adjusted payment labels
+Analyzing metric: total_yards_adj
+QBs in dataset: 59
+
+================================================================================
+DECISION YEAR 3 (payment in Year 3)
+Using performance from Years 0 to 2
+================================================================================
+Players with data: 59
+Complete cases: 51
+Payment distribution: 20 paid, 31 not paid
+
+Year-by-year coefficients:
+     Year  Coefficient   Weight_%
+0  Year 0     0.006781   3.011139
+1  Year 1     0.100278  44.529795
+2  Year 2     0.118134  52.459066
+
+Model R²: 0.1988
+
+================================================================================
+DECISION YEAR 4 (payment in Year 4)
+Using performance from Years 0 to 3
+================================================================================
+Players with data: 59
+Complete cases: 47
+Payment distribution: 20 paid, 27 not paid
+
+Year-by-year coefficients:
+     Year  Coefficient   Weight_%
+0  Year 0     0.027934   9.392962
+1  Year 1     0.084807  28.516849
+2  Year 2     0.023310   7.838196
+3  Year 3     0.161342  54.251994
+
+Model R²: 0.2786
+
+================================================================================
+DECISION YEAR 5 (payment in Year 5)
+Using performance from Years 0 to 4
+================================================================================
+Players with data: 59
+Complete cases: 40
+Payment distribution: 18 paid, 22 not paid
+
+Year-by-year coefficients:
+     Year  Coefficient   Weight_%
+0  Year 0     0.036880  10.116298
+1  Year 1     0.077482  21.253696
+2  Year 2    -0.020587   5.647052
+3  Year 3     0.076957  21.109522
+4  Year 4     0.152653  41.873433
+
+Model R²: 0.3024
+
+================================================================================
+DECISION YEAR 6 (payment in Year 6)
+Using performance from Years 0 to 5
+================================================================================
+Players with data: 59
+Complete cases: 33
+Payment distribution: 14 paid, 19 not paid
+
+Year-by-year coefficients:
+     Year  Coefficient   Weight_%
+0  Year 0     0.031799   8.703883
+1  Year 1     0.065357  17.889178
+2  Year 2    -0.030887   8.454192
+3  Year 3     0.039949  10.934780
+4  Year 4     0.107808  29.508749
+5  Year 5     0.089542  24.509218
+
+Model R²: 0.2604
+
+================================================================================
+SUMMARY: YEAR WEIGHTS ACROSS DECISION YEARS (total_yards_adj)
+================================================================================
+
+Weight Matrix (% importance of each year):
+Rows = Performance year, Columns = Decision year
+Decision_Year             3          4          5          6
+Performance_Year                                            
+Year 0             3.011139   9.392962  10.116298   8.703883
+Year 1            44.529795  28.516849  21.253696  17.889178
+Year 2            52.459066   7.838196   5.647052   8.454192
+Year 3                  NaN  54.251994  21.109522  10.934780
+Year 4                  NaN        NaN  41.873433  29.508749
+Year 5                  NaN        NaN        NaN  24.509218
+
+================================================================================
+AVERAGE WEIGHTS ACROSS ALL DECISION YEARS
+================================================================================
+
+Average importance of each performance year:
+  Year 0: 7.8%
+  Year 1: 28.0%
+  Year 2: 18.6%
+  Year 3: 28.8%
+  Year 4: 35.7%
+  Year 5: 24.5%
+
+✓ Results saved to year_weights_total_yards_adj.csv and year_weights_matrix_total_yards_adj.csv
