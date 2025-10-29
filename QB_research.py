@@ -23,6 +23,8 @@ from scipy.stats import f_oneway
 from sklearn.linear_model import Ridge, RidgeCV
 from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import confusion_matrix, classification_report, roc_auc_score, roc_curve, precision_recall_curve
+
 
 def load_csv_safe(filepath, description="file"):
     """
@@ -4625,7 +4627,7 @@ def ridge_regression_with_significance_testing(train_df=None, test_df=None, use_
     X_train_scaled = scaler.fit_transform(X_train)
     
     # Get the optimal alpha from base results
-    optimal_alpha = base_results['best_alpha'] if 'best_alpha' in base_results else 1.0
+    optimal_alpha = base_results.get('best_alpha', 1.0)
     
     print(f"Running {n_bootstrap} bootstrap samples for significance testing...")
     print(f"Training samples: {len(X_train_scaled)}")
@@ -5037,6 +5039,375 @@ def payment_prediction_with_confusion_matrix(alpha_range=None, exclude_recent_dr
     print(f"✓ Classification feature importance saved to: payment_prediction_classification_importance.csv")
     
     return enhanced_results
+
+def year_weighting_regression_with_significance(metric='total_yards_adj', max_decision_year=6, n_bootstrap=1000):
+    """
+    Determines how each prior year is weighted in payment decisions WITH STATISTICAL SIGNIFICANCE TESTING.
+    
+    For each decision year (3-6), runs regression with bootstrap significance testing:
+        got_paid ~ metric_year0 + metric_year1 + metric_year2 + ... + metric_year(N-1)
+    
+    Shows which years matter most for the payment decision AND provides p-values for each year.
+    
+    Args:
+        metric (str): Metric to analyze ('total_yards_adj' or 'Pass_ANY/A_adj')
+        max_decision_year (int): Latest decision year to model (default 6)
+        n_bootstrap (int): Number of bootstrap samples for significance testing
+    
+    Returns:
+        dict: Weighting results with p-values for each decision year
+    """
+    print("\n" + "="*80)
+    print(f"YEAR-BY-YEAR WEIGHTING ANALYSIS WITH P-VALUES: {metric}")
+    print("="*80)
+    
+    # Load prepared payment data
+    if not os.path.exists('qb_seasons_payment_labeled_era_adjusted.csv'):
+        print("✗ ERROR: qb_seasons_payment_labeled_era_adjusted.csv not found")
+        print("Run create_era_adjusted_payment_data() first")
+        return None
+
+    payment_df = load_csv_safe('qb_seasons_payment_labeled_era_adjusted.csv')
+    print(f"✓ Loaded {len(payment_df)} seasons with era-adjusted payment labels")
+    
+    # If analyzing team metric (W-L%), need to merge with season records
+    if metric == 'W-L%':
+        season_records = load_csv_safe("season_records.csv", "season records")
+        if season_records is None:
+            return None
+        
+        season_records['Season'] = pd.to_numeric(season_records['Season'], errors='coerce')
+        season_records = season_records.dropna(subset=['Season'])
+        season_records['Season'] = season_records['Season'].astype(int)
+        
+        payment_df['season'] = pd.to_numeric(payment_df['season'], errors='coerce')
+        payment_df = payment_df.dropna(subset=['season'])
+        payment_df['season'] = payment_df['season'].astype(int)
+        
+        payment_df = pd.merge(
+            payment_df,
+            season_records[['Season', 'Team', 'W-L%']],
+            left_on=['season', 'Team'],
+            right_on=['Season', 'Team'],
+            how='inner'
+        )
+    
+    # Filter to eligible QBs (drafted ≤2020)
+    cutoff_year = 2020
+    payment_df['draft_year'] = pd.to_numeric(payment_df['draft_year'], errors='coerce')
+    payment_df = payment_df[payment_df['draft_year'] <= cutoff_year]
+    
+    # Calculate years since draft
+    payment_df['years_since_draft'] = payment_df['season'] - payment_df['draft_year']
+    
+    print(f"Analyzing metric: {metric}")
+    print(f"QBs in dataset: {payment_df['player_id'].nunique()}")
+    print(f"Using {n_bootstrap} bootstrap samples for significance testing")
+    
+    # Results storage
+    all_results = {}
+    
+    # For each decision year (3-6)
+    for decision_year in range(3, max_decision_year + 1):
+        print("\n" + "="*80)
+        print(f"DECISION YEAR {decision_year} WITH P-VALUES")
+        print(f"Using performance from Years 0 to {decision_year - 1}")
+        print("="*80)
+        
+        # Get performance for each year 0 to (decision_year - 1)
+        year_features = []
+        
+        # Pivot data to get one row per player with columns for each year
+        player_data = []
+        
+        for player_id, group in payment_df.groupby('player_id'):
+            group = group.sort_values('years_since_draft')
+            
+            record = {
+                'player_id': player_id,
+                'got_paid': group['got_paid'].iloc[0]
+            }
+            
+            # Get metric value for each year 0 to (decision_year - 1)
+            for year in range(decision_year):
+                year_data = group[group['years_since_draft'] == year]
+                if len(year_data) > 0:
+                    record[f'{metric}_year{year}'] = pd.to_numeric(year_data[metric].iloc[0], errors='coerce')
+                else:
+                    record[f'{metric}_year{year}'] = np.nan
+                
+                year_features.append(f'{metric}_year{year}')
+        
+            player_data.append(record)
+        
+        year_features = sorted(list(set(year_features)))  # Remove duplicates
+        df = pd.DataFrame(player_data)
+        
+        print(f"Players with data: {len(df)}")
+        
+        # Drop rows with missing values
+        df = df.dropna(subset=year_features)
+        
+        print(f"Complete cases: {len(df)}")
+        
+        if len(df) < 20:
+            print(f"⚠️  Insufficient data for Year {decision_year} decision")
+            continue
+        
+        # Payment distribution
+        paid = df['got_paid'].sum()
+        print(f"Payment distribution: {paid} paid, {len(df) - paid} not paid")
+        
+        # Prepare X and y
+        X = df[year_features]
+        y = df['got_paid'].astype(int)
+        
+        # Standardize features
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+        
+        # =====================================================================
+        # BOOTSTRAP STATISTICAL SIGNIFICANCE TESTING
+        # =====================================================================
+        print(f"\n🔬 BOOTSTRAP SIGNIFICANCE TESTING ({n_bootstrap} samples)...")
+        
+        bootstrap_coefs = []
+        bootstrap_r2s = []
+        
+        for i in range(n_bootstrap):
+            if i % 200 == 0:
+                print(f"  Bootstrap sample {i}/{n_bootstrap}...")
+            
+            # Sample with replacement
+            indices = np.random.choice(len(X_scaled), len(X_scaled), replace=True)
+            X_boot = X_scaled[indices]
+            y_boot = y.iloc[indices].values
+            
+            # Fit model on bootstrap sample
+            ridge_model = Ridge(alpha=10.0)  # Use moderate regularization
+            ridge_model.fit(X_boot, y_boot)
+            
+            # Store coefficients and R²
+            bootstrap_coefs.append(ridge_model.coef_)
+            r2_boot = ridge_model.score(X_boot, y_boot)
+            bootstrap_r2s.append(r2_boot)
+        
+        bootstrap_coefs = np.array(bootstrap_coefs)
+        bootstrap_r2s = np.array(bootstrap_r2s)
+        
+        print(f"✓ Bootstrap complete!")
+        
+        # =====================================================================
+        # STATISTICAL SIGNIFICANCE RESULTS  
+        # =====================================================================
+        print(f"\n" + "="*60)
+        print("STATISTICAL SIGNIFICANCE RESULTS")
+        print("="*60)
+        
+        # Original model for comparison
+        ridge_model = Ridge(alpha=10.0)
+        ridge_model.fit(X_scaled, y)
+        
+        significance_results = []
+        
+        for i, feature in enumerate(year_features):
+            year_num = int(feature.split('year')[-1])
+            coef_dist = bootstrap_coefs[:, i]
+            original_coef = ridge_model.coef_[i]
+            
+            # Calculate confidence intervals (95%)
+            ci_lower = np.percentile(coef_dist, 2.5)
+            ci_upper = np.percentile(coef_dist, 97.5)
+            
+            # Statistical significance test: CI doesn't include zero
+            is_significant = not (ci_lower <= 0 <= ci_upper)
+            
+            # Calculate p-value approximation (two-tailed)
+            if original_coef > 0:
+                p_value_approx = 2 * np.mean(coef_dist <= 0)
+            else:
+                p_value_approx = 2 * np.mean(coef_dist >= 0)
+            p_value_approx = min(p_value_approx, 1.0)
+            
+            # Standard error
+            se = np.std(coef_dist)
+            
+            # T-statistic approximation
+            t_stat = original_coef / se if se > 0 else 0
+            
+            significance_results.append({
+                'Decision_Year': decision_year,
+                'Performance_Year': f'Year {year_num}',
+                'Year_Number': year_num,
+                'Feature': feature,
+                'Coefficient': original_coef,
+                'Std_Error': se,
+                'T_Statistic': t_stat,
+                'P_Value_Bootstrap': p_value_approx,
+                'CI_Lower_95': ci_lower,
+                'CI_Upper_95': ci_upper,
+                'Significant_95': is_significant,
+                'Coefficient_Mean_Bootstrap': np.mean(coef_dist),
+                'Coefficient_Std_Bootstrap': np.std(coef_dist)
+            })
+        
+        significance_df = pd.DataFrame(significance_results)
+        significance_df = significance_df.sort_values('Year_Number')
+        
+        print(f"\nYear-by-year coefficients WITH P-VALUES:")
+        print("(Bootstrap method with 95% confidence intervals)")
+        
+        display(significance_df[['Performance_Year', 'Coefficient', 'Std_Error', 'T_Statistic', 
+                                'P_Value_Bootstrap', 'CI_Lower_95', 'CI_Upper_95', 'Significant_95']])
+        
+        # Calculate normalized weights (for comparison with original function)
+        total_abs = significance_df['Coefficient'].abs().sum()
+        if total_abs > 0:
+            significance_df['Weight_%'] = (significance_df['Coefficient'].abs() / total_abs * 100)
+        else:
+            significance_df['Weight_%'] = 0
+        
+        # Model performance
+        r2 = ridge_model.score(X_scaled, y)
+        r2_mean_bootstrap = np.mean(bootstrap_r2s)
+        r2_std_bootstrap = np.std(bootstrap_r2s)
+        
+        print(f"\nModel Performance:")
+        print(f"  Original R²: {r2:.4f}")
+        print(f"  Bootstrap R² mean: {r2_mean_bootstrap:.4f} ± {r2_std_bootstrap:.4f}")
+        
+        # Identify significant years
+        significant_years = significance_df[significance_df['Significant_95']]
+        
+        print(f"\n🔍 STATISTICALLY SIGNIFICANT YEARS ({len(significant_years)} of {len(significance_df)}):")
+        for _, row in significant_years.iterrows():
+            direction = "increases" if row['Coefficient'] > 0 else "decreases"
+            print(f"  ✓ {row['Performance_Year']}: {direction} payment probability (p = {row['P_Value_Bootstrap']:.4f})")
+        
+        if len(significant_years) == 0:
+            print("  ⚠️  No years are statistically significant at p < 0.05")
+        
+        # Store results
+        all_results[f'year_{decision_year}'] = {
+            'decision_year': decision_year,
+            'significance_results': significance_df,
+            'model': ridge_model,
+            'scaler': scaler,
+            'features': year_features,
+            'r2': r2,
+            'r2_bootstrap_mean': r2_mean_bootstrap,
+            'r2_bootstrap_std': r2_bootstrap_std,
+            'n_samples': len(df),
+            'bootstrap_coefficients': bootstrap_coefs,
+            'bootstrap_r2s': bootstrap_r2s,
+            'significant_years': significant_years
+        }
+    
+    # =========================================================================
+    # SUMMARY ACROSS ALL DECISION YEARS WITH P-VALUES
+    # =========================================================================
+    print("\n" + "="*80)
+    print(f"SUMMARY: YEAR SIGNIFICANCE ACROSS DECISION YEARS ({metric})")
+    print("="*80)
+    
+    # Combine all significance results
+    all_significance_data = []
+    for decision_year in range(3, max_decision_year + 1):
+        key = f'year_{decision_year}'
+        if key in all_results:
+            result = all_results[key]
+            sig_df = result['significance_results']
+            
+            for _, row in sig_df.iterrows():
+                all_significance_data.append({
+                    'Decision_Year': decision_year,
+                    'Performance_Year': row['Performance_Year'],
+                    'Year_Number': row['Year_Number'],
+                    'Coefficient': row['Coefficient'],
+                    'P_Value_Bootstrap': row['P_Value_Bootstrap'],
+                    'Significant_95': row['Significant_95'],
+                    'Weight_%': row['Weight_%'],
+                    'T_Statistic': row['T_Statistic'],
+                    'CI_Lower_95': row['CI_Lower_95'],
+                    'CI_Upper_95': row['CI_Upper_95']
+                })
+    
+    all_significance_df = pd.DataFrame(all_significance_data)
+    
+    if len(all_significance_df) > 0:
+        # Create significance summary matrix
+        significance_matrix = all_significance_df.pivot(
+            index='Performance_Year', 
+            columns='Decision_Year', 
+            values='Significant_95'
+        )
+        
+        print("\nSignificance Matrix (True = p < 0.05):")
+        print("Rows = Performance year, Columns = Decision year")
+        display(significance_matrix)
+        
+        # P-value matrix
+        pvalue_matrix = all_significance_df.pivot(
+            index='Performance_Year', 
+            columns='Decision_Year', 
+            values='P_Value_Bootstrap'
+        )
+        
+        print("\nP-Value Matrix:")
+        display(pvalue_matrix)
+        
+        # Weight matrix (for comparison)
+        weight_matrix = all_significance_df.pivot(
+            index='Performance_Year', 
+            columns='Decision_Year', 
+            values='Weight_%'
+        )
+        
+        print("\nWeight Matrix (% importance of each year):")
+        display(weight_matrix)
+        
+        # Overall significance summary
+        print("\n" + "="*80)
+        print("OVERALL YEAR SIGNIFICANCE SUMMARY")
+        print("="*80)
+        
+        year_significance_summary = all_significance_df.groupby('Performance_Year').agg({
+            'Significant_95': 'sum',  # How many decision years this year is significant
+            'P_Value_Bootstrap': 'mean',  # Average p-value across decision years
+            'Weight_%': 'mean',  # Average weight across decision years
+            'T_Statistic': lambda x: np.mean(np.abs(x))  # Average absolute t-statistic
+        }).reset_index()
+        
+        year_significance_summary.columns = ['Performance_Year', 'Times_Significant', 'Avg_P_Value', 'Avg_Weight_%', 'Avg_Abs_T_Stat']
+        year_significance_summary = year_significance_summary.sort_values('Times_Significant', ascending=False)
+        
+        print("\nOverall significance of each performance year:")
+        display(year_significance_summary)
+        
+        print(f"\n🏆 MOST CONSISTENTLY SIGNIFICANT YEARS:")
+        for _, row in year_significance_summary.head(3).iterrows():
+            print(f"  {row['Performance_Year']}: Significant in {int(row['Times_Significant'])}/{max_decision_year-2} decision years (avg p = {row['Avg_P_Value']:.4f})")
+        
+        # Save all results
+        safe_metric_name = metric.replace('/', '_').replace('%', 'pct')
+        
+        # Save detailed significance results
+        all_significance_df.to_csv(f'year_weights_significance_{safe_metric_name}.csv', index=False)
+        print(f"\n✓ Detailed significance results saved to: year_weights_significance_{safe_metric_name}.csv")
+        
+        # Save summary matrices
+        significance_matrix.to_csv(f'year_significance_matrix_{safe_metric_name}.csv')
+        pvalue_matrix.to_csv(f'year_pvalue_matrix_{safe_metric_name}.csv')
+        weight_matrix.to_csv(f'year_weight_matrix_{safe_metric_name}.csv')
+        year_significance_summary.to_csv(f'year_significance_summary_{safe_metric_name}.csv', index=False)
+        
+        print(f"✓ Summary matrices saved:")
+        print(f"  - year_significance_matrix_{safe_metric_name}.csv (True/False significance)")
+        print(f"  - year_pvalue_matrix_{safe_metric_name}.csv (actual p-values)")
+        print(f"  - year_weight_matrix_{safe_metric_name}.csv (importance weights)")
+        print(f"  - year_significance_summary_{safe_metric_name}.csv (overall summary)")
+    
+    return all_results
 
 if __name__ == "__main__":
     print("="*80)
