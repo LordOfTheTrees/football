@@ -1,6 +1,12 @@
 to reformat:
 //////////////////////////////////////////
 
+fix wins regression to also use adjusment when present (why not)
+
+compare reduced payment era adjustment (ANY/A = eff, total yards=vol) to current era adjustment
+
+re-upload my regression visuals
+
 organize, group, and sanitize the workflow of my code to be more comprehensible to others
 
 create more data validation functions

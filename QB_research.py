@@ -2992,9 +2992,12 @@ def calculate_era_adjustment_factors(reference_year=2024):
         'total_yards': 'Total_Yards',
         'Pass_TD': 'Pass_TD',
         'Pass_Yds': 'Pass_Yds',
-        'Pass_ANY/A': 'NY/A',  # NEW - use Net Yards per Attempt as proxy
+        'Pass_ANY/A': 'NY/A',  # Use Net Yards per Attempt as proxy
+        'Pass_Rate': None,  # Calculate from QB data (passer rating)
+        'Pass_Cmp%': None,  # Calculate from QB data (completion percentage)
+        'Pass_QBR': None,  # Calculate from QB data (QBR)
         'Rush_Rushing_Succ%': None,  # Can't calculate from season_averages, handle separately
-        'W-L%': None,  # NEW - Calculate from season_records
+        'W-L%': None,  # Calculate from season_records
         'Pts': 'PF'
     }
         
@@ -3085,6 +3088,44 @@ def calculate_era_adjustment_factors(reference_year=2024):
             print(f"  Rush_Rushing_Succ%: R² = {model.score(years.reshape(-1, 1), values):.4f}")
             print(f"  {reference_year} predicted average: {reference_avg:.2f}%")
 
+    # Calculate adjustments for traditional QB metrics from QB data
+    print("\nCalculating adjustments for traditional QB metrics from QB data...")
+    traditional_metrics = ['Pass_Rate', 'Pass_Cmp%', 'Pass_QBR']
+    
+    for metric in traditional_metrics:
+        if os.path.exists('qb_seasons_payment_labeled.csv'):
+            qb_df = pd.read_csv('qb_seasons_payment_labeled.csv')
+            qb_df['season'] = pd.to_numeric(qb_df['season'], errors='coerce')
+            qb_df['GS'] = pd.to_numeric(qb_df['GS'], errors='coerce')
+            qb_df[metric] = pd.to_numeric(qb_df[metric], errors='coerce')
+            
+            # Filter to starters only (8+ games)
+            qb_filtered = qb_df[qb_df['GS'] >= 8].copy()
+            
+            # Calculate yearly averages
+            yearly_avg = qb_filtered.groupby('season')[metric].mean().reset_index()
+            yearly_avg = yearly_avg.dropna()
+            
+            if len(yearly_avg) > 10:  # Need enough data
+                years = yearly_avg['season'].values
+                values = yearly_avg[metric].values
+                
+                # Fit linear trend
+                model = LinearRegression()
+                model.fit(years.reshape(-1, 1), values)
+                
+                reference_avg = model.predict([[reference_year]])[0]
+                predicted = model.predict(years.reshape(-1, 1))
+                
+                year_factors = {}
+                for year, pred_val in zip(years, predicted):
+                    year_factors[int(year)] = reference_avg / pred_val
+                
+                adjustment_factors[metric] = year_factors
+                
+                print(f"  {metric}: R² = {model.score(years.reshape(-1, 1), values):.4f}")
+                print(f"  {reference_year} predicted average: {reference_avg:.2f}")
+
     print("\nCalculating adjustment for W-L% from season records...")
     if os.path.exists('season_records.csv'):
         season_rec = pd.read_csv('season_records.csv')
@@ -3135,7 +3176,7 @@ def calculate_era_adjustment_factors(reference_year=2024):
     
     return adjustment_factors
 
-def apply_era_adjustments(df, adjustment_factors, stats_to_adjust=['total_yards', 'Pass_TD', 'Pass_ANY/A', 'Rush_Rushing_Succ%']):
+def apply_era_adjustments(df, adjustment_factors, stats_to_adjust=['total_yards', 'Pass_TD', 'Pass_ANY/A', 'Rush_Rushing_Succ%', 'Pass_Rate', 'Pass_Cmp%', 'Pass_QBR']):
     """
     Applies era adjustment factors to a dataframe with QB/team stats.
     
@@ -3245,7 +3286,10 @@ def create_era_adjusted_payment_data(force_refresh=False):
         'total_yards', 
         'Pass_TD', 
         'Pass_ANY/A',
-        'Rush_Rushing_Succ%'
+        'Rush_Rushing_Succ%',
+        'Pass_Rate',      # Add passer rating
+        'Pass_Cmp%',      # Add completion percentage
+        'Pass_QBR'        # Add QBR
     ]
     adjusted_df = apply_era_adjustments(payment_df, adjustment_factors, stats_to_adjust)
     
@@ -4279,7 +4323,7 @@ def create_player_ids_from_qb_data():
     
     return True
 
-def wins_prediction_linear_ridge(train_df=None, test_df=None, use_extended_features=True, n_bootstrap=1000):
+def wins_prediction_linear_ridge(train_df=None, test_df=None, use_extended_features=False, n_bootstrap=1000, qb_metrics = ['total_yards_adj', 'Pass_TD_adj', 'Pass_ANY/A_adj', 'Rush_Rushing_Succ%_adj']):
     """
     Enhanced ridge regression for wins prediction with bootstrap-based statistical significance testing.
     
@@ -4343,27 +4387,79 @@ def wins_prediction_linear_ridge(train_df=None, test_df=None, use_extended_featu
     train_merged['Wins'] = pd.to_numeric(train_merged['W'], errors='coerce')
     train_merged = train_merged.dropna(subset=['Wins'])
     
-    # Define features (same logic as original)
+        # ================================================================
+    # Define and prepare features (with auto-adjusted column creation)
+    # ================================================================
     if use_extended_features:
         performance_factors = [
             'Pass_TD', 'Pass_ANY/A', 'Rush_Rushing_Succ%', 'Pass_Int%', 'Pass_Sk%',
             'total_yards', 'Pass_4QC', 'Pass_GWD', 'Rush_Rushing_TD', 'Rush_Rushing_Yds'
         ]
     else:
-        performance_factors = [
-            'Pass_TD', 'Pass_ANY/A', 'Rush_Rushing_Succ%', 'Pass_Int%', 'Pass_Sk%'
-        ]
-    
+        performance_factors = qb_metrics
+
+    # --- Auto-create adjusted versions if necessary ---
+    adjustment_factors_path = "era_adjustment_factors.csv"
+    if os.path.exists(adjustment_factors_path):
+        factor_df = pd.read_csv(adjustment_factors_path)
+        adj_factors = (
+            factor_df.pivot_table(index="year", columns="stat", values="adjustment_factor")
+            .to_dict(orient="index")
+        )
+
+        def apply_adjustment(row, base_col):
+            year = int(row["season"]) if not pd.isna(row["season"]) else None
+            base_val = row.get(base_col, np.nan)
+
+            # Coerce to numeric safely
+            try:
+                base_val = float(base_val)
+            except (TypeError, ValueError):
+                return np.nan
+
+            if year in adj_factors and base_col in adj_factors[year]:
+                factor = adj_factors[year][base_col]
+                try:
+                    factor = float(factor)
+                except (TypeError, ValueError):
+                    factor = 1.0
+                return base_val * factor
+            return base_val
+
+        for col in performance_factors:
+            if col.endswith("_adj") and col not in train_merged.columns:
+                base_col = col.replace("_adj", "")
+                if base_col in train_merged.columns:
+                    # Use vectorized .apply for speed but numeric-safe
+                    train_merged[col] = train_merged.apply(lambda r: apply_adjustment(r, base_col), axis=1)
+                    print(f"✓ Created adjusted column '{col}' from '{base_col}' using era factors")
+                else:
+                    print(f"⚠ Missing both '{col}' and '{base_col}' — cannot compute adjusted version.")
+    else:
+        print("⚠ No era_adjustment_factors.csv found — using raw stats only (no _adj columns created).")
+
+    # Filter available factors and warn about missing ones
     available_factors = [f for f in performance_factors if f in train_merged.columns]
-    
+    missing_factors = [f for f in performance_factors if f not in train_merged.columns]
+
+    if not available_factors:
+        raise ValueError(
+            f"No valid features found. Missing: {missing_factors}. "
+            "Check qb_metrics names or adjustment file."
+        )
+
+    if missing_factors:
+        print(f"⚠ Missing features (ignored): {missing_factors}")
+
     # Build training dataset
     train_features = train_merged[available_factors + ['Wins']].copy()
     for col in available_factors:
         train_features[col] = pd.to_numeric(train_features[col], errors='coerce')
-    train_features = train_features.dropna()
-    
+
+    train_features = train_features.dropna(subset=available_factors + ['Wins'])
     X_train = train_features[available_factors].values
     y_train = train_features['Wins'].values
+
     
     # Standardize features
     scaler = StandardScaler()
@@ -4508,7 +4604,7 @@ def wins_prediction_linear_ridge(train_df=None, test_df=None, use_extended_featu
     
     return enhanced_results
 
-def payment_prediction_logistic_ridge(alpha_range=None, exclude_recent_drafts=True, probability_thresholds=None):
+def payment_prediction_logistic_ridge(alpha_range=None, exclude_recent_drafts=True, probability_thresholds=None, qb_metrics = ['total_yards_adj', 'Pass_TD_adj', 'Pass_ANY/A_adj', 'Rush_Rushing_Succ%_adj']):
     """
     Enhanced payment prediction with comprehensive confusion matrix analysis and classification metrics.
     
@@ -4580,7 +4676,6 @@ def payment_prediction_logistic_ridge(alpha_range=None, exclude_recent_drafts=Tr
         merged_df['Pts_adj'] = merged_df['Pts']
     
     # Create features (same as original)
-    qb_metrics = ['total_yards_adj', 'Pass_TD_adj', 'Pass_ANY/A_adj', 'Rush_Rushing_Succ%_adj']
     team_metrics = ['W-L%', 'Pts_adj']
     all_metrics = qb_metrics + team_metrics
     
@@ -5198,6 +5293,34 @@ if __name__ == "__main__":
     print("="*80)
     train_df, test_df = create_train_test_split(test_size=0.2, split_by='temporal')
     
+    # STEP 8A: re-run wins prediction model to verify everything is working
+    print("\n" + "="*80)
+    print("RUNNING WINS PREDICTION MODEL")
+    print("="*80)
+    wins_model_results = wins_prediction_linear_ridge(
+        train_df=train_df,
+        test_df=test_df,
+        #need to change this to be without adjustment, since the initial function doesnt adjust
+        qb_metrics=['total_yards_adj', 'Pass_ANY/A_adj', 'Rush_Rushing_Succ%_adj']
+    )
+    if wins_model_results is None:
+        print("✗ ERROR: Wins prediction model failed")
+        exit(1)
+
+    # STEP 8B: re-run payment prediction model to verify everything is working
+    print("\n" + "="*80)
+    print("RUNNING PAYMENT PREDICTION MODEL")
+    print("="*80)
+    payment_model_results = payment_prediction_logistic_ridge(
+        alpha_range=[0.1, 1.0, 10.0, 100.0, 200.0],
+        exclude_recent_drafts=True,
+        probability_thresholds=[0.3, 0.4, 0.5, 0.6, 0.7],
+        qb_metrics=['total_yards_adj', 'Pass_ANY/A_adj', 'Rush_Rushing_Succ%_adj']
+    )
+    if payment_model_results is None:
+        print("✗ ERROR: Payment prediction model failed")
+        exit(1)
+
     # STEP 9: Generate Tableau exports
     print("\n" + "="*80)
     print("GENERATING TABLEAU EXPORTS")
