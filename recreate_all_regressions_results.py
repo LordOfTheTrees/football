@@ -20,7 +20,7 @@ import io
 def create_results_directory():
     """Create a timestamped results directory"""
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    results_dir = f"fixed_ridge_regression_results_{timestamp}"
+    results_dir = f"regenerated_regression_results_{timestamp}"
     os.makedirs(results_dir, exist_ok=True)
     print(f"Created results directory: {results_dir}")
     return results_dir
