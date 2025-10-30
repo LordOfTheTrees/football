@@ -1,6 +1,6 @@
 ================================================================================
 Enhanced Wins Prediction: Statistical Significance Testing (Extended Features)
-Generated: 2025-10-29 11:24:04
+Generated: 2025-10-30 09:03:10
 ================================================================================
 
 
@@ -9,123 +9,94 @@ RIDGE REGRESSION WITH STATISTICAL SIGNIFICANCE TESTING
 ================================================================================
 
 ================================================================================
-RIDGE REGRESSION WITH 5-FOLD CROSS-VALIDATION
+FIXED PAYMENT PREDICTION: LOGISTIC REGRESSION
+Using AVERAGED performance (Years 1-3)
 ================================================================================
-
-Loading train/test split from files...
-✓ Loaded 447 records from file
-✓ Loaded 112 records from file
-Loaded train set: 447 records
-Loaded test set: 112 records
+✓ Loaded 562 records from file
+✓ Loaded 562 seasons with payment labels
+Excluding QBs drafted after 2020
+  Before: 73 unique QBs
+  After: 59 unique QBs
 ✓ Loaded 798 records from season records
+✓ Merged with team metrics: 513 seasons
+✓ Created Pts_adj: 513 values
+
+Complete cases: 453
+
+Payment outcome distribution:
+  Got paid: 196 (43.3%)
+  Not paid: 257 (56.7%)
+
+Train/test split:
+  Train: 362 samples (160 paid)
+  Test: 91 samples (36 paid)
 
 ================================================================================
-PROCESSING TRAINING DATA
+LOGISTIC REGRESSION WITH L2 REGULARIZATION
 ================================================================================
-Training set: 442 QB season-team records
-After filtering (8+ GS): 292 records
+  C=   0.001: CV AUC = 0.7834 ± 0.1868
+  C=   0.010: CV AUC = 0.7847 ± 0.1627
+  C=   0.100: CV AUC = 0.7753 ± 0.1243
+  C=   1.000: CV AUC = 0.7705 ± 0.1231
+  C=  10.000: CV AUC = 0.7687 ± 0.1300
+  C= 100.000: CV AUC = 0.7679 ± 0.1314
 
-================================================================================
-PROCESSING TEST DATA
-================================================================================
-Test set: 103 QB season-team records
-After filtering (8+ GS): 57 records
-
-Using EXTENDED feature set (top PC1 loadings)
+✓ Best C: 0.01 (CV AUC: 0.7847)
 
 ================================================================================
-FEATURE SELECTION
+TRAINING PERFORMANCE
 ================================================================================
-
-Using 10 performance factors:
-  - Pass_TD
-  - Pass_ANY/A
-  - Rush_Rushing_Succ%
-  - Pass_Int%
-  - Pass_Sk%
-  - total_yards
-  - Pass_4QC
-  - Pass_GWD
-  - Rush_Rushing_TD
-  - Rush_Rushing_Yds
-
-Proceeding with 10 available factors
-
-Training set complete cases: 292
-Test set complete cases: 57
+  AUC = 0.8104
+  Accuracy = 0.7265
 
 ================================================================================
-CROSS-VALIDATION TO SELECT OPTIMAL ALPHA
+TEST PERFORMANCE
 ================================================================================
-
-Testing 7 alpha values with 5-fold CV:
-Alpha range: [0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
-
-Best alpha (regularization strength): 1.0
+  AUC = 0.6490
+  Accuracy = 0.6044
 
 ================================================================================
-5-FOLD CROSS-VALIDATION PERFORMANCE
+VARIABLE IMPORTANCE
 ================================================================================
 
-Cross-Validation R² Scores (5 folds):
-  Fold 1: 0.2523
-  Fold 2: 0.5087
-  Fold 3: 0.3825
-  Fold 4: 0.3724
-  Fold 5: 0.5396
-
-Mean CV R²: 0.4111 (+/- 0.2070)
-
-Cross-Validation RMSE Scores (5 folds):
-  Fold 1: 2.461 wins
-  Fold 2: 2.156 wins
-  Fold 3: 2.196 wins
-  Fold 4: 2.146 wins
-  Fold 5: 2.171 wins
-
-Mean CV RMSE: 2.226 (+/- 0.237) wins
+All features ranked by importance:
+  1. total_yards_adj_avg: increases payment probability (coef=0.2355)
+  2. W-L%_avg: increases payment probability (coef=0.2187)
+  3. Pass_ANY/A_adj_avg: increases payment probability (coef=0.2115)
+  4. Rush_Rushing_Succ%_adj_avg: increases payment probability (coef=0.2031)
+  5. Pass_TD_adj_avg: increases payment probability (coef=0.2027)
+  6. Pts_adj_avg: increases payment probability (coef=0.1261)
 
 ================================================================================
-TRAINING SET PERFORMANCE
+CONFUSION MATRIX (Threshold = 0.5)
 ================================================================================
 
-  R² = 0.4666
-  RMSE = 2.146 wins
+Test Set Confusion Matrix:
+                Predicted
+              No Pay  Pay
+Actual No Pay     35   20
+Actual Pay        16   20
+
+Classification Metrics:
+  Precision: 0.500 (20/40 predicted pays were correct)
+  Recall:    0.556 (20/36 actual pays were caught)
+  F1-Score:  0.526
 
 ================================================================================
-TEST SET PERFORMANCE (HELD-OUT DATA)
+SUMMARY
 ================================================================================
 
-  R² = 0.5620
-  RMSE = 2.124 wins
+Top 3 Most Important Predictors:
+  1. total_yards_adj_avg: increases payment probability
+  2. W-L%_avg: increases payment probability
+  3. Pass_ANY/A_adj_avg: increases payment probability
 
-  R² drop (train→test) = -0.0954
-  ✓ Model generalizes well
+🏆 BEST PREDICTOR: total_yards_adj
+   Model Performance: AUC = 0.649
 
-================================================================================
-VARIABLE IMPORTANCE (Ridge Regression)
-================================================================================
-
-Ridge Regression Coefficients (standardized):
-  Interpretation: Effect on wins for 1 std dev change in predictor
-  (controlling for other variables)
-             Variable  Ridge_Coefficient  Abs_Coefficient
-1          Pass_ANY/A           1.159028         1.159028
-0             Pass_TD           1.031507         1.031507
-5         total_yards          -0.984986         0.984986
-7            Pass_GWD           0.803984         0.803984
-2  Rush_Rushing_Succ%          -0.612123         0.612123
-9    Rush_Rushing_Yds           0.558470         0.558470
-8     Rush_Rushing_TD           0.264493         0.264493
-4            Pass_Sk%          -0.209736         0.209736
-3           Pass_Int%          -0.046670         0.046670
-6            Pass_4QC          -0.044834         0.044834
-
-================================================================================
-COMPARISON: Ridge vs OLS
-================================================================================
-
-✓ Results saved to: ridge_regression_variable_importance.csv
+✓ Results saved to:
+  - payment_prediction_logistic_importance.csv
+  - payment_prediction_logistic_test_results.csv
 
 ================================================================================
 BOOTSTRAP STATISTICAL SIGNIFICANCE TESTING
@@ -159,58 +130,39 @@ Interpretation:
   - P_Value_Bootstrap: Approximate two-tailed p-value
   - T_Statistic: Coefficient / Standard Error
               Feature  Coefficient  Std_Error  ...  CI_Lower_95  CI_Upper_95  Significant_95
-1          Pass_ANY/A     1.159028   0.257108  ...     0.636773     1.651169            True
-0             Pass_TD     1.031507   0.245005  ...     0.546291     1.487780            True
-5         total_yards    -0.984986   0.236044  ...    -1.482022    -0.494922            True
-2  Rush_Rushing_Succ%    -0.612123   0.169682  ...    -0.959836    -0.290385            True
-7            Pass_GWD     0.803984   0.223305  ...     0.354511     1.208403            True
-9    Rush_Rushing_Yds     0.558470   0.179967  ...     0.193373     0.906121            True
-8     Rush_Rushing_TD     0.264493   0.177559  ...    -0.061137     0.644315           False
-4            Pass_Sk%    -0.209736   0.156082  ...    -0.519062     0.094787           False
-3           Pass_Int%    -0.046670   0.175129  ...    -0.393946     0.294727           False
-6            Pass_4QC    -0.044834   0.215433  ...    -0.456145     0.366401           False
+1          Pass_ANY/A     1.159028   0.257717  ...     0.668382     1.684468            True
+5         total_yards    -0.984986   0.236797  ...    -1.472059    -0.511815            True
+0             Pass_TD     1.031507   0.250022  ...     0.517102     1.495787            True
+2  Rush_Rushing_Succ%    -0.612123   0.163464  ...    -0.943175    -0.314524            True
+7            Pass_GWD     0.803984   0.221057  ...     0.346965     1.239249            True
+9    Rush_Rushing_Yds     0.558470   0.179154  ...     0.188821     0.895691            True
+8     Rush_Rushing_TD     0.264493   0.175212  ...    -0.032978     0.645988           False
+4            Pass_Sk%    -0.209736   0.155902  ...    -0.543310     0.073069           False
+3           Pass_Int%    -0.046670   0.173645  ...    -0.386415     0.269304           False
+6            Pass_4QC    -0.044834   0.208441  ...    -0.434237     0.365791           False
 
 [10 rows x 8 columns]
-
-================================================================================
-ALL P-VALUES SUMMARY
-================================================================================
-
-P-Value interpretation:
-  < 0.001: Highly significant (***)
-  < 0.01:  Very significant (**)
-  < 0.05:  Significant (*)
-  ≥ 0.05:  Not significant (ns)
-
-All variables ranked by statistical significance:
-   1. Pass_ANY/A          : p = 0.0000 *** (coef = +1.159)
-   2. Pass_TD             : p = 0.0000 *** (coef = +1.032)
-   3. total_yards         : p = 0.0000 *** (coef = -0.985)
-   4. Rush_Rushing_Succ%  : p = 0.0000 *** (coef = -0.612)
-   5. Pass_GWD            : p = 0.0000 *** (coef = +0.804)
-   6. Rush_Rushing_Yds    : p = 0.0060 **  (coef = +0.558)
-   7. Rush_Rushing_TD     : p = 0.1020 ns  (coef = +0.264)
-   8. Pass_Sk%            : p = 0.1660 ns  (coef = -0.210)
-   9. Pass_Int%           : p = 0.7720 ns  (coef = -0.047)
-  10. Pass_4QC            : p = 0.8640 ns  (coef = -0.045)
-
-Summary: 6 of 10 variables are statistically significant (p < 0.05)
 
 ================================================================================
 MODEL STABILITY ANALYSIS
 ================================================================================
 Bootstrap R² statistics:
-  Mean R²: 0.4818
-  Std R²: 0.0441
-  95% CI R²: [0.3970, 0.5704]
+  Mean R²: 0.4842
+  Std R²: 0.0419
+  95% CI R²: [0.3996, 0.5659]
   Original R²: 0.4666
 
-🔍 SIGNIFICANT PREDICTORS (6 of 10):
-  ✓ Pass_ANY/A: increases wins (p = 0.0000)
-  ✓ Pass_TD: increases wins (p = 0.0000)
-  ✓ total_yards: decreases wins (p = 0.0000)
-  ✓ Rush_Rushing_Succ%: decreases wins (p = 0.0000)
-  ✓ Pass_GWD: increases wins (p = 0.0000)
-  ✓ Rush_Rushing_Yds: increases wins (p = 0.0060)
+🔍 ALL PREDICTORS WITH P-VALUES (10 total):
+YOU INTERPRET - no arbitrary significance thresholds applied
+  Pass_ANY/A: increases wins (p = 0.0000)
+  total_yards: decreases wins (p = 0.0000)
+  Pass_TD: increases wins (p = 0.0000)
+  Rush_Rushing_Succ%: decreases wins (p = 0.0000)
+  Pass_GWD: increases wins (p = 0.0000)
+  Rush_Rushing_Yds: increases wins (p = 0.0040)
+  Rush_Rushing_TD: increases wins (p = 0.1020)
+  Pass_Sk%: decreases wins (p = 0.1620)
+  Pass_Int%: decreases wins (p = 0.7960)
+  Pass_4QC: decreases wins (p = 0.8560)
 
 ✓ Significance test results saved to: ridge_regression_significance_tests.csv

@@ -2343,46 +2343,27 @@ def prepare_qb_payment_data(
 
 def ridge_regression_payment_prediction(alpha_range=None, exclude_recent_drafts=True):
     """
-    Ridge regression to identify what predicts getting paid.
+    FIXED VERSION: Uses LogisticRegression for binary classification instead of Ridge.
     
-    Uses AVERAGED performance metrics across Years 1-3:
-    - QB metrics: total_yards, Pass_TD, Pass_ANY/A, Rush_Rushing_Succ%
-    - Team metrics: W (Wins), Pts (Points For)
-    
-    Args:
-        alpha_range: List of alpha values to test
-        exclude_recent_drafts: If True, exclude QBs drafted after 2020 (haven't reached contract window)
-    
-    Returns:
-        dict: Results including most important predictor
+    Predicts QB payment decisions using logistic regression with proper classification metrics.
     """
     print("\n" + "="*80)
-    print("RIDGE REGRESSION: WHAT PREDICTS GETTING PAID?")
+    print("FIXED PAYMENT PREDICTION: LOGISTIC REGRESSION")
     print("Using AVERAGED performance (Years 1-3)")
     print("="*80)
     
     # Load prepared payment data
-    if not os.path.exists('qb_seasons_payment_labeled.csv'):
-        print("✗ ERROR: qb_seasons_payment_labeled.csv not found")
-        return None
-    
     if not os.path.exists('qb_seasons_payment_labeled_era_adjusted.csv'):
         print("✗ ERROR: qb_seasons_payment_labeled_era_adjusted.csv not found")
-        print("Run create_era_adjusted_payment_data() first")
         return None
 
+    from QB_research import load_csv_safe, validate_columns
     payment_df = load_csv_safe('qb_seasons_payment_labeled_era_adjusted.csv')
     print(f"✓ Loaded {len(payment_df)} seasons with payment labels")
     
-    # CRITICAL: Remove QBs who haven't reached contract window yet
+    # Filter to eligible QBs (drafted ≤2020)
     if exclude_recent_drafts:
-        print("\n" + "="*80)
-        print("EXCLUDING RECENT DRAFT CLASSES")
-        print("="*80)
-        
-        current_year = 2025
-        cutoff_year = 2020  # QBs drafted 2020 or earlier have had chance to get paid
-        
+        cutoff_year = 2020
         payment_df['draft_year'] = pd.to_numeric(payment_df['draft_year'], errors='coerce')
         
         before_filter = len(payment_df['player_id'].unique())
@@ -2392,7 +2373,6 @@ def ridge_regression_payment_prediction(alpha_range=None, exclude_recent_drafts=
         print(f"Excluding QBs drafted after {cutoff_year}")
         print(f"  Before: {before_filter} unique QBs")
         print(f"  After: {after_filter} unique QBs")
-        print(f"  Removed: {before_filter - after_filter} QBs (2021-2024 classes)")
     
     # Load season records for team metrics
     season_records = load_csv_safe("season_records.csv", "season records")
@@ -2419,146 +2399,72 @@ def ridge_regression_payment_prediction(alpha_range=None, exclude_recent_drafts=
     
     print(f"✓ Merged with team metrics: {len(merged_df)} seasons")
     
-    # ADD THIS NEW SECTION HERE:
-    print("\n" + "="*80)
-    print("ADJUSTING TEAM METRICS")
-    print("="*80)
-
-    # Load adjustment factors
+    # Create adjusted Pts
     if os.path.exists('era_adjustment_factors.csv'):
         factor_df = pd.read_csv('era_adjustment_factors.csv')
         pts_factors = factor_df[factor_df['stat'] == 'Pts'].set_index('year')['adjustment_factor'].to_dict()
-        
-        # Apply Pts adjustment
         merged_df['Pts_adj'] = merged_df['Pts'] * merged_df['season'].map(pts_factors)
         print(f"✓ Created Pts_adj: {merged_df['Pts_adj'].notna().sum()} values")
     else:
-        print("⚠️ No adjustment factors found, using raw Pts")
         merged_df['Pts_adj'] = merged_df['Pts']
 
-    # Define reduced metric set
+    # Define metrics
     qb_metrics = [
         'total_yards_adj',
-        'Pass_TD_adj',
+        'Pass_TD_adj', 
         'Pass_ANY/A_adj',
         'Rush_Rushing_Succ%_adj'
     ]
     
     team_metrics = [
-        'W-L%',      # Changed from 'W'
+        'W-L%',
         'Pts_adj'
     ]
     
     all_metrics = qb_metrics + team_metrics
     
-    # Check which QB metrics already have lags
-    print("\n" + "="*80)
-    print("CHECKING EXISTING LAGS")
-    print("="*80)
-    
-    missing_qb_metrics = []
-    
-    for metric in qb_metrics:
-        has_lags = all(f"{metric}_lag{lag}" in merged_df.columns for lag in [1, 2, 3])
-        if has_lags:
-            print(f"✓ {metric}: has lag features")
-        else:
-            print(f"✗ {metric}: missing lag features, will create")
-            missing_qb_metrics.append(metric)
-    
-    # Create missing QB metric lags
-    if missing_qb_metrics:
-        print("\n" + "="*80)
-        print("CREATING MISSING QB METRIC LAGS")
-        print("="*80)
-        
-        merged_df = merged_df.sort_values(['player_id', 'season'])
-        
-        for metric in missing_qb_metrics:
-            merged_df[metric] = pd.to_numeric(merged_df[metric], errors='coerce')
-            for lag in [1, 2, 3]:
-                lag_col = f"{metric}_lag{lag}"
-                merged_df[lag_col] = merged_df.groupby('player_id')[metric].shift(lag)
-                non_null = merged_df[lag_col].notna().sum()
-                print(f"  {lag_col}: {non_null} non-null values")
-    
-    # Create team metric lags
-    print("\n" + "="*80)
-    print("CREATING TEAM METRIC LAGS")
-    print("="*80)
-    
+    # Create lags and averages
     merged_df = merged_df.sort_values(['player_id', 'season'])
     
-    for metric in team_metrics:
+    for metric in all_metrics:
         merged_df[metric] = pd.to_numeric(merged_df[metric], errors='coerce')
         for lag in [1, 2, 3]:
             lag_col = f"{metric}_lag{lag}"
             merged_df[lag_col] = merged_df.groupby('player_id')[metric].shift(lag)
-            non_null = merged_df[lag_col].notna().sum()
-            print(f"  {lag_col}: {non_null} non-null values")
     
-    # Create AVERAGED features across lags
-    print("\n" + "="*80)
-    print("CREATING AVERAGED FEATURES (lag1, lag2, lag3)")
-    print("="*80)
-    
+    # Create averaged features
     features = []
-    
     for metric in all_metrics:
         avg_col = f"{metric}_avg"
         merged_df[avg_col] = merged_df[[f"{metric}_lag1", f"{metric}_lag2", f"{metric}_lag3"]].mean(axis=1)
         features.append(avg_col)
-        non_null = merged_df[avg_col].notna().sum()
-        print(f"  {avg_col}: {non_null} non-null values")
-    
-    print(f"\n✓ Total features: {len(features)} (reduced from {len(all_metrics) * 3})")
     
     # Prepare features and target
     X = merged_df[features + ['got_paid', 'player_id']].copy()
-    
-    # Drop rows with missing values
     X = X.dropna(subset=features)
+    
     print(f"\nComplete cases: {len(X)}")
-    
-    # Check payment distribution among eligible QBs
-    unique_qbs = X.groupby('player_id')['got_paid'].first()
-    paid_qbs = unique_qbs.sum()
-    total_qbs = len(unique_qbs)
-    
-    print(f"\n" + "="*80)
-    print("ELIGIBLE QB PAYMENT DISTRIBUTION")
-    print("="*80)
-    print(f"Total eligible QBs (drafted ≤{cutoff_year}): {total_qbs}")
-    print(f"  Got paid: {paid_qbs} ({paid_qbs/total_qbs*100:.1f}%)")
-    print(f"  Not paid: {total_qbs - paid_qbs} ({(total_qbs - paid_qbs)/total_qbs*100:.1f}%)")
     
     if len(X) < 30:
         print("\n✗ ERROR: Insufficient complete cases for modeling")
         return None
     
     y = X['got_paid'].astype(int)
-    X = X[features]
+    X_features = X[features]
     
-    # Payment distribution in dataset
+    # Payment distribution
     paid_count = y.sum()
     paid_pct = paid_count / len(y) * 100
-    print(f"\nPayment outcome in dataset (season-level):")
+    print(f"\nPayment outcome distribution:")
     print(f"  Got paid: {paid_count} ({paid_pct:.1f}%)")
     print(f"  Not paid: {len(y) - paid_count} ({100-paid_pct:.1f}%)")
     
-    # Sample size check
-    observations_per_feature = len(X) / len(features)
-    print(f"\nSample size ratio:")
-    print(f"  Observations per feature: {observations_per_feature:.1f}")
-    if observations_per_feature < 10:
-        print(f"  ⚠️  Warning: Low ratio (recommend 10-20+)")
-    else:
-        print(f"  ✓ Good ratio for modeling")
-    
     # Train/test split (80/20)
-    split_idx = int(len(X) * 0.8)
-    X_train, X_test = X.iloc[:split_idx], X.iloc[split_idx:]
-    y_train, y_test = y.iloc[:split_idx], y.iloc[split_idx:]
+    split_idx = int(len(X_features) * 0.8)
+    X_train = X_features.iloc[:split_idx]
+    X_test = X_features.iloc[split_idx:]
+    y_train = y.iloc[:split_idx]
+    y_test = y.iloc[split_idx:]
     
     print(f"\nTrain/test split:")
     print(f"  Train: {len(X_train)} samples ({y_train.sum()} paid)")
@@ -2569,119 +2475,488 @@ def ridge_regression_payment_prediction(alpha_range=None, exclude_recent_drafts=
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
     
-    # Ridge regression with CV
+    # FIXED: Use LogisticRegression for binary classification
     print("\n" + "="*80)
-    print("RIDGE REGRESSION WITH 5-FOLD CV")
+    print("LOGISTIC REGRESSION WITH L2 REGULARIZATION")
     print("="*80)
     
     if alpha_range is None:
-        alpha_range = [0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
+        # C = 1/alpha, so larger C = less regularization
+        C_values = [0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
+    else:
+        C_values = [1.0/alpha for alpha in alpha_range]
     
-    ridge_cv = RidgeCV(alphas=alpha_range, cv=5, scoring='r2')
-    ridge_cv.fit(X_train_scaled, y_train)
+    # Cross-validation to find best C
+    best_score = -np.inf
+    best_C = 1.0
     
-    best_alpha = ridge_cv.alpha_
-    print(f"\n✓ Best alpha: {best_alpha}")
+    for C in C_values:
+        model = LogisticRegression(penalty='l2', C=C, max_iter=1000, random_state=42)
+        scores = cross_val_score(model, X_train_scaled, y_train, cv=5, scoring='roc_auc')
+        mean_score = scores.mean()
+        
+        print(f"  C={C:8.3f}: CV AUC = {mean_score:.4f} ± {scores.std()*2:.4f}")
+        
+        if mean_score > best_score:
+            best_score = mean_score
+            best_C = C
+    
+    print(f"\n✓ Best C: {best_C} (CV AUC: {best_score:.4f})")
     
     # Train final model
-    ridge_model = LogisticRegression(penalty='l2', C=1/best_alpha, max_iter=1000)
-    ridge_model.fit(X_train_scaled, y_train)
-    
-    # CV scores
-    cv_scores = cross_val_score(ridge_model, X_train_scaled, y_train, cv=5, scoring='r2')
-    print(f"\nCross-validation R² scores:")
-    for i, score in enumerate(cv_scores, 1):
-        print(f"  Fold {i}: {score:.4f}")
-    print(f"Mean CV R²: {cv_scores.mean():.4f} (+/- {cv_scores.std() * 2:.4f})")
+    final_model = LogisticRegression(penalty='l2', C=best_C, max_iter=1000, random_state=42)
+    final_model.fit(X_train_scaled, y_train)
     
     # Training performance
-    y_train_pred = ridge_model.predict(X_train_scaled)
-    train_r2 = ridge_model.score(X_train_scaled, y_train)
-    train_rmse = np.sqrt(np.mean((y_train - y_train_pred)**2))
+    y_train_prob = final_model.predict_proba(X_train_scaled)[:, 1]
+    y_train_pred = final_model.predict(X_train_scaled)
+    
+    train_auc = roc_auc_score(y_train, y_train_prob)
+    train_acc = np.mean(y_train == y_train_pred)
     
     print(f"\n" + "="*80)
     print("TRAINING PERFORMANCE")
     print("="*80)
-    print(f"  R² = {train_r2:.4f}")
-    print(f"  RMSE = {train_rmse:.4f}")
+    print(f"  AUC = {train_auc:.4f}")
+    print(f"  Accuracy = {train_acc:.4f}")
     
-    # Test performance
-    y_test_pred = ridge_model.predict(X_test_scaled)
-    test_r2 = ridge_model.score(X_test_scaled, y_test)
-    test_rmse = np.sqrt(np.mean((y_test - y_test_pred)**2))
+    # Test performance  
+    y_test_prob = final_model.predict_proba(X_test_scaled)[:, 1]
+    y_test_pred = final_model.predict(X_test_scaled)
+    
+    test_auc = roc_auc_score(y_test, y_test_prob)
+    test_acc = np.mean(y_test == y_test_pred)
     
     print(f"\n" + "="*80)
     print("TEST PERFORMANCE")
     print("="*80)
-    print(f"  R² = {test_r2:.4f}")
-    print(f"  RMSE = {test_rmse:.4f}")
+    print(f"  AUC = {test_auc:.4f}")
+    print(f"  Accuracy = {test_acc:.4f}")
     
-    # Variable importance
+    # FIXED: Variable importance with proper coefficient handling
     print(f"\n" + "="*80)
     print("VARIABLE IMPORTANCE")
     print("="*80)
     
+    # Get coefficients (1D array for logistic regression)
+    coefficients = final_model.coef_[0]  # Extract 1D array from 2D
+    
     importance_df = pd.DataFrame({
         'Feature': features,
-        'Coefficient': ridge_model.coef_,
-        'Abs_Coefficient': np.abs(ridge_model.coef_)
+        'Coefficient': coefficients,
+        'Abs_Coefficient': np.abs(coefficients)
     }).sort_values('Abs_Coefficient', ascending=False)
     
     print("\nAll features ranked by importance:")
-    display(importance_df)
+    for idx, (_, row) in enumerate(importance_df.iterrows(), 1):
+        direction = "increases" if row['Coefficient'] > 0 else "decreases"
+        print(f"  {idx}. {row['Feature']}: {direction} payment probability (coef={row['Coefficient']:.4f})")
     
-    # Identify most important metric overall
+    # Confusion matrix at default threshold (0.5)
     print(f"\n" + "="*80)
-    print("MOST IMPORTANT PREDICTOR")
+    print("CONFUSION MATRIX (Threshold = 0.5)")
     print("="*80)
     
-    top_feature = importance_df.iloc[0]['Feature']
-    top_coef = importance_df.iloc[0]['Coefficient']
+    cm = confusion_matrix(y_test, y_test_pred)
+    tn, fp, fn, tp = cm.ravel()
     
-    # Extract base metric name (remove _avg)
-    base_metric = top_feature.replace('_avg', '')
+    print(f"\nTest Set Confusion Matrix:")
+    print(f"                Predicted")
+    print(f"              No Pay  Pay")
+    print(f"Actual No Pay    {tn:3d}  {fp:3d}")
+    print(f"Actual Pay       {fn:3d}  {tp:3d}")
     
-    print(f"\n🏆 WINNER: {base_metric}")
-    print(f"   Feature: {top_feature}")
-    print(f"   Coefficient: {top_coef:.4f}")
+    precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+    recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+    f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
     
-    # Separate QB vs Team
+    print(f"\nClassification Metrics:")
+    print(f"  Precision: {precision:.3f} ({tp}/{tp + fp} predicted pays were correct)")
+    print(f"  Recall:    {recall:.3f} ({tp}/{tp + fn} actual pays were caught)")
+    print(f"  F1-Score:  {f1:.3f}")
+    
+    # Summary
+    top_3_vars = importance_df.head(3)['Feature'].tolist()
+    best_predictor = importance_df.iloc[0]['Feature']
+    
     print(f"\n" + "="*80)
-    print("QB METRICS vs TEAM METRICS")
+    print("SUMMARY")
     print("="*80)
+    print(f"\nTop 3 Most Important Predictors:")
+    for i, var in enumerate(top_3_vars, 1):
+        coef = importance_df[importance_df['Feature']==var]['Coefficient'].values[0]
+        direction = "increases" if coef > 0 else "decreases"
+        print(f"  {i}. {var}: {direction} payment probability")
     
-    qb_features = importance_df[importance_df['Feature'].str.contains('|'.join([m.replace('%', '') for m in qb_metrics]))]
-    team_features = importance_df[importance_df['Feature'].str.contains('|'.join(team_metrics))]
-    
-    print(f"\nQB metric features:")
-    display(qb_features)
-    
-    print(f"\nTeam metric features:")
-    display(team_features)
+    print(f"\n🏆 BEST PREDICTOR: {best_predictor.replace('_avg', '')}")
+    print(f"   Model Performance: AUC = {test_auc:.3f}")
     
     # Save results
     results = {
-        'model': ridge_model,
+        'model': final_model,
         'scaler': scaler,
-        'best_alpha': best_alpha,
+        'best_C': best_C,
         'features': features,
-        'cv_r2_mean': cv_scores.mean(),
-        'cv_r2_std': cv_scores.std(),
-        'train_r2': train_r2,
-        'test_r2': test_r2,
-        'train_rmse': train_rmse,
-        'test_rmse': test_rmse,
+        'train_auc': train_auc,
+        'test_auc': test_auc,
+        'train_accuracy': train_acc,
+        'test_accuracy': test_acc,
         'variable_importance': importance_df,
-        'top_predictor': base_metric,
-        'top_feature': top_feature,
-        'eligible_qbs': total_qbs,
-        'paid_qbs': paid_qbs
+        'confusion_matrix': cm,
+        'classification_metrics': {
+            'precision': precision,
+            'recall': recall,
+            'f1_score': f1
+        },
+        'best_predictor': best_predictor.replace('_avg', '')
     }
     
-    importance_df.to_csv('payment_prediction_importance.csv', index=False)
-    print(f"\n✓ Results saved to: payment_prediction_importance.csv")
+    # Save CSV files
+    importance_df.to_csv('payment_prediction_logistic_importance.csv', index=False)
+    
+    # Save predictions
+    test_results_df = pd.DataFrame({
+        'Actual': y_test.values,
+        'Predicted_Probability': y_test_prob,
+        'Predicted_Class': y_test_pred
+    })
+    test_results_df.to_csv('payment_prediction_logistic_test_results.csv', index=False)
+    
+    print(f"\n✓ Results saved to:")
+    print(f"  - payment_prediction_logistic_importance.csv")
+    print(f"  - payment_prediction_logistic_test_results.csv")
     
     return results
+
+def year_weighting_regression(metric='total_yards_adj', max_decision_year=6, n_bootstrap=1000):
+    """
+    FIXED VERSION: Properly defines all variables and handles bootstrap results.
+    
+    Determines how each prior year is weighted in payment decisions WITH STATISTICAL SIGNIFICANCE TESTING.
+    """
+    print("\n" + "="*80)
+    print(f"FIXED YEAR WEIGHTING WITH P-VALUES: {metric}")
+    print("="*80)
+    
+    # Load prepared payment data
+    if not os.path.exists('qb_seasons_payment_labeled_era_adjusted.csv'):
+        print("✗ ERROR: qb_seasons_payment_labeled_era_adjusted.csv not found")
+        return None
+
+    from QB_research import load_csv_safe
+    payment_df = load_csv_safe('qb_seasons_payment_labeled_era_adjusted.csv')
+    print(f"✓ Loaded {len(payment_df)} seasons with era-adjusted payment labels")
+    
+    # Handle team metrics if needed
+    if metric == 'W-L%':
+        season_records = load_csv_safe("season_records.csv", "season records")
+        if season_records is None:
+            return None
+        
+        season_records['Season'] = pd.to_numeric(season_records['Season'], errors='coerce')
+        season_records = season_records.dropna(subset=['Season'])
+        season_records['Season'] = season_records['Season'].astype(int)
+        
+        payment_df['season'] = pd.to_numeric(payment_df['season'], errors='coerce')
+        payment_df = payment_df.dropna(subset=['season'])
+        payment_df['season'] = payment_df['season'].astype(int)
+        
+        payment_df = pd.merge(
+            payment_df,
+            season_records[['Season', 'Team', 'W-L%']],
+            left_on=['season', 'Team'],
+            right_on=['Season', 'Team'],
+            how='inner'
+        )
+    
+    # Filter to eligible QBs (drafted ≤2020)
+    cutoff_year = 2020
+    payment_df['draft_year'] = pd.to_numeric(payment_df['draft_year'], errors='coerce')
+    payment_df = payment_df[payment_df['draft_year'] <= cutoff_year]
+    
+    # Calculate years since draft
+    payment_df['years_since_draft'] = payment_df['season'] - payment_df['draft_year']
+    
+    print(f"Analyzing metric: {metric}")
+    print(f"QBs in dataset: {payment_df['player_id'].nunique()}")
+    print(f"Using {n_bootstrap} bootstrap samples for significance testing")
+    
+    # Results storage
+    all_results = {}
+    
+    # For each decision year (3-6)
+    for decision_year in range(3, max_decision_year + 1):
+        print("\n" + "="*80)
+        print(f"DECISION YEAR {decision_year} WITH P-VALUES")
+        print(f"Using performance from Years 0 to {decision_year - 1}")
+        print("="*80)
+        
+        # Pivot data to get one row per player with columns for each year
+        player_data = []
+        
+        for player_id, group in payment_df.groupby('player_id'):
+            group = group.sort_values('years_since_draft')
+            
+            record = {
+                'player_id': player_id,
+                'got_paid': group['got_paid'].iloc[0]
+            }
+            
+            # Get metric value for each year 0 to (decision_year - 1)
+            for year in range(decision_year):
+                year_data = group[group['years_since_draft'] == year]
+                if len(year_data) > 0:
+                    record[f'{metric}_year{year}'] = pd.to_numeric(year_data[metric].iloc[0], errors='coerce')
+                else:
+                    record[f'{metric}_year{year}'] = np.nan
+            
+            player_data.append(record)
+        
+        year_features = [f'{metric}_year{year}' for year in range(decision_year)]
+        df = pd.DataFrame(player_data)
+        
+        print(f"Players with data: {len(df)}")
+        
+        # Drop rows with missing values
+        df = df.dropna(subset=year_features)
+        
+        print(f"Complete cases: {len(df)}")
+        
+        if len(df) < 20:
+            print(f"⚠️  Insufficient data for Year {decision_year} decision")
+            continue
+        
+        # Payment distribution
+        paid = df['got_paid'].sum()
+        print(f"Payment distribution: {paid} paid, {len(df) - paid} not paid")
+        
+        # Prepare X and y
+        X = df[year_features]
+        y = df['got_paid'].astype(int)
+        
+        # Standardize features
+        scaler = StandardScaler()
+        X_scaled = scaler.fit_transform(X)
+        
+        # Bootstrap significance testing
+        print(f"\n🔬 BOOTSTRAP SIGNIFICANCE TESTING ({n_bootstrap} samples)...")
+        
+        bootstrap_coefs = []
+        bootstrap_r2s = []
+        
+        from sklearn.linear_model import LogisticRegression
+        
+        for i in range(n_bootstrap):
+            if i % 200 == 0:
+                print(f"  Bootstrap sample {i}/{n_bootstrap}...")
+            
+            # Sample with replacement
+            indices = np.random.choice(len(X_scaled), len(X_scaled), replace=True)
+            X_boot = X_scaled[indices]
+            y_boot = y.iloc[indices].values
+            
+            # Fit model on bootstrap sample
+            model_boot = LogisticRegression(penalty='l2', C=10.0, max_iter=1000, random_state=42)
+            model_boot.fit(X_boot, y_boot)
+            
+            # Store coefficients and pseudo-R²
+            bootstrap_coefs.append(model_boot.coef_[0])  # Extract 1D array
+            
+            # Calculate pseudo-R² (McFadden's R²)
+            y_pred_prob = model_boot.predict_proba(X_boot)[:, 1]
+            y_pred_prob = np.clip(y_pred_prob, 1e-15, 1-1e-15)  # Avoid log(0)
+            
+            log_likelihood = np.sum(y_boot * np.log(y_pred_prob) + (1 - y_boot) * np.log(1 - y_pred_prob))
+            null_prob = np.mean(y_boot)
+            null_prob = np.clip(null_prob, 1e-15, 1-1e-15)
+            null_log_likelihood = len(y_boot) * (null_prob * np.log(null_prob) + (1 - null_prob) * np.log(1 - null_prob))
+            
+            pseudo_r2 = 1 - (log_likelihood / null_log_likelihood) if null_log_likelihood != 0 else 0
+            bootstrap_r2s.append(pseudo_r2)
+        
+        bootstrap_coefs = np.array(bootstrap_coefs)
+        bootstrap_r2s = np.array(bootstrap_r2s)
+        
+        print(f"✓ Bootstrap complete!")
+        
+        # Statistical significance results
+        print(f"\n" + "="*60)
+        print("STATISTICAL SIGNIFICANCE RESULTS")
+        print("="*60)
+        
+        # Original model for comparison
+        original_model = LogisticRegression(penalty='l2', C=10.0, max_iter=1000, random_state=42)
+        original_model.fit(X_scaled, y)
+        
+        significance_results = []
+        
+        for i, feature in enumerate(year_features):
+            year_num = int(feature.split('year')[-1])
+            coef_dist = bootstrap_coefs[:, i]
+            original_coef = original_model.coef_[0][i]
+            
+            # Calculate confidence intervals (95%)
+            ci_lower = np.percentile(coef_dist, 2.5)
+            ci_upper = np.percentile(coef_dist, 97.5)
+            
+            # Statistical significance test: CI doesn't include zero
+            is_significant = not (ci_lower <= 0 <= ci_upper)
+            
+            # Calculate p-value approximation (two-tailed)
+            if original_coef > 0:
+                p_value_approx = 2 * np.mean(coef_dist <= 0)
+            else:
+                p_value_approx = 2 * np.mean(coef_dist >= 0)
+            p_value_approx = min(p_value_approx, 1.0)
+            
+            # Standard error
+            se = np.std(coef_dist)
+            
+            # T-statistic approximation
+            t_stat = original_coef / se if se > 0 else 0
+            
+            significance_results.append({
+                'Decision_Year': decision_year,
+                'Performance_Year': f'Year {year_num}',
+                'Year_Number': year_num,
+                'Feature': feature,
+                'Coefficient': original_coef,
+                'Std_Error': se,
+                'T_Statistic': t_stat,
+                'P_Value_Bootstrap': p_value_approx,
+                'CI_Lower_95': ci_lower,
+                'CI_Upper_95': ci_upper,
+                'Significant_95': is_significant,
+                'Coefficient_Mean_Bootstrap': np.mean(coef_dist),
+                'Coefficient_Std_Bootstrap': np.std(coef_dist)
+            })
+        
+        significance_df = pd.DataFrame(significance_results)
+        significance_df = significance_df.sort_values('Year_Number')
+        
+        print(f"\nYear-by-year coefficients WITH P-VALUES:")
+        print("(Bootstrap method with 95% confidence intervals)")
+        
+        for _, row in significance_df.iterrows():
+            sig_marker = "***" if row['P_Value_Bootstrap'] < 0.001 else "**" if row['P_Value_Bootstrap'] < 0.01 else "*" if row['P_Value_Bootstrap'] < 0.05 else ""
+            print(f"  {row['Performance_Year']}: coef={row['Coefficient']:7.4f}, p={row['P_Value_Bootstrap']:6.4f} {sig_marker}")
+        
+        # Calculate normalized weights
+        total_abs = significance_df['Coefficient'].abs().sum()
+        if total_abs > 0:
+            significance_df['Weight_%'] = (significance_df['Coefficient'].abs() / total_abs * 100)
+        else:
+            significance_df['Weight_%'] = 0
+        
+        # FIXED: Model performance with proper variable definitions
+        # Calculate original model performance
+        y_pred_prob = original_model.predict_proba(X_scaled)[:, 1]
+        y_pred_prob = np.clip(y_pred_prob, 1e-15, 1-1e-15)
+        
+        log_likelihood = np.sum(y * np.log(y_pred_prob) + (1 - y) * np.log(1 - y_pred_prob))
+        null_prob = np.mean(y)
+        null_prob = np.clip(null_prob, 1e-15, 1-1e-15)
+        null_log_likelihood = len(y) * (null_prob * np.log(null_prob) + (1 - null_prob) * np.log(1 - null_prob))
+        
+        pseudo_r2 = 1 - (log_likelihood / null_log_likelihood) if null_log_likelihood != 0 else 0
+        
+        # FIXED: Properly define bootstrap statistics
+        r2_mean_bootstrap = np.mean(bootstrap_r2s)
+        r2_std_bootstrap = np.std(bootstrap_r2s)
+        
+        print(f"\nModel Performance:")
+        print(f"  Original Pseudo-R²: {pseudo_r2:.4f}")
+        print(f"  Bootstrap Pseudo-R² mean: {r2_mean_bootstrap:.4f} ± {r2_std_bootstrap:.4f}")
+        
+        # Identify significant years
+        significant_years = significance_df[significance_df['Significant_95']]
+        
+        print(f"\n🔍 STATISTICALLY SIGNIFICANT YEARS ({len(significant_years)} of {len(significance_df)}):")
+        for _, row in significant_years.iterrows():
+            direction = "increases" if row['Coefficient'] > 0 else "decreases"
+            print(f"  ✓ {row['Performance_Year']}: {direction} payment probability (p = {row['P_Value_Bootstrap']:.4f})")
+        
+        if len(significant_years) == 0:
+            print("  ⚠️  No years are statistically significant at p < 0.05")
+        
+        # Store results (FIXED: use properly defined variables)
+        all_results[f'year_{decision_year}'] = {
+            'decision_year': decision_year,
+            'significance_results': significance_df,
+            'model': original_model,
+            'scaler': scaler,
+            'features': year_features,
+            'pseudo_r2': pseudo_r2,
+            'r2_bootstrap_mean': r2_mean_bootstrap,  # FIXED: properly defined
+            'r2_bootstrap_std': r2_std_bootstrap,    # FIXED: properly defined
+            'n_samples': len(df),
+            'bootstrap_coefficients': bootstrap_coefs,
+            'bootstrap_r2s': bootstrap_r2s,
+            'significant_years': significant_years
+        }
+    
+    # Save results and create summary (same as original)
+    if all_results:
+        safe_metric_name = metric.replace('/', '_').replace('%', 'pct')
+        
+        # Combine all significance results
+        all_significance_data = []
+        for decision_year in range(3, max_decision_year + 1):
+            key = f'year_{decision_year}'
+            if key in all_results:
+                result = all_results[key]
+                sig_df = result['significance_results']
+                
+                for _, row in sig_df.iterrows():
+                    all_significance_data.append({
+                        'Decision_Year': decision_year,
+                        'Performance_Year': row['Performance_Year'],
+                        'Year_Number': row['Year_Number'],
+                        'Coefficient': row['Coefficient'],
+                        'P_Value_Bootstrap': row['P_Value_Bootstrap'],
+                        'Significant_95': row['Significant_95'],
+                        'Weight_%': row['Weight_%'],
+                        'T_Statistic': row['T_Statistic'],
+                        'CI_Lower_95': row['CI_Lower_95'],
+                        'CI_Upper_95': row['CI_Upper_95']
+                    })
+        
+        all_significance_df = pd.DataFrame(all_significance_data)
+        
+        if len(all_significance_df) > 0:
+            # Save detailed results
+            all_significance_df.to_csv(f'year_weights_significance_{safe_metric_name}.csv', index=False)
+            print(f"\n✓ Detailed significance results saved to: year_weights_significance_{safe_metric_name}.csv")
+            
+            # Create and save summary matrices
+            significance_matrix = all_significance_df.pivot(
+                index='Performance_Year', 
+                columns='Decision_Year', 
+                values='Significant_95'
+            )
+            
+            pvalue_matrix = all_significance_df.pivot(
+                index='Performance_Year', 
+                columns='Decision_Year', 
+                values='P_Value_Bootstrap'
+            )
+            
+            weight_matrix = all_significance_df.pivot(
+                index='Performance_Year', 
+                columns='Decision_Year', 
+                values='Weight_%'
+            )
+            
+            significance_matrix.to_csv(f'year_significance_matrix_{safe_metric_name}.csv')
+            pvalue_matrix.to_csv(f'year_pvalue_matrix_{safe_metric_name}.csv')
+            weight_matrix.to_csv(f'year_weight_matrix_{safe_metric_name}.csv')
+            
+            print(f"✓ Summary matrices saved:")
+            print(f"  - year_significance_matrix_{safe_metric_name}.csv")
+            print(f"  - year_pvalue_matrix_{safe_metric_name}.csv") 
+            print(f"  - year_weight_matrix_{safe_metric_name}.csv")
+    
+    return all_results
 
 def calculate_era_adjustment_factors(reference_year=2024):
     """
@@ -4004,7 +4279,7 @@ def create_player_ids_from_qb_data():
     
     return True
 
-def ridge_regression_with_significance_testing(train_df=None, test_df=None, use_extended_features=True, n_bootstrap=1000):
+def wins_prediction_linear_ridge(train_df=None, test_df=None, use_extended_features=True, n_bootstrap=1000):
     """
     Enhanced ridge regression for wins prediction with bootstrap-based statistical significance testing.
     
@@ -4022,8 +4297,12 @@ def ridge_regression_with_significance_testing(train_df=None, test_df=None, use_
     print("="*80)
     
     # Run the existing ridge regression first
-    base_results = ridge_regression_with_cv(train_df, test_df, use_extended_features=use_extended_features)
     
+    base_results = ridge_regression_payment_prediction(
+        alpha_range=None, 
+        exclude_recent_drafts=True
+    )
+
     if base_results is None:
         return None
     
@@ -4198,15 +4477,17 @@ def ridge_regression_with_significance_testing(train_df=None, test_df=None, use_
     print(f"  Original R²: {original_model.score(X_train_scaled, y_train):.4f}")
     
     # Identify most stable predictors
-    '''significant_predictors = significance_df[significance_df['Significant_95']]
-    
-    print(f"\n🔍 SIGNIFICANT PREDICTORS ({len(significant_predictors)} of {len(significance_df)}):")
-    for _, row in significant_predictors.iterrows():
+    print(f"\n🔍 ALL PREDICTORS WITH P-VALUES ({len(significance_df)} total):")
+    print("YOU INTERPRET - no arbitrary significance thresholds applied")
+    for _, row in significance_df.iterrows():
         direction = "increases" if row['Coefficient'] > 0 else "decreases"
-        print(f"  ✓ {row['Feature']}: {direction} wins (p ≈ {row['P_Value_Bootstrap']:.4f})")
-    '''
+        print(f"  {row['Feature']}: {direction} wins (p = {row['P_Value_Bootstrap']:.4f})")
+
+    # Keep significant_predictors for the results dict but don't filter the display
+    significant_predictors = significance_df[significance_df['Significant_95']]  # Keep for compatibility
+    
     # Save results
-    significance_df.to_csv('ridge_regression_significance_tests.csv', index=False)
+    significance_df.to_csv('wins_prediction_ridge_significance_tests.csv', index=False)
     
     # Combine with base results
     enhanced_results = base_results.copy()
@@ -4223,11 +4504,11 @@ def ridge_regression_with_significance_testing(train_df=None, test_df=None, use_
         }
     })
     
-    print(f"\n✓ Significance test results saved to: ridge_regression_significance_tests.csv")
+    print(f"\n✓ Significance test results saved to: wins_prediction_ridge_significance_tests.csv")
     
     return enhanced_results
 
-def payment_prediction_with_confusion_matrix(alpha_range=None, exclude_recent_drafts=True, probability_thresholds=None):
+def payment_prediction_logistic_ridge(alpha_range=None, exclude_recent_drafts=True, probability_thresholds=None):
     """
     Enhanced payment prediction with comprehensive confusion matrix analysis and classification metrics.
     
@@ -4503,375 +4784,6 @@ def payment_prediction_with_confusion_matrix(alpha_range=None, exclude_recent_dr
     print(f"✓ Classification feature importance saved to: payment_prediction_classification_importance.csv")
     
     return enhanced_results
-
-def year_weighting_regression_with_significance(metric='total_yards_adj', max_decision_year=6, n_bootstrap=1000):
-    """
-    Determines how each prior year is weighted in payment decisions WITH STATISTICAL SIGNIFICANCE TESTING.
-    
-    For each decision year (3-6), runs regression with bootstrap significance testing:
-        got_paid ~ metric_year0 + metric_year1 + metric_year2 + ... + metric_year(N-1)
-    
-    Shows which years matter most for the payment decision AND provides p-values for each year.
-    
-    Args:
-        metric (str): Metric to analyze ('total_yards_adj' or 'Pass_ANY/A_adj')
-        max_decision_year (int): Latest decision year to model (default 6)
-        n_bootstrap (int): Number of bootstrap samples for significance testing
-    
-    Returns:
-        dict: Weighting results with p-values for each decision year
-    """
-    print("\n" + "="*80)
-    print(f"YEAR-BY-YEAR WEIGHTING ANALYSIS WITH P-VALUES: {metric}")
-    print("="*80)
-    
-    # Load prepared payment data
-    if not os.path.exists('qb_seasons_payment_labeled_era_adjusted.csv'):
-        print("✗ ERROR: qb_seasons_payment_labeled_era_adjusted.csv not found")
-        print("Run create_era_adjusted_payment_data() first")
-        return None
-
-    payment_df = load_csv_safe('qb_seasons_payment_labeled_era_adjusted.csv')
-    print(f"✓ Loaded {len(payment_df)} seasons with era-adjusted payment labels")
-    
-    # If analyzing team metric (W-L%), need to merge with season records
-    if metric == 'W-L%':
-        season_records = load_csv_safe("season_records.csv", "season records")
-        if season_records is None:
-            return None
-        
-        season_records['Season'] = pd.to_numeric(season_records['Season'], errors='coerce')
-        season_records = season_records.dropna(subset=['Season'])
-        season_records['Season'] = season_records['Season'].astype(int)
-        
-        payment_df['season'] = pd.to_numeric(payment_df['season'], errors='coerce')
-        payment_df = payment_df.dropna(subset=['season'])
-        payment_df['season'] = payment_df['season'].astype(int)
-        
-        payment_df = pd.merge(
-            payment_df,
-            season_records[['Season', 'Team', 'W-L%']],
-            left_on=['season', 'Team'],
-            right_on=['Season', 'Team'],
-            how='inner'
-        )
-    
-    # Filter to eligible QBs (drafted ≤2020)
-    cutoff_year = 2020
-    payment_df['draft_year'] = pd.to_numeric(payment_df['draft_year'], errors='coerce')
-    payment_df = payment_df[payment_df['draft_year'] <= cutoff_year]
-    
-    # Calculate years since draft
-    payment_df['years_since_draft'] = payment_df['season'] - payment_df['draft_year']
-    
-    print(f"Analyzing metric: {metric}")
-    print(f"QBs in dataset: {payment_df['player_id'].nunique()}")
-    print(f"Using {n_bootstrap} bootstrap samples for significance testing")
-    
-    # Results storage
-    all_results = {}
-    
-    # For each decision year (3-6)
-    for decision_year in range(3, max_decision_year + 1):
-        print("\n" + "="*80)
-        print(f"DECISION YEAR {decision_year} WITH P-VALUES")
-        print(f"Using performance from Years 0 to {decision_year - 1}")
-        print("="*80)
-        
-        # Get performance for each year 0 to (decision_year - 1)
-        year_features = []
-        
-        # Pivot data to get one row per player with columns for each year
-        player_data = []
-        
-        for player_id, group in payment_df.groupby('player_id'):
-            group = group.sort_values('years_since_draft')
-            
-            record = {
-                'player_id': player_id,
-                'got_paid': group['got_paid'].iloc[0]
-            }
-            
-            # Get metric value for each year 0 to (decision_year - 1)
-            for year in range(decision_year):
-                year_data = group[group['years_since_draft'] == year]
-                if len(year_data) > 0:
-                    record[f'{metric}_year{year}'] = pd.to_numeric(year_data[metric].iloc[0], errors='coerce')
-                else:
-                    record[f'{metric}_year{year}'] = np.nan
-                
-                year_features.append(f'{metric}_year{year}')
-        
-            player_data.append(record)
-        
-        year_features = sorted(list(set(year_features)))  # Remove duplicates
-        df = pd.DataFrame(player_data)
-        
-        print(f"Players with data: {len(df)}")
-        
-        # Drop rows with missing values
-        df = df.dropna(subset=year_features)
-        
-        print(f"Complete cases: {len(df)}")
-        
-        if len(df) < 20:
-            print(f"⚠️  Insufficient data for Year {decision_year} decision")
-            continue
-        
-        # Payment distribution
-        paid = df['got_paid'].sum()
-        print(f"Payment distribution: {paid} paid, {len(df) - paid} not paid")
-        
-        # Prepare X and y
-        X = df[year_features]
-        y = df['got_paid'].astype(int)
-        
-        # Standardize features
-        scaler = StandardScaler()
-        X_scaled = scaler.fit_transform(X)
-        
-        # =====================================================================
-        # BOOTSTRAP STATISTICAL SIGNIFICANCE TESTING
-        # =====================================================================
-        print(f"\n🔬 BOOTSTRAP SIGNIFICANCE TESTING ({n_bootstrap} samples)...")
-        
-        bootstrap_coefs = []
-        bootstrap_r2s = []
-        
-        for i in range(n_bootstrap):
-            if i % 200 == 0:
-                print(f"  Bootstrap sample {i}/{n_bootstrap}...")
-            
-            # Sample with replacement
-            indices = np.random.choice(len(X_scaled), len(X_scaled), replace=True)
-            X_boot = X_scaled[indices]
-            y_boot = y.iloc[indices].values
-            
-            # Fit model on bootstrap sample
-            ridge_model = Ridge(alpha=10.0)  # Use moderate regularization
-            ridge_model.fit(X_boot, y_boot)
-            
-            # Store coefficients and R²
-            bootstrap_coefs.append(ridge_model.coef_)
-            r2_boot = ridge_model.score(X_boot, y_boot)
-            bootstrap_r2s.append(r2_boot)
-        
-        bootstrap_coefs = np.array(bootstrap_coefs)
-        bootstrap_r2s = np.array(bootstrap_r2s)
-        
-        print(f"✓ Bootstrap complete!")
-        
-        # =====================================================================
-        # STATISTICAL SIGNIFICANCE RESULTS  
-        # =====================================================================
-        print(f"\n" + "="*60)
-        print("STATISTICAL SIGNIFICANCE RESULTS")
-        print("="*60)
-        
-        # Original model for comparison
-        ridge_model = Ridge(alpha=10.0)
-        ridge_model.fit(X_scaled, y)
-        
-        significance_results = []
-        
-        for i, feature in enumerate(year_features):
-            year_num = int(feature.split('year')[-1])
-            coef_dist = bootstrap_coefs[:, i]
-            original_coef = ridge_model.coef_[i]
-            
-            # Calculate confidence intervals (95%)
-            ci_lower = np.percentile(coef_dist, 2.5)
-            ci_upper = np.percentile(coef_dist, 97.5)
-            
-            # Statistical significance test: CI doesn't include zero
-            is_significant = not (ci_lower <= 0 <= ci_upper)
-            
-            # Calculate p-value approximation (two-tailed)
-            if original_coef > 0:
-                p_value_approx = 2 * np.mean(coef_dist <= 0)
-            else:
-                p_value_approx = 2 * np.mean(coef_dist >= 0)
-            p_value_approx = min(p_value_approx, 1.0)
-            
-            # Standard error
-            se = np.std(coef_dist)
-            
-            # T-statistic approximation
-            t_stat = original_coef / se if se > 0 else 0
-            
-            significance_results.append({
-                'Decision_Year': decision_year,
-                'Performance_Year': f'Year {year_num}',
-                'Year_Number': year_num,
-                'Feature': feature,
-                'Coefficient': original_coef,
-                'Std_Error': se,
-                'T_Statistic': t_stat,
-                'P_Value_Bootstrap': p_value_approx,
-                'CI_Lower_95': ci_lower,
-                'CI_Upper_95': ci_upper,
-                'Significant_95': is_significant,
-                'Coefficient_Mean_Bootstrap': np.mean(coef_dist),
-                'Coefficient_Std_Bootstrap': np.std(coef_dist)
-            })
-        
-        significance_df = pd.DataFrame(significance_results)
-        significance_df = significance_df.sort_values('Year_Number')
-        
-        print(f"\nYear-by-year coefficients WITH P-VALUES:")
-        print("(Bootstrap method with 95% confidence intervals)")
-        
-        display(significance_df[['Performance_Year', 'Coefficient', 'Std_Error', 'T_Statistic', 
-                                'P_Value_Bootstrap', 'CI_Lower_95', 'CI_Upper_95', 'Significant_95']])
-        
-        # Calculate normalized weights (for comparison with original function)
-        total_abs = significance_df['Coefficient'].abs().sum()
-        if total_abs > 0:
-            significance_df['Weight_%'] = (significance_df['Coefficient'].abs() / total_abs * 100)
-        else:
-            significance_df['Weight_%'] = 0
-        
-        # Model performance
-        r2 = ridge_model.score(X_scaled, y)
-        r2_mean_bootstrap = np.mean(bootstrap_r2s)
-        r2_std_bootstrap = np.std(bootstrap_r2s)
-        
-        print(f"\nModel Performance:")
-        print(f"  Original R²: {r2:.4f}")
-        print(f"  Bootstrap R² mean: {r2_mean_bootstrap:.4f} ± {r2_std_bootstrap:.4f}")
-        
-        # Identify significant years
-        significant_years = significance_df[significance_df['Significant_95']]
-        
-        print(f"\n🔍 STATISTICALLY SIGNIFICANT YEARS ({len(significant_years)} of {len(significance_df)}):")
-        for _, row in significant_years.iterrows():
-            direction = "increases" if row['Coefficient'] > 0 else "decreases"
-            print(f"  ✓ {row['Performance_Year']}: {direction} payment probability (p = {row['P_Value_Bootstrap']:.4f})")
-        
-        if len(significant_years) == 0:
-            print("  ⚠️  No years are statistically significant at p < 0.05")
-        
-        # Store results
-        all_results[f'year_{decision_year}'] = {
-            'decision_year': decision_year,
-            'significance_results': significance_df,
-            'model': ridge_model,
-            'scaler': scaler,
-            'features': year_features,
-            'r2': r2,
-            'r2_bootstrap_mean': r2_mean_bootstrap,
-            'r2_bootstrap_std': r2_bootstrap_std,
-            'n_samples': len(df),
-            'bootstrap_coefficients': bootstrap_coefs,
-            'bootstrap_r2s': bootstrap_r2s,
-            'significant_years': significant_years
-        }
-    
-    # =========================================================================
-    # SUMMARY ACROSS ALL DECISION YEARS WITH P-VALUES
-    # =========================================================================
-    print("\n" + "="*80)
-    print(f"SUMMARY: YEAR SIGNIFICANCE ACROSS DECISION YEARS ({metric})")
-    print("="*80)
-    
-    # Combine all significance results
-    all_significance_data = []
-    for decision_year in range(3, max_decision_year + 1):
-        key = f'year_{decision_year}'
-        if key in all_results:
-            result = all_results[key]
-            sig_df = result['significance_results']
-            
-            for _, row in sig_df.iterrows():
-                all_significance_data.append({
-                    'Decision_Year': decision_year,
-                    'Performance_Year': row['Performance_Year'],
-                    'Year_Number': row['Year_Number'],
-                    'Coefficient': row['Coefficient'],
-                    'P_Value_Bootstrap': row['P_Value_Bootstrap'],
-                    'Significant_95': row['Significant_95'],
-                    'Weight_%': row['Weight_%'],
-                    'T_Statistic': row['T_Statistic'],
-                    'CI_Lower_95': row['CI_Lower_95'],
-                    'CI_Upper_95': row['CI_Upper_95']
-                })
-    
-    all_significance_df = pd.DataFrame(all_significance_data)
-    
-    if len(all_significance_df) > 0:
-        # Create significance summary matrix
-        significance_matrix = all_significance_df.pivot(
-            index='Performance_Year', 
-            columns='Decision_Year', 
-            values='Significant_95'
-        )
-        
-        print("\nSignificance Matrix (True = p < 0.05):")
-        print("Rows = Performance year, Columns = Decision year")
-        display(significance_matrix)
-        
-        # P-value matrix
-        pvalue_matrix = all_significance_df.pivot(
-            index='Performance_Year', 
-            columns='Decision_Year', 
-            values='P_Value_Bootstrap'
-        )
-        
-        print("\nP-Value Matrix:")
-        display(pvalue_matrix)
-        
-        # Weight matrix (for comparison)
-        weight_matrix = all_significance_df.pivot(
-            index='Performance_Year', 
-            columns='Decision_Year', 
-            values='Weight_%'
-        )
-        
-        print("\nWeight Matrix (% importance of each year):")
-        display(weight_matrix)
-        
-        # Overall significance summary
-        print("\n" + "="*80)
-        print("OVERALL YEAR SIGNIFICANCE SUMMARY")
-        print("="*80)
-        
-        year_significance_summary = all_significance_df.groupby('Performance_Year').agg({
-            'Significant_95': 'sum',  # How many decision years this year is significant
-            'P_Value_Bootstrap': 'mean',  # Average p-value across decision years
-            'Weight_%': 'mean',  # Average weight across decision years
-            'T_Statistic': lambda x: np.mean(np.abs(x))  # Average absolute t-statistic
-        }).reset_index()
-        
-        year_significance_summary.columns = ['Performance_Year', 'Times_Significant', 'Avg_P_Value', 'Avg_Weight_%', 'Avg_Abs_T_Stat']
-        year_significance_summary = year_significance_summary.sort_values('Times_Significant', ascending=False)
-        
-        print("\nOverall significance of each performance year:")
-        display(year_significance_summary)
-        
-        print(f"\n🏆 MOST CONSISTENTLY SIGNIFICANT YEARS:")
-        for _, row in year_significance_summary.head(3).iterrows():
-            print(f"  {row['Performance_Year']}: Significant in {int(row['Times_Significant'])}/{max_decision_year-2} decision years (avg p = {row['Avg_P_Value']:.4f})")
-        
-        # Save all results
-        safe_metric_name = metric.replace('/', '_').replace('%', 'pct')
-        
-        # Save detailed significance results
-        all_significance_df.to_csv(f'year_weights_significance_{safe_metric_name}.csv', index=False)
-        print(f"\n✓ Detailed significance results saved to: year_weights_significance_{safe_metric_name}.csv")
-        
-        # Save summary matrices
-        significance_matrix.to_csv(f'year_significance_matrix_{safe_metric_name}.csv')
-        pvalue_matrix.to_csv(f'year_pvalue_matrix_{safe_metric_name}.csv')
-        weight_matrix.to_csv(f'year_weight_matrix_{safe_metric_name}.csv')
-        year_significance_summary.to_csv(f'year_significance_summary_{safe_metric_name}.csv', index=False)
-        
-        print(f"✓ Summary matrices saved:")
-        print(f"  - year_significance_matrix_{safe_metric_name}.csv (True/False significance)")
-        print(f"  - year_pvalue_matrix_{safe_metric_name}.csv (actual p-values)")
-        print(f"  - year_weight_matrix_{safe_metric_name}.csv (importance weights)")
-        print(f"  - year_significance_summary_{safe_metric_name}.csv (overall summary)")
-    
-    return all_results
 
 def find_most_similar_qbs(
     target_qb_id,

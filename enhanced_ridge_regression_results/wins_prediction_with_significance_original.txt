@@ -1,6 +1,6 @@
 ================================================================================
 Enhanced Wins Prediction: Statistical Significance Testing (Original Features)
-Generated: 2025-10-29 11:24:04
+Generated: 2025-10-30 09:03:11
 ================================================================================
 
 
@@ -9,113 +9,94 @@ RIDGE REGRESSION WITH STATISTICAL SIGNIFICANCE TESTING
 ================================================================================
 
 ================================================================================
-RIDGE REGRESSION WITH 5-FOLD CROSS-VALIDATION
+FIXED PAYMENT PREDICTION: LOGISTIC REGRESSION
+Using AVERAGED performance (Years 1-3)
 ================================================================================
-
-Loading train/test split from files...
-✓ Loaded 447 records from file
-✓ Loaded 112 records from file
-Loaded train set: 447 records
-Loaded test set: 112 records
+✓ Loaded 562 records from file
+✓ Loaded 562 seasons with payment labels
+Excluding QBs drafted after 2020
+  Before: 73 unique QBs
+  After: 59 unique QBs
 ✓ Loaded 798 records from season records
+✓ Merged with team metrics: 513 seasons
+✓ Created Pts_adj: 513 values
+
+Complete cases: 453
+
+Payment outcome distribution:
+  Got paid: 196 (43.3%)
+  Not paid: 257 (56.7%)
+
+Train/test split:
+  Train: 362 samples (160 paid)
+  Test: 91 samples (36 paid)
 
 ================================================================================
-PROCESSING TRAINING DATA
+LOGISTIC REGRESSION WITH L2 REGULARIZATION
 ================================================================================
-Training set: 442 QB season-team records
-After filtering (8+ GS): 292 records
+  C=   0.001: CV AUC = 0.7834 ± 0.1868
+  C=   0.010: CV AUC = 0.7847 ± 0.1627
+  C=   0.100: CV AUC = 0.7753 ± 0.1243
+  C=   1.000: CV AUC = 0.7705 ± 0.1231
+  C=  10.000: CV AUC = 0.7687 ± 0.1300
+  C= 100.000: CV AUC = 0.7679 ± 0.1314
 
-================================================================================
-PROCESSING TEST DATA
-================================================================================
-Test set: 103 QB season-team records
-After filtering (8+ GS): 57 records
-
-Using ORIGINAL feature set (manual selection)
+✓ Best C: 0.01 (CV AUC: 0.7847)
 
 ================================================================================
-FEATURE SELECTION
+TRAINING PERFORMANCE
 ================================================================================
-
-Using 5 performance factors:
-  - Pass_TD
-  - Pass_ANY/A
-  - Rush_Rushing_Succ%
-  - Pass_Int%
-  - Pass_Sk%
-
-Proceeding with 5 available factors
-
-Training set complete cases: 292
-Test set complete cases: 57
+  AUC = 0.8104
+  Accuracy = 0.7265
 
 ================================================================================
-CROSS-VALIDATION TO SELECT OPTIMAL ALPHA
+TEST PERFORMANCE
 ================================================================================
-
-Testing 7 alpha values with 5-fold CV:
-Alpha range: [0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
-
-Best alpha (regularization strength): 10.0
+  AUC = 0.6490
+  Accuracy = 0.6044
 
 ================================================================================
-5-FOLD CROSS-VALIDATION PERFORMANCE
+VARIABLE IMPORTANCE
 ================================================================================
 
-Cross-Validation R² Scores (5 folds):
-  Fold 1: 0.0759
-  Fold 2: 0.4484
-  Fold 3: 0.2534
-  Fold 4: 0.2516
-  Fold 5: 0.4076
-
-Mean CV R²: 0.2874 (+/- 0.2646)
-
-Cross-Validation RMSE Scores (5 folds):
-  Fold 1: 2.735 wins
-  Fold 2: 2.284 wins
-  Fold 3: 2.415 wins
-  Fold 4: 2.344 wins
-  Fold 5: 2.462 wins
-
-Mean CV RMSE: 2.448 (+/- 0.312) wins
+All features ranked by importance:
+  1. total_yards_adj_avg: increases payment probability (coef=0.2355)
+  2. W-L%_avg: increases payment probability (coef=0.2187)
+  3. Pass_ANY/A_adj_avg: increases payment probability (coef=0.2115)
+  4. Rush_Rushing_Succ%_adj_avg: increases payment probability (coef=0.2031)
+  5. Pass_TD_adj_avg: increases payment probability (coef=0.2027)
+  6. Pts_adj_avg: increases payment probability (coef=0.1261)
 
 ================================================================================
-TRAINING SET PERFORMANCE
+CONFUSION MATRIX (Threshold = 0.5)
 ================================================================================
 
-  R² = 0.3482
-  RMSE = 2.372 wins
+Test Set Confusion Matrix:
+                Predicted
+              No Pay  Pay
+Actual No Pay     35   20
+Actual Pay        16   20
+
+Classification Metrics:
+  Precision: 0.500 (20/40 predicted pays were correct)
+  Recall:    0.556 (20/36 actual pays were caught)
+  F1-Score:  0.526
 
 ================================================================================
-TEST SET PERFORMANCE (HELD-OUT DATA)
+SUMMARY
 ================================================================================
 
-  R² = 0.4832
-  RMSE = 2.307 wins
+Top 3 Most Important Predictors:
+  1. total_yards_adj_avg: increases payment probability
+  2. W-L%_avg: increases payment probability
+  3. Pass_ANY/A_adj_avg: increases payment probability
 
-  R² drop (train→test) = -0.1349
-  ✓ Model generalizes well
+🏆 BEST PREDICTOR: total_yards_adj
+   Model Performance: AUC = 0.649
 
-================================================================================
-VARIABLE IMPORTANCE (Ridge Regression)
-================================================================================
-
-Ridge Regression Coefficients (standardized):
-  Interpretation: Effect on wins for 1 std dev change in predictor
-  (controlling for other variables)
-             Variable  Ridge_Coefficient  Abs_Coefficient
-1          Pass_ANY/A           1.158541         1.158541
-0             Pass_TD           0.536122         0.536122
-2  Rush_Rushing_Succ%          -0.266681         0.266681
-3           Pass_Int%          -0.050401         0.050401
-4            Pass_Sk%          -0.043037         0.043037
-
-================================================================================
-COMPARISON: Ridge vs OLS
-================================================================================
-
-✓ Results saved to: ridge_regression_variable_importance.csv
+✓ Results saved to:
+  - payment_prediction_logistic_importance.csv
+  - payment_prediction_logistic_test_results.csv
 
 ================================================================================
 BOOTSTRAP STATISTICAL SIGNIFICANCE TESTING
@@ -128,7 +109,7 @@ Loaded test set: 112 records
 Running 1000 bootstrap samples for significance testing...
 Training samples: 292
 Features: 5
-Optimal alpha: 10.0
+Optimal alpha: 1.0
   Bootstrap sample 0/1000...
   Bootstrap sample 200/1000...
   Bootstrap sample 400/1000...
@@ -149,44 +130,29 @@ Interpretation:
   - P_Value_Bootstrap: Approximate two-tailed p-value
   - T_Statistic: Coefficient / Standard Error
               Feature  Coefficient  Std_Error  ...  CI_Lower_95  CI_Upper_95  Significant_95
-1          Pass_ANY/A     1.158541   0.236960  ...     0.694155     1.617870            True
-0             Pass_TD     0.536122   0.190769  ...     0.185220     0.911067            True
-2  Rush_Rushing_Succ%    -0.266681   0.147598  ...    -0.558312     0.028589           False
-3           Pass_Int%    -0.050401   0.173200  ...    -0.402680     0.285041           False
-4            Pass_Sk%    -0.043037   0.151036  ...    -0.335869     0.258250           False
+1          Pass_ANY/A     1.241664   0.272579  ...     0.696761     1.785000            True
+0             Pass_TD     0.511078   0.223856  ...     0.089253     0.947949            True
+2  Rush_Rushing_Succ%    -0.273340   0.157811  ...    -0.567367     0.029074           False
+4            Pass_Sk%    -0.025536   0.160534  ...    -0.333655     0.277232           False
+3           Pass_Int%    -0.013939   0.184298  ...    -0.362589     0.343677           False
 
 [5 rows x 8 columns]
-
-================================================================================
-ALL P-VALUES SUMMARY
-================================================================================
-
-P-Value interpretation:
-  < 0.001: Highly significant (***)
-  < 0.01:  Very significant (**)
-  < 0.05:  Significant (*)
-  ≥ 0.05:  Not significant (ns)
-
-All variables ranked by statistical significance:
-   1. Pass_ANY/A          : p = 0.0000 *** (coef = +1.159)
-   2. Pass_TD             : p = 0.0020 **  (coef = +0.536)
-   3. Rush_Rushing_Succ%  : p = 0.0780 ns  (coef = -0.267)
-   4. Pass_Int%           : p = 0.7320 ns  (coef = -0.050)
-   5. Pass_Sk%            : p = 0.7360 ns  (coef = -0.043)
-
-Summary: 2 of 5 variables are statistically significant (p < 0.05)
 
 ================================================================================
 MODEL STABILITY ANALYSIS
 ================================================================================
 Bootstrap R² statistics:
-  Mean R²: 0.3574
-  Std R²: 0.0457
-  95% CI R²: [0.2708, 0.4466]
-  Original R²: 0.3482
+  Mean R²: 0.3602
+  Std R²: 0.0478
+  95% CI R²: [0.2710, 0.4539]
+  Original R²: 0.3486
 
-🔍 SIGNIFICANT PREDICTORS (2 of 5):
-  ✓ Pass_ANY/A: increases wins (p = 0.0000)
-  ✓ Pass_TD: increases wins (p = 0.0020)
+🔍 ALL PREDICTORS WITH P-VALUES (5 total):
+YOU INTERPRET - no arbitrary significance thresholds applied
+  Pass_ANY/A: increases wins (p = 0.0000)
+  Pass_TD: increases wins (p = 0.0240)
+  Rush_Rushing_Succ%: decreases wins (p = 0.0640)
+  Pass_Sk%: decreases wins (p = 0.8880)
+  Pass_Int%: decreases wins (p = 0.9380)
 
 ✓ Significance test results saved to: ridge_regression_significance_tests.csv

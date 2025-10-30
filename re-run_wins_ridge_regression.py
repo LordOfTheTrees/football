@@ -20,8 +20,8 @@ try:
     from QB_research import *
     # Try to import the new functions to verify they were added
     try:
-        ridge_regression_with_significance_testing
-        payment_prediction_with_confusion_matrix
+        wins_prediction_linear_ridge
+        payment_prediction_logistic_ridge
         print("✓ Enhanced functions detected!")
     except NameError:
         print("⚠️  Enhanced functions not found. Please add the functions from additional_qb_research_functions.py to QB_research.py")
@@ -75,7 +75,7 @@ def main():
     # 1. Enhanced Wins Prediction with Statistical Significance (Extended Features)
     print("\n[1/4] Running Enhanced Wins Prediction with Statistical Significance (Extended Features)...")
     output1, result1 = capture_function_output(
-        ridge_regression_with_significance_testing,
+        wins_prediction_linear_ridge,
         train_df=None,
         test_df=None,
         use_extended_features=True,
@@ -91,7 +91,7 @@ def main():
     # 2. Enhanced Wins Prediction with Statistical Significance (Original Features)
     print("\n[2/4] Running Enhanced Wins Prediction with Statistical Significance (Original Features)...")
     output2, result2 = capture_function_output(
-        ridge_regression_with_significance_testing,
+        wins_prediction_linear_ridge,
         train_df=None,
         test_df=None,
         use_extended_features=False,
@@ -107,7 +107,7 @@ def main():
     # 3. Enhanced Payment Prediction with Confusion Matrix Analysis
     print("\n[3/4] Running Enhanced Payment Prediction with Confusion Matrix Analysis...")
     output3, result3 = capture_function_output(
-        payment_prediction_with_confusion_matrix,
+        wins_prediction_linear_ridge,
         alpha_range=None,
         exclude_recent_drafts=True,
         probability_thresholds=[0.3, 0.35, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7]

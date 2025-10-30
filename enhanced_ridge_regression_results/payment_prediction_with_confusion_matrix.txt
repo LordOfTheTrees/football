@@ -1,6 +1,6 @@
 ================================================================================
 Enhanced Payment Prediction: Confusion Matrix & Classification Analysis
-Generated: 2025-10-29 11:24:05
+Generated: 2025-10-30 09:03:12
 ================================================================================
 
 
@@ -9,157 +9,94 @@ PAYMENT PREDICTION WITH CONFUSION MATRIX ANALYSIS
 ================================================================================
 
 ================================================================================
-RIDGE REGRESSION: WHAT PREDICTS GETTING PAID?
+FIXED PAYMENT PREDICTION: LOGISTIC REGRESSION
 Using AVERAGED performance (Years 1-3)
 ================================================================================
 ✓ Loaded 562 records from file
 ✓ Loaded 562 seasons with payment labels
-
-================================================================================
-EXCLUDING RECENT DRAFT CLASSES
-================================================================================
 Excluding QBs drafted after 2020
   Before: 73 unique QBs
   After: 59 unique QBs
-  Removed: 14 QBs (2021-2024 classes)
 ✓ Loaded 798 records from season records
 ✓ Merged with team metrics: 513 seasons
-
-================================================================================
-ADJUSTING TEAM METRICS
-================================================================================
 ✓ Created Pts_adj: 513 values
-
-================================================================================
-CHECKING EXISTING LAGS
-================================================================================
-✗ total_yards_adj: missing lag features, will create
-✗ Pass_TD_adj: missing lag features, will create
-✗ Pass_ANY/A_adj: missing lag features, will create
-✗ Rush_Rushing_Succ%_adj: missing lag features, will create
-
-================================================================================
-CREATING MISSING QB METRIC LAGS
-================================================================================
-  total_yards_adj_lag1: 454 non-null values
-  total_yards_adj_lag2: 395 non-null values
-  total_yards_adj_lag3: 339 non-null values
-  Pass_TD_adj_lag1: 454 non-null values
-  Pass_TD_adj_lag2: 395 non-null values
-  Pass_TD_adj_lag3: 339 non-null values
-  Pass_ANY/A_adj_lag1: 453 non-null values
-  Pass_ANY/A_adj_lag2: 395 non-null values
-  Pass_ANY/A_adj_lag3: 339 non-null values
-  Rush_Rushing_Succ%_adj_lag1: 445 non-null values
-  Rush_Rushing_Succ%_adj_lag2: 391 non-null values
-  Rush_Rushing_Succ%_adj_lag3: 337 non-null values
-
-================================================================================
-CREATING TEAM METRIC LAGS
-================================================================================
-  W-L%_lag1: 454 non-null values
-  W-L%_lag2: 395 non-null values
-  W-L%_lag3: 339 non-null values
-  Pts_adj_lag1: 454 non-null values
-  Pts_adj_lag2: 395 non-null values
-  Pts_adj_lag3: 339 non-null values
-
-================================================================================
-CREATING AVERAGED FEATURES (lag1, lag2, lag3)
-================================================================================
-  total_yards_adj_avg: 454 non-null values
-  Pass_TD_adj_avg: 454 non-null values
-  Pass_ANY/A_adj_avg: 454 non-null values
-  Rush_Rushing_Succ%_adj_avg: 453 non-null values
-  W-L%_avg: 454 non-null values
-  Pts_adj_avg: 454 non-null values
-
-✓ Total features: 6 (reduced from 18)
 
 Complete cases: 453
 
-================================================================================
-ELIGIBLE QB PAYMENT DISTRIBUTION
-================================================================================
-Total eligible QBs (drafted ≤2020): 59
-  Got paid: 23 (39.0%)
-  Not paid: 36 (61.0%)
-
-Payment outcome in dataset (season-level):
+Payment outcome distribution:
   Got paid: 196 (43.3%)
   Not paid: 257 (56.7%)
-
-Sample size ratio:
-  Observations per feature: 75.5
-  ✓ Good ratio for modeling
 
 Train/test split:
   Train: 362 samples (160 paid)
   Test: 91 samples (36 paid)
 
 ================================================================================
-RIDGE REGRESSION WITH 5-FOLD CV
+LOGISTIC REGRESSION WITH L2 REGULARIZATION
 ================================================================================
+  C=   0.001: CV AUC = 0.7834 ± 0.1868
+  C=   0.010: CV AUC = 0.7847 ± 0.1627
+  C=   0.100: CV AUC = 0.7753 ± 0.1243
+  C=   1.000: CV AUC = 0.7705 ± 0.1231
+  C=  10.000: CV AUC = 0.7687 ± 0.1300
+  C= 100.000: CV AUC = 0.7679 ± 0.1314
 
-✓ Best alpha: 100.0
-
-Cross-validation R² scores:
-  Fold 1: 0.1332
-  Fold 2: 0.2925
-  Fold 3: -0.1474
-  Fold 4: 0.2477
-  Fold 5: -0.0891
-Mean CV R²: 0.0874 (+/- 0.3534)
+✓ Best C: 0.01 (CV AUC: 0.7847)
 
 ================================================================================
 TRAINING PERFORMANCE
 ================================================================================
-  R² = 0.2853
-  RMSE = 0.4198
+  AUC = 0.8104
+  Accuracy = 0.7265
 
 ================================================================================
 TEST PERFORMANCE
 ================================================================================
-  R² = 0.0898
-  RMSE = 0.4665
+  AUC = 0.6490
+  Accuracy = 0.6044
 
 ================================================================================
 VARIABLE IMPORTANCE
 ================================================================================
 
 All features ranked by importance:
-                      Feature  Coefficient  Abs_Coefficient
-4                    W-L%_avg     0.088076         0.088076
-3  Rush_Rushing_Succ%_adj_avg     0.082261         0.082261
-0         total_yards_adj_avg     0.077780         0.077780
-2          Pass_ANY/A_adj_avg     0.072055         0.072055
-1             Pass_TD_adj_avg     0.043416         0.043416
-5                 Pts_adj_avg     0.012856         0.012856
+  1. total_yards_adj_avg: increases payment probability (coef=0.2355)
+  2. W-L%_avg: increases payment probability (coef=0.2187)
+  3. Pass_ANY/A_adj_avg: increases payment probability (coef=0.2115)
+  4. Rush_Rushing_Succ%_adj_avg: increases payment probability (coef=0.2031)
+  5. Pass_TD_adj_avg: increases payment probability (coef=0.2027)
+  6. Pts_adj_avg: increases payment probability (coef=0.1261)
 
 ================================================================================
-MOST IMPORTANT PREDICTOR
+CONFUSION MATRIX (Threshold = 0.5)
 ================================================================================
 
-🏆 WINNER: W-L%
-   Feature: W-L%_avg
-   Coefficient: 0.0881
+Test Set Confusion Matrix:
+                Predicted
+              No Pay  Pay
+Actual No Pay     35   20
+Actual Pay        16   20
+
+Classification Metrics:
+  Precision: 0.500 (20/40 predicted pays were correct)
+  Recall:    0.556 (20/36 actual pays were caught)
+  F1-Score:  0.526
 
 ================================================================================
-QB METRICS vs TEAM METRICS
+SUMMARY
 ================================================================================
 
-QB metric features:
-               Feature  Coefficient  Abs_Coefficient
-0  total_yards_adj_avg     0.077780         0.077780
-2   Pass_ANY/A_adj_avg     0.072055         0.072055
-1      Pass_TD_adj_avg     0.043416         0.043416
+Top 3 Most Important Predictors:
+  1. total_yards_adj_avg: increases payment probability
+  2. W-L%_avg: increases payment probability
+  3. Pass_ANY/A_adj_avg: increases payment probability
 
-Team metric features:
-       Feature  Coefficient  Abs_Coefficient
-4     W-L%_avg     0.088076         0.088076
-5  Pts_adj_avg     0.012856         0.012856
+🏆 BEST PREDICTOR: total_yards_adj
+   Model Performance: AUC = 0.649
 
-✓ Results saved to: payment_prediction_importance.csv
+✓ Results saved to:
+  - payment_prediction_logistic_importance.csv
+  - payment_prediction_logistic_test_results.csv
 
 ================================================================================
 CONFUSION MATRIX AND CLASSIFICATION ANALYSIS
