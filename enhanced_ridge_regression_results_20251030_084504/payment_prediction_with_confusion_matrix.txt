@@ -1,0 +1,129 @@
+================================================================================
+Enhanced Payment Prediction: Confusion Matrix & Classification Analysis
+Generated: 2025-10-30 08:45:04
+================================================================================
+
+
+================================================================================
+PAYMENT PREDICTION WITH CONFUSION MATRIX ANALYSIS
+================================================================================
+
+================================================================================
+RIDGE REGRESSION: WHAT PREDICTS GETTING PAID?
+Using AVERAGED performance (Years 1-3)
+================================================================================
+✓ Loaded 562 records from file
+✓ Loaded 562 seasons with payment labels
+
+================================================================================
+EXCLUDING RECENT DRAFT CLASSES
+================================================================================
+Excluding QBs drafted after 2020
+  Before: 73 unique QBs
+  After: 59 unique QBs
+  Removed: 14 QBs (2021-2024 classes)
+✓ Loaded 798 records from season records
+✓ Merged with team metrics: 513 seasons
+
+================================================================================
+ADJUSTING TEAM METRICS
+================================================================================
+✓ Created Pts_adj: 513 values
+
+================================================================================
+CHECKING EXISTING LAGS
+================================================================================
+✗ total_yards_adj: missing lag features, will create
+✗ Pass_TD_adj: missing lag features, will create
+✗ Pass_ANY/A_adj: missing lag features, will create
+✗ Rush_Rushing_Succ%_adj: missing lag features, will create
+
+================================================================================
+CREATING MISSING QB METRIC LAGS
+================================================================================
+  total_yards_adj_lag1: 454 non-null values
+  total_yards_adj_lag2: 395 non-null values
+  total_yards_adj_lag3: 339 non-null values
+  Pass_TD_adj_lag1: 454 non-null values
+  Pass_TD_adj_lag2: 395 non-null values
+  Pass_TD_adj_lag3: 339 non-null values
+  Pass_ANY/A_adj_lag1: 453 non-null values
+  Pass_ANY/A_adj_lag2: 395 non-null values
+  Pass_ANY/A_adj_lag3: 339 non-null values
+  Rush_Rushing_Succ%_adj_lag1: 445 non-null values
+  Rush_Rushing_Succ%_adj_lag2: 391 non-null values
+  Rush_Rushing_Succ%_adj_lag3: 337 non-null values
+
+================================================================================
+CREATING TEAM METRIC LAGS
+================================================================================
+  W-L%_lag1: 454 non-null values
+  W-L%_lag2: 395 non-null values
+  W-L%_lag3: 339 non-null values
+  Pts_adj_lag1: 454 non-null values
+  Pts_adj_lag2: 395 non-null values
+  Pts_adj_lag3: 339 non-null values
+
+================================================================================
+CREATING AVERAGED FEATURES (lag1, lag2, lag3)
+================================================================================
+  total_yards_adj_avg: 454 non-null values
+  Pass_TD_adj_avg: 454 non-null values
+  Pass_ANY/A_adj_avg: 454 non-null values
+  Rush_Rushing_Succ%_adj_avg: 453 non-null values
+  W-L%_avg: 454 non-null values
+  Pts_adj_avg: 454 non-null values
+
+✓ Total features: 6 (reduced from 18)
+
+Complete cases: 453
+
+================================================================================
+ELIGIBLE QB PAYMENT DISTRIBUTION
+================================================================================
+Total eligible QBs (drafted ≤2020): 59
+  Got paid: 23 (39.0%)
+  Not paid: 36 (61.0%)
+
+Payment outcome in dataset (season-level):
+  Got paid: 196 (43.3%)
+  Not paid: 257 (56.7%)
+
+Sample size ratio:
+  Observations per feature: 75.5
+  ✓ Good ratio for modeling
+
+Train/test split:
+  Train: 362 samples (160 paid)
+  Test: 91 samples (36 paid)
+
+================================================================================
+RIDGE REGRESSION WITH 5-FOLD CV
+================================================================================
+
+✓ Best alpha: 100.0
+
+Cross-validation R² scores:
+  Fold 1: -0.1128
+  Fold 2: -0.3354
+  Fold 3: 0.2688
+  Fold 4: -0.7437
+  Fold 5: 0.2125
+Mean CV R²: -0.1421 (+/- 0.7455)
+
+================================================================================
+TRAINING PERFORMANCE
+================================================================================
+  R² = 0.7265
+  RMSE = 0.5230
+
+================================================================================
+TEST PERFORMANCE
+================================================================================
+  R² = 0.6044
+  RMSE = 0.6290
+
+================================================================================
+VARIABLE IMPORTANCE
+================================================================================
+Error running function: Per-column arrays must each be 1-dimensional

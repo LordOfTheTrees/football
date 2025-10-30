@@ -198,7 +198,7 @@ def main():
     # Run for total_yards_adj
     print("  - Analyzing total_yards_adj...")
     output4a, result4a = capture_function_output(
-        year_weighting_regression,
+        year_weighting_regression_with_significance,
         metric='total_yards_adj',
         max_decision_year=6
     )
@@ -212,7 +212,7 @@ def main():
     # Run for Pass_ANY/A_adj
     print("  - Analyzing Pass_ANY/A_adj...")
     output4b, result4b = capture_function_output(
-        year_weighting_regression,
+        year_weighting_regression_with_significance,
         metric='Pass_ANY/A_adj',
         max_decision_year=6
     )

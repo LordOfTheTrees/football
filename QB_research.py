@@ -20,7 +20,7 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 from scipy.stats import f_oneway
-from sklearn.linear_model import Ridge, RidgeCV
+from sklearn.linear_model import Ridge, RidgeCV, LogisticRegression
 from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import confusion_matrix, classification_report, roc_auc_score, roc_curve, precision_recall_curve
@@ -1393,335 +1393,6 @@ def regression_with_pc1_factors(train_df=None, test_df=None):
     
     return results
 
-def ridge_regression_with_cv(train_df=None, test_df=None, alpha_range=None, use_extended_features=True):
-    """
-    Performs Ridge regression with 5-fold cross-validation.
-    
-    Args:
-        train_df: Training data
-        test_df: Test data
-        alpha_range: List of alpha values to test
-        use_extended_features: If True, uses top PC1 factors; if False, uses original 5
-    
-    Returns:
-        dict: Results including best model, coefficients, and CV scores
-    """
-    # .
-   
-    print("\n" + "="*80)
-    print("RIDGE REGRESSION WITH 5-FOLD CROSS-VALIDATION")
-    print("="*80)
-    
-    # Load train/test data if not provided
-    if train_df is None or test_df is None:
-        print("\nLoading train/test split from files...")
-        train_df, test_df = load_train_test_split()
-        if train_df is None or test_df is None:
-            print("Error: Could not load train/test data")
-            return None
-    
-    # Load season records
-    season_records = load_csv_safe("season_records.csv", "season records")
-    if season_records is None:
-        return None
-    
-    required_cols = ['Season', 'Team', 'W', 'W-L%']
-    if not validate_columns(season_records, required_cols, "season records"):
-        return None
-    
-    # Convert Season column to int
-    season_records['Season'] = pd.to_numeric(season_records['Season'], errors='coerce')
-    season_records = season_records.dropna(subset=['Season'])
-    season_records['Season'] = season_records['Season'].astype(int)
-    
-    # Process training data
-    print("\n" + "="*80)
-    print("PROCESSING TRAINING DATA")
-    print("="*80)
-    
-    train_df['season'] = pd.to_numeric(train_df['season'], errors='coerce')
-    train_df = train_df.dropna(subset=['season'])
-    train_df['season'] = train_df['season'].astype(int)
-    
-    train_merged = pd.merge(
-        train_df,
-        season_records,
-        left_on=['season', 'Team'],
-        right_on=['Season', 'Team'],
-        how='inner'
-    )
-    
-    print(f"Training set: {len(train_merged)} QB season-team records")
-    
-    train_merged['GS_numeric'] = pd.to_numeric(train_merged['GS'], errors='coerce')
-    train_merged = train_merged[train_merged['GS_numeric'] >= 8]
-    print(f"After filtering (8+ GS): {len(train_merged)} records")
-    
-    train_merged['Wins'] = pd.to_numeric(train_merged['W'], errors='coerce')
-    train_merged = train_merged.dropna(subset=['Wins'])
-    
-    # Process test data
-    print("\n" + "="*80)
-    print("PROCESSING TEST DATA")
-    print("="*80)
-    
-    test_df['season'] = pd.to_numeric(test_df['season'], errors='coerce')
-    test_df = test_df.dropna(subset=['season'])
-    test_df['season'] = test_df['season'].astype(int)
-    
-    test_merged = pd.merge(
-        test_df,
-        season_records,
-        left_on=['season', 'Team'],
-        right_on=['Season', 'Team'],
-        how='inner'
-    )
-    
-    print(f"Test set: {len(test_merged)} QB season-team records")
-    
-    test_merged['GS_numeric'] = pd.to_numeric(test_merged['GS'], errors='coerce')
-    test_merged = test_merged[test_merged['GS_numeric'] >= 8]
-    print(f"After filtering (8+ GS): {len(test_merged)} records")
-    
-    test_merged['Wins'] = pd.to_numeric(test_merged['W'], errors='coerce')
-    test_merged = test_merged.dropna(subset=['Wins'])
-    
-    if use_extended_features:
-        print("\nUsing EXTENDED feature set (top PC1 loadings)")
-        performance_factors = [
-            # Core efficiency
-            'Pass_TD',              
-            'Pass_ANY/A',           
-            'Rush_Rushing_Succ%',   
-            'Pass_Int%',            
-            'Pass_Sk%',
-            
-            # Volume
-            'total_yards',          
-            
-            # Clutch
-            'Pass_4QC',             
-            'Pass_GWD',             
-            
-            # Dual-threat
-            'Rush_Rushing_TD',      
-            'Rush_Rushing_Yds',     
-        ]
-    else:
-        print("\nUsing ORIGINAL feature set (manual selection)")
-        performance_factors = [
-            'Pass_TD',              # Scoring ability
-            'Pass_ANY/A',           # Best efficiency metric
-            'Rush_Rushing_Succ%',   # Dual-threat efficiency
-            'Pass_Int%',            # Turnover avoidance
-            'Pass_Sk%',             # Pressure handling
-        ]
-    
-    print("\n" + "="*80)
-    print("FEATURE SELECTION")
-    print("="*80)
-    
-    print(f"\nUsing {len(performance_factors)} performance factors:")
-    for factor in performance_factors:
-        print(f"  - {factor}")
-    
-    # Check which factors are available
-    available_factors = [f for f in performance_factors if f in train_merged.columns]
-    missing_factors = [f for f in performance_factors if f not in train_merged.columns]
-    
-    if missing_factors:
-        print(f"\nWarning: {len(missing_factors)} factors not found:")
-        for factor in missing_factors:
-            print(f"  - {factor}")
-    
-    print(f"\nProceeding with {len(available_factors)} available factors")
-    
-    # Build datasets
-    train_features = train_merged[available_factors + ['Wins']].copy()
-    for col in available_factors:
-        train_features[col] = pd.to_numeric(train_features[col], errors='coerce')
-    train_features = train_features.dropna()
-    
-    test_features = test_merged[available_factors + ['Wins']].copy()
-    for col in available_factors:
-        test_features[col] = pd.to_numeric(test_features[col], errors='coerce')
-    test_features = test_features.dropna()
-    
-    print(f"\nTraining set complete cases: {len(train_features)}")
-    print(f"Test set complete cases: {len(test_features)}")
-    
-    if len(train_features) < 50 or len(test_features) < 10:
-        print("Insufficient data for regression")
-        return None
-    
-    # Prepare data
-    X_train = train_features[available_factors].values
-    y_train = train_features['Wins'].values
-    
-    X_test = test_features[available_factors].values
-    y_test = test_features['Wins'].values
-    
-    # Standardize features (CRITICAL for Ridge regression)
-    scaler = StandardScaler()
-    X_train_scaled = scaler.fit_transform(X_train)
-    X_test_scaled = scaler.transform(X_test)
-    
-    # =========================================================================
-    # RIDGE REGRESSION WITH CROSS-VALIDATION
-    # =========================================================================
-    print("\n" + "="*80)
-    print("CROSS-VALIDATION TO SELECT OPTIMAL ALPHA")
-    print("="*80)
-    
-    # Define alpha range to test
-    if alpha_range is None:
-        alpha_range = [0.001, 0.01, 0.1, 1.0, 10.0, 100.0, 1000.0]
-    
-    print(f"\nTesting {len(alpha_range)} alpha values with 5-fold CV:")
-    print(f"Alpha range: {alpha_range}")
-    
-    # Use RidgeCV to automatically find best alpha
-    ridge_cv = RidgeCV(alphas=alpha_range, cv=5, scoring='r2')
-    ridge_cv.fit(X_train_scaled, y_train)
-    
-    best_alpha = ridge_cv.alpha_
-    print(f"\nBest alpha (regularization strength): {best_alpha}")
-    
-    # =========================================================================
-    # CROSS-VALIDATION SCORES
-    # =========================================================================
-    print("\n" + "="*80)
-    print("5-FOLD CROSS-VALIDATION PERFORMANCE")
-    print("="*80)
-    
-    # Fit final model with best alpha
-    ridge_model = Ridge(alpha=best_alpha)
-    
-    # Get CV scores
-    cv_r2_scores = cross_val_score(ridge_model, X_train_scaled, y_train, cv=5, scoring='r2')
-    cv_rmse_scores = -cross_val_score(ridge_model, X_train_scaled, y_train, cv=5, 
-                                       scoring='neg_root_mean_squared_error')
-    
-    print(f"\nCross-Validation R² Scores (5 folds):")
-    for i, score in enumerate(cv_r2_scores, 1):
-        print(f"  Fold {i}: {score:.4f}")
-    print(f"\nMean CV R²: {cv_r2_scores.mean():.4f} (+/- {cv_r2_scores.std() * 2:.4f})")
-    
-    print(f"\nCross-Validation RMSE Scores (5 folds):")
-    for i, score in enumerate(cv_rmse_scores, 1):
-        print(f"  Fold {i}: {score:.3f} wins")
-    print(f"\nMean CV RMSE: {cv_rmse_scores.mean():.3f} (+/- {cv_rmse_scores.std() * 2:.3f}) wins")
-    
-    # =========================================================================
-    # TRAIN FINAL MODEL
-    # =========================================================================
-    ridge_model.fit(X_train_scaled, y_train)
-    
-    # Training performance
-    y_train_pred = ridge_model.predict(X_train_scaled)
-    train_r2 = ridge_model.score(X_train_scaled, y_train)
-    train_rmse = np.sqrt(np.mean((y_train - y_train_pred)**2))
-    
-    print("\n" + "="*80)
-    print("TRAINING SET PERFORMANCE")
-    print("="*80)
-    print(f"\n  R² = {train_r2:.4f}")
-    print(f"  RMSE = {train_rmse:.3f} wins")
-    
-    # Test performance
-    y_test_pred = ridge_model.predict(X_test_scaled)
-    test_r2 = ridge_model.score(X_test_scaled, y_test)
-    test_rmse = np.sqrt(np.mean((y_test - y_test_pred)**2))
-    
-    print("\n" + "="*80)
-    print("TEST SET PERFORMANCE (HELD-OUT DATA)")
-    print("="*80)
-    print(f"\n  R² = {test_r2:.4f}")
-    print(f"  RMSE = {test_rmse:.3f} wins")
-    
-    r2_drop = train_r2 - test_r2
-    print(f"\n  R² drop (train→test) = {r2_drop:.4f}")
-    
-    if r2_drop > 0.1:
-        print("  ⚠️  Warning: Significant performance drop suggests overfitting")
-    else:
-        print("  ✓ Model generalizes well")
-    
-    # =========================================================================
-    # VARIABLE IMPORTANCE (STANDARDIZED COEFFICIENTS)
-    # =========================================================================
-    print("\n" + "="*80)
-    print("VARIABLE IMPORTANCE (Ridge Regression)")
-    print("="*80)
-    
-    # Ridge coefficients are already on standardized scale
-    importance_df = pd.DataFrame({
-        'Variable': available_factors,
-        'Ridge_Coefficient': ridge_model.coef_,
-        'Abs_Coefficient': np.abs(ridge_model.coef_)
-    })
-    
-    importance_df = importance_df.sort_values('Abs_Coefficient', ascending=False)
-    
-    print("\nRidge Regression Coefficients (standardized):")
-    print("  Interpretation: Effect on wins for 1 std dev change in predictor")
-    print("  (controlling for other variables)")
-    display(importance_df)
-    
-    # =========================================================================
-    # COMPARISON WITH OLS RESULTS
-    # =========================================================================
-    print("\n" + "="*80)
-    print("COMPARISON: Ridge vs OLS")
-    print("="*80)
-    
-    # Load OLS results if available
-    if os.path.exists('pc1_regression_variable_importance.csv'):
-        ols_importance = load_csv_safe('pc1_regression_variable_importance.csv')
-        
-        comparison_df = importance_df.merge(
-            ols_importance[['Variable', 'Std_Coefficient']], 
-            on='Variable',
-            how='left'
-        )
-        comparison_df = comparison_df.rename(columns={'Std_Coefficient': 'OLS_Std_Coefficient'})
-        comparison_df['Difference'] = comparison_df['Ridge_Coefficient'] - comparison_df['OLS_Std_Coefficient']
-        comparison_df['Shrinkage_%'] = (1 - np.abs(comparison_df['Ridge_Coefficient']) / 
-                                         np.abs(comparison_df['OLS_Std_Coefficient'])) * 100
-        
-        print("\nCoefficient Comparison:")
-        print("(Ridge applies shrinkage - coefficients pulled toward zero)")
-        display(comparison_df[['Variable', 'OLS_Std_Coefficient', 'Ridge_Coefficient', 'Shrinkage_%']])
-        
-        print("\nKey Insights:")
-        print("  - Variables with large shrinkage may be less stable/reliable")
-        print("  - Variables that maintain magnitude are more robust predictors")
-        print(f"  - Mean shrinkage: {comparison_df['Shrinkage_%'].mean():.1f}%")
-    
-    # =========================================================================
-    # SAVE RESULTS
-    # =========================================================================
-    results = {
-        'model': ridge_model,
-        'scaler': scaler,
-        'best_alpha': best_alpha,
-        'features': available_factors,
-        'cv_r2_mean': cv_r2_scores.mean(),
-        'cv_r2_std': cv_r2_scores.std(),
-        'cv_rmse_mean': cv_rmse_scores.mean(),
-        'cv_rmse_std': cv_rmse_scores.std(),
-        'train_r2': train_r2,
-        'test_r2': test_r2,
-        'train_rmse': train_rmse,
-        'test_rmse': test_rmse,
-        'variable_importance': importance_df
-    }
-    
-    importance_df.to_csv('ridge_regression_variable_importance.csv', index=False)
-    print("\n✓ Results saved to: ridge_regression_variable_importance.csv")
-    
-    return results
-
 def load_or_create_cache(cache_file, creation_function, *args, force_refresh=False, **kwargs):
     """
     Generic caching function to avoid recomputing expensive operations.
@@ -2913,7 +2584,7 @@ def ridge_regression_payment_prediction(alpha_range=None, exclude_recent_drafts=
     print(f"\n✓ Best alpha: {best_alpha}")
     
     # Train final model
-    ridge_model = Ridge(alpha=best_alpha)
+    ridge_model = LogisticRegression(penalty='l2', C=1/best_alpha, max_iter=1000)
     ridge_model.fit(X_train_scaled, y_train)
     
     # CV scores
@@ -3011,213 +2682,6 @@ def ridge_regression_payment_prediction(alpha_range=None, exclude_recent_drafts=
     print(f"\n✓ Results saved to: payment_prediction_importance.csv")
     
     return results
-
-def year_weighting_regression(metric='total_yards_adj', max_decision_year=6):
-    """
-    Determines how each prior year is weighted in payment decisions.
-    
-    For each decision year (3-6), runs regression:
-        got_paid ~ metric_year0 + metric_year1 + metric_year2 + ... + metric_year(N-1)
-    
-    Shows which years matter most for the payment decision.
-    
-    Args:
-        metric (str): Metric to analyze ('total_yards' or 'W')
-        max_decision_year (int): Latest decision year to model (default 6)
-    
-    Returns:
-        dict: Weighting results for each decision year
-    """
-    print("\n" + "="*80)
-    print(f"YEAR-BY-YEAR WEIGHTING ANALYSIS: {metric}")
-    print("="*80)
-    
-    # Load prepared payment data
-    if not os.path.exists('qb_seasons_payment_labeled_era_adjusted.csv'):
-        print("✗ ERROR: qb_seasons_payment_labeled_era_adjusted.csv not found")
-        print("Run create_era_adjusted_payment_data() first")
-        return None
-
-    payment_df = load_csv_safe('qb_seasons_payment_labeled_era_adjusted.csv')
-    print(f"✓ Loaded {len(payment_df)} seasons with era-adjusted payment labels")
-    
-    # If analyzing team metric (W), need to merge with season records
-    if metric == 'W-L%':
-        season_records = load_csv_safe("season_records.csv", "season records")
-        if season_records is None:
-            return None
-        
-        season_records['Season'] = pd.to_numeric(season_records['Season'], errors='coerce')
-        season_records = season_records.dropna(subset=['Season'])
-        season_records['Season'] = season_records['Season'].astype(int)
-        
-        payment_df['season'] = pd.to_numeric(payment_df['season'], errors='coerce')
-        payment_df = payment_df.dropna(subset=['season'])
-        payment_df['season'] = payment_df['season'].astype(int)
-        
-        payment_df = pd.merge(
-            payment_df,
-            season_records[['Season', 'Team', 'W-L%']],
-            left_on=['season', 'Team'],
-            right_on=['Season', 'Team'],
-            how='inner'
-        )
-    
-    # Filter to eligible QBs (drafted ≤2020)
-    cutoff_year = 2020
-    payment_df['draft_year'] = pd.to_numeric(payment_df['draft_year'], errors='coerce')
-    payment_df = payment_df[payment_df['draft_year'] <= cutoff_year]
-    
-    # Calculate years since draft
-    payment_df['years_since_draft'] = payment_df['season'] - payment_df['draft_year']
-    
-    print(f"Analyzing metric: {metric}")
-    print(f"QBs in dataset: {payment_df['player_id'].nunique()}")
-    
-    # Results storage
-    all_results = {}
-    
-    # For each decision year (3-6)
-    for decision_year in range(3, max_decision_year + 1):
-        print("\n" + "="*80)
-        print(f"DECISION YEAR {decision_year} (payment in Year {decision_year})")
-        print(f"Using performance from Years 0 to {decision_year - 1}")
-        print("="*80)
-        
-        # Get performance for each year 0 to (decision_year - 1)
-        year_features = []
-        
-        # Pivot data to get one row per player with columns for each year
-        player_data = []
-        
-        for player_id, group in payment_df.groupby('player_id'):
-            group = group.sort_values('years_since_draft')
-            
-            record = {
-                'player_id': player_id,
-                'got_paid': group['got_paid'].iloc[0]
-            }
-            
-            # Get metric value for each year 0 to (decision_year - 1)
-            for year in range(decision_year):
-                year_data = group[group['years_since_draft'] == year]
-                if len(year_data) > 0:
-                    record[f'{metric}_year{year}'] = pd.to_numeric(year_data[metric].iloc[0], errors='coerce')
-                else:
-                    record[f'{metric}_year{year}'] = np.nan
-                
-                year_features.append(f'{metric}_year{year}')
-        
-            player_data.append(record)
-        
-        year_features = sorted(list(set(year_features)))  # Remove duplicates
-        df = pd.DataFrame(player_data)
-        
-        print(f"Players with data: {len(df)}")
-        
-        # Drop rows with missing values
-        df = df.dropna(subset=year_features)
-        
-        print(f"Complete cases: {len(df)}")
-        
-        if len(df) < 20:
-            print(f"⚠️  Insufficient data for Year {decision_year} decision")
-            continue
-        
-        # Payment distribution
-        paid = df['got_paid'].sum()
-        print(f"Payment distribution: {paid} paid, {len(df) - paid} not paid")
-        
-        # Prepare X and y
-        X = df[year_features]
-        y = df['got_paid'].astype(int)
-        
-        # Standardize features
-        scaler = StandardScaler()
-        X_scaled = scaler.fit_transform(X)
-        
-        # Ridge regression
-        ridge_model = Ridge(alpha=10.0)  # Use moderate regularization
-        ridge_model.fit(X_scaled, y)
-        
-        # Get coefficients
-        coefficients = pd.DataFrame({
-            'Year': [f'Year {i}' for i in range(decision_year)],
-            'Feature': year_features,
-            'Coefficient': ridge_model.coef_,
-            'Abs_Coefficient': np.abs(ridge_model.coef_)
-        }).sort_values('Year')
-        
-        # Normalize coefficients to sum to 1 (show as weights)
-        total_abs = coefficients['Abs_Coefficient'].sum()
-        coefficients['Weight_%'] = (coefficients['Abs_Coefficient'] / total_abs * 100)
-        
-        print(f"\nYear-by-year coefficients:")
-        display(coefficients[['Year', 'Coefficient', 'Weight_%']])
-        
-        # Model performance
-        r2 = ridge_model.score(X_scaled, y)
-        print(f"\nModel R²: {r2:.4f}")
-        
-        # Store results
-        all_results[f'year_{decision_year}'] = {
-            'decision_year': decision_year,
-            'coefficients': coefficients,
-            'model': ridge_model,
-            'scaler': scaler,
-            'features': year_features,
-            'r2': r2,
-            'n_samples': len(df)
-        }
-    
-    # Summary across all decision years
-    print("\n" + "="*80)
-    print(f"SUMMARY: YEAR WEIGHTS ACROSS DECISION YEARS ({metric})")
-    print("="*80)
-    
-    summary_data = []
-    for decision_year in range(3, max_decision_year + 1):
-        key = f'year_{decision_year}'
-        if key in all_results:
-            result = all_results[key]
-            coefs = result['coefficients']
-            
-            for _, row in coefs.iterrows():
-                summary_data.append({
-                    'Decision_Year': decision_year,
-                    'Performance_Year': row['Year'],
-                    'Weight_%': row['Weight_%'],
-                    'Coefficient': row['Coefficient']
-                })
-    
-    summary_df = pd.DataFrame(summary_data)
-    
-    if len(summary_df) > 0:
-        # Pivot to show weights matrix
-        pivot_weights = summary_df.pivot(index='Performance_Year', 
-                                         columns='Decision_Year', 
-                                         values='Weight_%')
-        
-        print("\nWeight Matrix (% importance of each year):")
-        print("Rows = Performance year, Columns = Decision year")
-        display(pivot_weights)
-        
-        # Average weight across all decision years for each performance year
-        print("\n" + "="*80)
-        print("AVERAGE WEIGHTS ACROSS ALL DECISION YEARS")
-        print("="*80)
-        
-        avg_weights = summary_df.groupby('Performance_Year')['Weight_%'].mean().sort_index()
-        print("\nAverage importance of each performance year:")
-        for year, weight in avg_weights.items():
-            print(f"  {year}: {weight:.1f}%")
-        
-        # Save results
-        summary_df.to_csv(f'year_weights_{metric}.csv', index=False)
-        pivot_weights.to_csv(f'year_weights_matrix_{metric}.csv')
-        print(f"\n✓ Results saved to year_weights_{metric}.csv and year_weights_matrix_{metric}.csv")
-    
-    return all_results
 
 def calculate_era_adjustment_factors(reference_year=2024):
     """
@@ -4734,13 +4198,13 @@ def ridge_regression_with_significance_testing(train_df=None, test_df=None, use_
     print(f"  Original R²: {original_model.score(X_train_scaled, y_train):.4f}")
     
     # Identify most stable predictors
-    significant_predictors = significance_df[significance_df['Significant_95']]
+    '''significant_predictors = significance_df[significance_df['Significant_95']]
     
     print(f"\n🔍 SIGNIFICANT PREDICTORS ({len(significant_predictors)} of {len(significance_df)}):")
     for _, row in significant_predictors.iterrows():
         direction = "increases" if row['Coefficient'] > 0 else "decreases"
         print(f"  ✓ {row['Feature']}: {direction} wins (p ≈ {row['P_Value_Bootstrap']:.4f})")
-    
+    '''
     # Save results
     significance_df.to_csv('ridge_regression_significance_tests.csv', index=False)
     
@@ -5408,6 +4872,321 @@ def year_weighting_regression_with_significance(metric='total_yards_adj', max_de
         print(f"  - year_significance_summary_{safe_metric_name}.csv (overall summary)")
     
     return all_results
+
+def find_most_similar_qbs(
+    target_qb_id,
+    decision_year=4,
+    metric='total_yards_adj',
+    n_comps=5,
+    year_weights=None
+):
+    """
+    Finds QBs with most similar trajectories through decision_year for a SINGLE metric.
+    Run this twice - once for yards, once for ANY/A.
+    
+    Args:
+        target_qb_id: QB to find comps for
+        decision_year: Evaluate through Year N (truncate all trajectories here)
+        metric: 'total_yards_adj' or 'Pass_ANY/A_adj'
+        n_comps: Number of similar QBs to return
+        year_weights: Optional weights {0: weight, 1: weight, ...}
+    
+    Returns:
+        DataFrame: Top N similar QBs with similarity scores and outcomes
+    """
+    print(f"\n{'='*70}")
+    print(f"FINDING COMPS: Decision Year {decision_year}, Metric: {metric}")
+    print('='*70)
+    
+    # Load era-adjusted data
+    if not os.path.exists('qb_seasons_payment_labeled_era_adjusted.csv'):
+        print("✗ ERROR: qb_seasons_payment_labeled_era_adjusted.csv not found")
+        return None
+    
+    df = pd.read_csv('qb_seasons_payment_labeled_era_adjusted.csv')
+    
+    # Calculate years since draft
+    df['season'] = pd.to_numeric(df['season'], errors='coerce')
+    df['draft_year'] = pd.to_numeric(df['draft_year'], errors='coerce')
+    df = df.dropna(subset=['season', 'draft_year'])
+    df['years_since_draft'] = df['season'] - df['draft_year']
+    
+    # CRITICAL: Truncate all trajectories to Years 0 through (decision_year-1)
+    df = df[df['years_since_draft'] < decision_year]
+    
+    # Get target QB's trajectory
+    target_data = df[df['player_id'] == target_qb_id].sort_values('years_since_draft')
+    
+    if len(target_data) == 0:
+        print(f"✗ ERROR: No data found for QB ID: {target_qb_id}")
+        return None
+    
+    # Convert metric to numeric
+    df[metric] = pd.to_numeric(df[metric], errors='coerce')
+    target_data[metric] = pd.to_numeric(target_data[metric], errors='coerce')
+    
+    target_trajectory = target_data[metric].dropna().values
+    target_name = target_data.iloc[0]['player_name']
+    
+    if len(target_trajectory) < decision_year:
+        print(f"⚠️  {target_name} only has {len(target_trajectory)} years of data (need {decision_year})")
+        return None
+    
+    # Truncate to decision year
+    target_trajectory = target_trajectory[:decision_year]
+    
+    # Load year weights if not provided
+    if year_weights is None:
+        # Use uniform weights as default
+        year_weights = {i: 1.0/decision_year for i in range(decision_year)}
+        print(f"Using uniform weights (no year_weights provided)")
+    else:
+        print(f"Using custom year weights")
+    
+    # Display weights being used
+    print(f"\nYear weights:")
+    for year in range(decision_year):
+        weight = year_weights.get(year, 1.0/decision_year)
+        print(f"  Year {year}: {weight:.3f} ({weight*100:.1f}%)")
+    
+    # Calculate similarity to all other QBs
+    similarities = []
+    
+    for player_id in df['player_id'].unique():
+        if player_id == target_qb_id:
+            continue
+        
+        player_data = df[df['player_id'] == player_id].sort_values('years_since_draft')
+        player_trajectory = player_data[metric].dropna().values
+        
+        # Skip if insufficient data
+        if len(player_trajectory) < decision_year:
+            continue
+        
+        # Truncate to decision_year
+        player_trajectory = player_trajectory[:decision_year]
+        
+        # Calculate weighted Euclidean distance
+        distance = 0
+        for year in range(decision_year):
+            weight = year_weights.get(year, 1.0/decision_year)
+            distance += weight * (target_trajectory[year] - player_trajectory[year])**2
+        
+        distance = np.sqrt(distance)
+        
+        # Get outcome info
+        got_paid = player_data.iloc[0]['got_paid']
+        payment_year = player_data.iloc[0].get('payment_year', np.nan)
+        draft_year = player_data.iloc[0].get('draft_year', np.nan)
+        
+        # Get the actual Year (decision_year-1) value for reference
+        year_value = player_trajectory[-1]
+        
+        similarities.append({
+            'player_id': player_id,
+            'player_name': player_data.iloc[0]['player_name'],
+            'similarity_score': distance,
+            f'year_{decision_year-1}_{metric}': year_value,
+            'got_paid': got_paid,
+            'payment_year': payment_year,
+            'draft_year': draft_year
+        })
+    
+    # Sort by similarity (lower distance = more similar)
+    results_df = pd.DataFrame(similarities).sort_values('similarity_score')
+    
+    if len(results_df) == 0:
+        print(f"✗ ERROR: No comparable QBs found")
+        return None
+    
+    # Display results
+    metric_label = 'Yards' if 'yards' in metric else 'ANY/A'
+    
+    print(f"\nTop {n_comps} most similar QBs to {target_name}:")
+    print(f"Through Year {decision_year-1} | Metric: {metric_label}")
+    print("-" * 70)
+    
+    for idx, (i, row) in enumerate(results_df.head(n_comps).iterrows(), 1):
+        paid_status = "✓ PAID" if row['got_paid'] else "✗ NO PAY"
+        year_val = row[f'year_{decision_year-1}_{metric}']
+        print(f"{idx}. {row['player_name']:20s} | Similarity: {row['similarity_score']:7.1f} | "
+              f"Y{decision_year-1} {metric_label}: {year_val:6.1f} | {paid_status}")
+    
+    payment_rate = results_df.head(n_comps)['got_paid'].mean() * 100
+    print(f"\nPayment rate among top {n_comps} comps: {payment_rate:.1f}%")
+    
+    return results_df.head(n_comps)
+
+def find_comps_both_metrics(
+    target_qb_id,
+    decision_year=4,
+    n_comps=5,
+    year_weights_yards=None,
+    year_weights_anya=None
+):
+    """
+    Convenience function to run comp analysis for BOTH metrics.
+    
+    Args:
+        target_qb_id: QB to find comps for
+        decision_year: Which year to evaluate at (4 = after Year 3)
+        n_comps: Number of comps to return per metric
+        year_weights_yards: Weights for total_yards_adj
+        year_weights_anya: Weights for Pass_ANY/A_adj
+    
+    Returns:
+        dict: {'yards_comps': DataFrame, 'anya_comps': DataFrame}
+    """
+    print("\n" + "🏈"*35)
+    print(f"COMPREHENSIVE COMP ANALYSIS")
+    print("🏈"*35)
+    
+    # Get QB name for display
+    df = pd.read_csv('qb_seasons_payment_labeled_era_adjusted.csv')
+    qb_data = df[df['player_id'] == target_qb_id]
+    if len(qb_data) > 0:
+        qb_name = qb_data.iloc[0]['player_name']
+        print(f"Target QB: {qb_name} ({target_qb_id})")
+        print(f"Decision Year: {decision_year}")
+    
+    # Run for yards
+    yards_comps = find_most_similar_qbs(
+        target_qb_id=target_qb_id,
+        decision_year=decision_year,
+        metric='total_yards_adj',
+        n_comps=n_comps,
+        year_weights=year_weights_yards
+    )
+    
+    print("\n")
+    
+    # Run for ANY/A
+    anya_comps = find_most_similar_qbs(
+        target_qb_id=target_qb_id,
+        decision_year=decision_year,
+        metric='Pass_ANY/A_adj',
+        n_comps=n_comps,
+        year_weights=year_weights_anya
+    )
+    
+    return {
+        'yards_comps': yards_comps,
+        'anya_comps': anya_comps
+    }
+
+def extract_year_weights_from_regression_results(results, decision_year):
+    """
+    Helper function to extract year weights from year_weighting_regression() output.
+    
+    Args:
+        results: Output from year_weighting_regression()
+        decision_year: Which decision year to extract weights for
+    
+    Returns:
+        dict: {0: weight0, 1: weight1, ...} normalized to sum to 1.0
+    """
+    key = f'year_{decision_year}'
+    
+    if key not in results:
+        print(f"⚠️  Warning: Decision year {decision_year} not found in results")
+        return None
+    
+    coef_df = results[key]['coefficients']
+    
+    # Extract weights - they're already as percentages
+    weights_dict = {}
+    for _, row in coef_df.iterrows():
+        year_num = int(row['Year_Number'])
+        weight_pct = row['Weight_%']
+        weights_dict[year_num] = weight_pct / 100.0  # Convert to decimal
+    
+    # Verify they sum to 1.0
+    total = sum(weights_dict.values())
+    print(f"\nExtracted weights for Decision Year {decision_year}:")
+    for year in sorted(weights_dict.keys()):
+        print(f"  Year {year}: {weights_dict[year]:.3f} ({weights_dict[year]*100:.1f}%)")
+    print(f"  Total: {total:.3f}")
+    
+    return weights_dict
+
+def batch_comp_analysis(qb_list, decision_year=4, n_comps=5, use_year_weights=True):
+    """
+    Run comp analysis for multiple QBs at once.
+    
+    Args:
+        qb_list: List of (qb_id, qb_name) tuples
+        decision_year: Which year to evaluate at
+        n_comps: Number of comps per metric
+        use_year_weights: If True, load weights from year_weighting_regression results
+    
+    Returns:
+        dict: {qb_name: {'yards_comps': df, 'anya_comps': df}}
+    """
+    print("\n" + "="*80)
+    print("BATCH COMP ANALYSIS")
+    print("="*80)
+    
+    # Load year weights if requested
+    yards_dict = None
+    anya_dict = None
+    
+    if use_year_weights:
+        print("\nLoading year weights from previous regression results...")
+        
+        # Try to load from year_weighting_regression output files
+        yards_file = 'year_weights_total_yards_adj.csv'
+        anya_file = 'year_weights_Pass_ANY_A_adj.csv'
+        
+        if os.path.exists(yards_file):
+            yards_df = pd.read_csv(yards_file)
+            yards_df = yards_df[yards_df['Decision_Year'] == decision_year]
+            if len(yards_df) > 0:
+                yards_dict = {}
+                for _, row in yards_df.iterrows():
+                    year_str = row['Performance_Year']
+                    year_num = int(year_str.split()[-1])
+                    yards_dict[year_num] = row['Weight_%'] / 100.0
+                print(f"✓ Loaded total_yards weights from {yards_file}")
+            else:
+                print(f"⚠️  No weights for decision year {decision_year} in {yards_file}")
+        else:
+            print(f"⚠️  {yards_file} not found, using uniform weights for yards")
+        
+        if os.path.exists(anya_file):
+            anya_df = pd.read_csv(anya_file)
+            anya_df = anya_df[anya_df['Decision_Year'] == decision_year]
+            if len(anya_df) > 0:
+                anya_dict = {}
+                for _, row in anya_df.iterrows():
+                    year_str = row['Performance_Year']
+                    year_num = int(year_str.split()[-1])
+                    anya_dict[year_num] = row['Weight_%'] / 100.0
+                print(f"✓ Loaded ANY/A weights from {anya_file}")
+            else:
+                print(f"⚠️  No weights for decision year {decision_year} in {anya_file}")
+        else:
+            print(f"⚠️  {anya_file} not found, using uniform weights for ANY/A")
+    
+    # Run analysis for each QB
+    all_results = {}
+    
+    for qb_id, qb_name in qb_list:
+        print(f"\n\n{'#'*80}")
+        print(f"ANALYZING: {qb_name} (ID: {qb_id})")
+        print('#'*80)
+        
+        results = find_comps_both_metrics(
+            target_qb_id=qb_id,
+            decision_year=decision_year,
+            n_comps=n_comps,
+            year_weights_yards=yards_dict,
+            year_weights_anya=anya_dict
+        )
+        
+        all_results[qb_name] = results
+    
+    return all_results
+
 
 if __name__ == "__main__":
     print("="*80)

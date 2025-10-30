@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank
+LeftBy00,Byron Leftwich,375.2328681647987,1260.5208193039252,False,,2003,FielJu00,Justin Fields,4,total_yards_adj,1
+HarrJo00,Joey Harrington,621.8441385285645,2213.162906332414,False,,2002,FielJu00,Justin Fields,4,total_yards_adj,2
+JoneMa05,Mac Jones,658.3670827658725,1764.0,False,,2021,FielJu00,Justin Fields,4,total_yards_adj,3
+TrubMi00,Mitchell Trubisky,670.7054304613822,2274.2651713440387,False,,2017,FielJu00,Justin Fields,4,total_yards_adj,4
+BollKy00,Kyle Boller,815.8878796879463,545.1752543489476,False,,2003,FielJu00,Justin Fields,4,total_yards_adj,5
