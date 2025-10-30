@@ -4323,155 +4323,200 @@ def create_player_ids_from_qb_data():
     
     return True
 
-def wins_prediction_linear_ridge(train_df=None, test_df=None, use_extended_features=False, n_bootstrap=1000, qb_metrics = ['total_yards_adj', 'Pass_TD_adj', 'Pass_ANY/A_adj', 'Rush_Rushing_Succ%_adj']):
+def wins_prediction_linear_ridge(alpha_range=None, exclude_recent_drafts=True, n_bootstrap=1000, qb_metrics=['total_yards_adj', 'Pass_TD_adj', 'Pass_ANY/A_adj', 'Rush_Rushing_Succ%_adj']):
     """
     Enhanced ridge regression for wins prediction with bootstrap-based statistical significance testing.
     
     Args:
-        train_df: Training data
-        test_df: Test data  
-        use_extended_features: Use extended (10) vs original (5) feature set
+        alpha_range: Alpha values for ridge regression
+        exclude_recent_drafts: Whether to exclude recent draft classes
         n_bootstrap: Number of bootstrap samples for significance testing
+        qb_metrics: List of QB performance metrics to use
     
     Returns:
         dict: Results including significance tests and confidence intervals
     """
     print("\n" + "="*80)
-    print("RIDGE REGRESSION WITH STATISTICAL SIGNIFICANCE TESTING")
+    print("WINS PREDICTION WITH RIDGE REGRESSION")
+    print("Using AVERAGED performance (Years 1-3)")
     print("="*80)
     
-    # Run the existing ridge regression first
-    
-    base_results = ridge_regression_payment_prediction(
-        alpha_range=None, 
-        exclude_recent_drafts=True
-    )
-
-    if base_results is None:
+    # Load prepared payment data (same source as payment prediction)
+    if not os.path.exists('qb_seasons_payment_labeled_era_adjusted.csv'):
+        print("✗ ERROR: qb_seasons_payment_labeled_era_adjusted.csv not found")
         return None
+
+    payment_df = load_csv_safe('qb_seasons_payment_labeled_era_adjusted.csv')
+    print(f"✓ Loaded {len(payment_df)} seasons with payment labels")
     
-    print("\n" + "="*80)
-    print("BOOTSTRAP STATISTICAL SIGNIFICANCE TESTING")
-    print("="*80)
+    # Filter to eligible QBs (drafted ≤2020)
+    if exclude_recent_drafts:
+        cutoff_year = 2020
+        payment_df['draft_year'] = pd.to_numeric(payment_df['draft_year'], errors='coerce')
+        
+        before_filter = len(payment_df['player_id'].unique())
+        payment_df = payment_df[payment_df['draft_year'] <= cutoff_year]
+        after_filter = len(payment_df['player_id'].unique())
+        
+        print(f"Excluding QBs drafted after {cutoff_year}")
+        print(f"  Before: {before_filter} unique QBs")
+        print(f"  After: {after_filter} unique QBs")
     
-    # Get the training data used in the original analysis
-    if train_df is None or test_df is None:
-        train_df, test_df = load_train_test_split()
-        if train_df is None or test_df is None:
-            return None
-    
-    # Load season records
-    season_records = load_csv_safe("season_records.csv")
+    # Load season records for team metrics
+    season_records = load_csv_safe("season_records.csv", "season records")
     if season_records is None:
         return None
     
+    # Prepare season records
     season_records['Season'] = pd.to_numeric(season_records['Season'], errors='coerce')
     season_records = season_records.dropna(subset=['Season'])
     season_records['Season'] = season_records['Season'].astype(int)
     
-    # Process training data (same as in original function)
-    train_df['season'] = pd.to_numeric(train_df['season'], errors='coerce')
-    train_df = train_df.dropna(subset=['season'])
-    train_df['season'] = train_df['season'].astype(int)
+    # Merge payment data with team metrics
+    payment_df['season'] = pd.to_numeric(payment_df['season'], errors='coerce')
+    payment_df = payment_df.dropna(subset=['season'])
+    payment_df['season'] = payment_df['season'].astype(int)
     
-    train_merged = pd.merge(
-        train_df,
-        season_records,
+    merged_df = pd.merge(
+        payment_df,
+        season_records[['Season', 'Team', 'W-L%', 'Pts', 'W']],
         left_on=['season', 'Team'],
         right_on=['Season', 'Team'],
         how='inner'
     )
     
-    train_merged['GS_numeric'] = pd.to_numeric(train_merged['GS'], errors='coerce')
-    train_merged = train_merged[train_merged['GS_numeric'] >= 8]
-    train_merged['Wins'] = pd.to_numeric(train_merged['W'], errors='coerce')
-    train_merged = train_merged.dropna(subset=['Wins'])
+    print(f"✓ Merged with team metrics: {len(merged_df)} seasons")
     
-        # ================================================================
-    # Define and prepare features (with auto-adjusted column creation)
-    # ================================================================
-    if use_extended_features:
-        performance_factors = [
-            'Pass_TD', 'Pass_ANY/A', 'Rush_Rushing_Succ%', 'Pass_Int%', 'Pass_Sk%',
-            'total_yards', 'Pass_4QC', 'Pass_GWD', 'Rush_Rushing_TD', 'Rush_Rushing_Yds'
-        ]
+    # Create adjusted Pts
+    if os.path.exists('era_adjustment_factors.csv'):
+        factor_df = pd.read_csv('era_adjustment_factors.csv')
+        pts_factors = factor_df[factor_df['stat'] == 'Pts'].set_index('year')['adjustment_factor'].to_dict()
+        merged_df['Pts_adj'] = merged_df['Pts'] * merged_df['season'].map(pts_factors)
+        print(f"✓ Created Pts_adj: {merged_df['Pts_adj'].notna().sum()} values")
     else:
-        performance_factors = qb_metrics
+        merged_df['Pts_adj'] = merged_df['Pts']
 
-    # --- Auto-create adjusted versions if necessary ---
-    adjustment_factors_path = "era_adjustment_factors.csv"
-    if os.path.exists(adjustment_factors_path):
-        factor_df = pd.read_csv(adjustment_factors_path)
-        adj_factors = (
-            factor_df.pivot_table(index="year", columns="stat", values="adjustment_factor")
-            .to_dict(orient="index")
-        )
-
-        def apply_adjustment(row, base_col):
-            year = int(row["season"]) if not pd.isna(row["season"]) else None
-            base_val = row.get(base_col, np.nan)
-
-            # Coerce to numeric safely
-            try:
-                base_val = float(base_val)
-            except (TypeError, ValueError):
-                return np.nan
-
-            if year in adj_factors and base_col in adj_factors[year]:
-                factor = adj_factors[year][base_col]
-                try:
-                    factor = float(factor)
-                except (TypeError, ValueError):
-                    factor = 1.0
-                return base_val * factor
-            return base_val
-
-        for col in performance_factors:
-            if col.endswith("_adj") and col not in train_merged.columns:
-                base_col = col.replace("_adj", "")
-                if base_col in train_merged.columns:
-                    # Use vectorized .apply for speed but numeric-safe
-                    train_merged[col] = train_merged.apply(lambda r: apply_adjustment(r, base_col), axis=1)
-                    print(f"✓ Created adjusted column '{col}' from '{base_col}' using era factors")
-                else:
-                    print(f"⚠ Missing both '{col}' and '{base_col}' — cannot compute adjusted version.")
-    else:
-        print("⚠ No era_adjustment_factors.csv found — using raw stats only (no _adj columns created).")
-
-    # Filter available factors and warn about missing ones
-    available_factors = [f for f in performance_factors if f in train_merged.columns]
-    missing_factors = [f for f in performance_factors if f not in train_merged.columns]
-
-    if not available_factors:
-        raise ValueError(
-            f"No valid features found. Missing: {missing_factors}. "
-            "Check qb_metrics names or adjustment file."
-        )
-
-    if missing_factors:
-        print(f"⚠ Missing features (ignored): {missing_factors}")
-
-    # Build training dataset
-    train_features = train_merged[available_factors + ['Wins']].copy()
-    for col in available_factors:
-        train_features[col] = pd.to_numeric(train_features[col], errors='coerce')
-
-    train_features = train_features.dropna(subset=available_factors + ['Wins'])
-    X_train = train_features[available_factors].values
-    y_train = train_features['Wins'].values
-
+    # Define metrics 
+    #team_metrics = ['Pts_adj'] (same structure as payment prediction, just no team metrics for now because we are doing wins and it biases towards team stuff)
+    team_metrics = []
+    
+    all_metrics = qb_metrics + team_metrics
+    
+    # Create lags and averages (same as payment prediction)
+    merged_df = merged_df.sort_values(['player_id', 'season'])
+    
+    for metric in all_metrics:
+        merged_df[metric] = pd.to_numeric(merged_df[metric], errors='coerce')
+        for lag in [1, 2, 3]:
+            lag_col = f"{metric}_lag{lag}"
+            merged_df[lag_col] = merged_df.groupby('player_id')[metric].shift(lag)
+    
+    # Create averaged features
+    features = []
+    for metric in all_metrics:
+        avg_col = f"{metric}_avg"
+        merged_df[avg_col] = merged_df[[f"{metric}_lag1", f"{metric}_lag2", f"{metric}_lag3"]].mean(axis=1)
+        features.append(avg_col)
+    
+    # Prepare features and target (using Wins instead of got_paid)
+    X = merged_df[features + ['W', 'player_id']].copy()
+    X = X.dropna(subset=features)
+    
+    print(f"\nComplete cases: {len(X)}")
+    
+    if len(X) < 30:
+        print("\n✗ ERROR: Insufficient complete cases for modeling")
+        return None
+    
+    # Convert wins to numeric
+    X['W'] = pd.to_numeric(X['W'], errors='coerce')
+    X = X.dropna(subset=['W'])
+    
+    y = X['W']  # Target is wins, not payment
+    X_features = X[features]
+    
+    # Wins distribution
+    print(f"\nWins distribution:")
+    print(f"  Min: {y.min()} wins")
+    print(f"  Mean: {y.mean():.1f} wins")
+    print(f"  Max: {y.max()} wins")
+    
+    # Train/test split (80/20)
+    split_idx = int(len(X_features) * 0.8)
+    X_train = X_features.iloc[:split_idx]
+    X_test = X_features.iloc[split_idx:]
+    y_train = y.iloc[:split_idx]
+    y_test = y.iloc[split_idx:]
+    
+    print(f"\nTrain/test split:")
+    print(f"  Train: {len(X_train)} samples (mean wins: {y_train.mean():.1f})")
+    print(f"  Test: {len(X_test)} samples (mean wins: {y_test.mean():.1f})")
     
     # Standardize features
     scaler = StandardScaler()
     X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
     
-    # Get the optimal alpha from base results
-    optimal_alpha = base_results.get('best_alpha', 1.0)
+    # Ridge regression with cross-validation
+    print("\n" + "="*80)
+    print("RIDGE REGRESSION WITH CROSS-VALIDATION")
+    print("="*80)
+    
+    if alpha_range is None:
+        alpha_range = [0.1, 1.0, 10.0, 100.0, 1000.0]
+    
+    # Cross-validation to find best alpha
+    best_score = -np.inf
+    best_alpha = 1.0
+    
+    for alpha in alpha_range:
+        model = Ridge(alpha=alpha)
+        scores = cross_val_score(model, X_train_scaled, y_train, cv=5, scoring='r2')
+        mean_score = scores.mean()
+        
+        print(f"  Alpha={alpha:8.1f}: CV R² = {mean_score:.4f} ± {scores.std()*2:.4f}")
+        
+        if mean_score > best_score:
+            best_score = mean_score
+            best_alpha = alpha
+    
+    print(f"\n✓ Best Alpha: {best_alpha} (CV R²: {best_score:.4f})")
+    
+    # Train final model
+    final_model = Ridge(alpha=best_alpha)
+    final_model.fit(X_train_scaled, y_train)
+    
+    # Training performance
+    y_train_pred = final_model.predict(X_train_scaled)
+    train_r2 = final_model.score(X_train_scaled, y_train)
+    train_rmse = np.sqrt(np.mean((y_train - y_train_pred)**2))
+    
+    print(f"\n" + "="*80)
+    print("TRAINING PERFORMANCE")
+    print("="*80)
+    print(f"  R² = {train_r2:.4f}")
+    print(f"  RMSE = {train_rmse:.3f} wins")
+    
+    # Test performance  
+    y_test_pred = final_model.predict(X_test_scaled)
+    test_r2 = final_model.score(X_test_scaled, y_test)
+    test_rmse = np.sqrt(np.mean((y_test - y_test_pred)**2))
+    
+    print(f"\n" + "="*80)
+    print("TEST PERFORMANCE")
+    print("="*80)
+    print(f"  R² = {test_r2:.4f}")
+    print(f"  RMSE = {test_rmse:.3f} wins")
+    
+    # Bootstrap significance testing
+    print(f"\n" + "="*80)
+    print("BOOTSTRAP STATISTICAL SIGNIFICANCE TESTING")
+    print("="*80)
     
     print(f"Running {n_bootstrap} bootstrap samples for significance testing...")
     print(f"Training samples: {len(X_train_scaled)}")
-    print(f"Features: {len(available_factors)}")
-    print(f"Optimal alpha: {optimal_alpha}")
+    print(f"Features: {len(features)}")
+    print(f"Optimal alpha: {best_alpha}")
     
     # Bootstrap resampling
     bootstrap_coefs = []
@@ -4484,10 +4529,10 @@ def wins_prediction_linear_ridge(train_df=None, test_df=None, use_extended_featu
         # Sample with replacement
         indices = np.random.choice(len(X_train_scaled), len(X_train_scaled), replace=True)
         X_boot = X_train_scaled[indices]
-        y_boot = y_train[indices]
+        y_boot = y_train.iloc[indices].values
         
         # Fit model on bootstrap sample
-        model_boot = Ridge(alpha=optimal_alpha)
+        model_boot = Ridge(alpha=best_alpha)
         model_boot.fit(X_boot, y_boot)
         
         # Store coefficients and R²
@@ -4506,12 +4551,12 @@ def wins_prediction_linear_ridge(train_df=None, test_df=None, use_extended_featu
     print("="*80)
     
     # Original model for comparison
-    original_model = Ridge(alpha=optimal_alpha)
+    original_model = Ridge(alpha=best_alpha)
     original_model.fit(X_train_scaled, y_train)
     
     significance_results = []
     
-    for i, feature in enumerate(available_factors):
+    for i, feature in enumerate(features):
         coef_dist = bootstrap_coefs[:, i]
         original_coef = original_model.coef_[i]
         
@@ -4582,42 +4627,70 @@ def wins_prediction_linear_ridge(train_df=None, test_df=None, use_extended_featu
     # Keep significant_predictors for the results dict but don't filter the display
     significant_predictors = significance_df[significance_df['Significant_95']]  # Keep for compatibility
     
+    # Variable importance
+    print(f"\n" + "="*80)
+    print("VARIABLE IMPORTANCE")
+    print("="*80)
+    
+    importance_df = pd.DataFrame({
+        'Feature': features,
+        'Coefficient': final_model.coef_,
+        'Abs_Coefficient': np.abs(final_model.coef_)
+    }).sort_values('Abs_Coefficient', ascending=False)
+    
+    print("\nAll features ranked by importance:")
+    for idx, (_, row) in enumerate(importance_df.iterrows(), 1):
+        direction = "increases" if row['Coefficient'] > 0 else "decreases"
+        print(f"  {idx}. {row['Feature']}: {direction} wins (coef={row['Coefficient']:.4f})")
+    
     # Save results
     significance_df.to_csv('wins_prediction_ridge_significance_tests.csv', index=False)
+    importance_df.to_csv('wins_prediction_ridge_importance.csv', index=False)
     
-    # Combine with base results
-    enhanced_results = base_results.copy()
-    enhanced_results.update({
+    # Create results dict
+    results = {
+        'model': final_model,
+        'scaler': scaler,
+        'best_alpha': best_alpha,
+        'features': features,
+        'train_r2': train_r2,
+        'test_r2': test_r2,
+        'train_rmse': train_rmse,
+        'test_rmse': test_rmse,
         'significance_tests': significance_df,
         'bootstrap_coefficients': bootstrap_coefs,
         'bootstrap_r2s': bootstrap_r2s,
         'significant_predictors': significant_predictors,
+        'variable_importance': importance_df,
         'model_stability': {
             'r2_mean': np.mean(bootstrap_r2s),
             'r2_std': np.std(bootstrap_r2s),
             'r2_ci_lower': np.percentile(bootstrap_r2s, 2.5),
             'r2_ci_upper': np.percentile(bootstrap_r2s, 97.5)
         }
-    })
+    }
     
-    print(f"\n✓ Significance test results saved to: wins_prediction_ridge_significance_tests.csv")
+    print(f"\n✓ Results saved to:")
+    print(f"  - wins_prediction_ridge_significance_tests.csv")
+    print(f"  - wins_prediction_ridge_importance.csv")
     
-    return enhanced_results
+    return results
 
-def payment_prediction_logistic_ridge(alpha_range=None, exclude_recent_drafts=True, probability_thresholds=None, qb_metrics = ['total_yards_adj', 'Pass_TD_adj', 'Pass_ANY/A_adj', 'Rush_Rushing_Succ%_adj']):
+def payment_prediction_logistic_ridge(alpha_range=None, exclude_recent_drafts=True, probability_thresholds=None, qb_metrics = ['total_yards_adj', 'Pass_TD_adj', 'Pass_ANY/A_adj', 'Rush_Rushing_Succ%_adj'], n_bootstrap=1000):
     """
-    Enhanced payment prediction with comprehensive confusion matrix analysis and classification metrics.
+    Enhanced payment prediction with comprehensive confusion matrix analysis, classification metrics, and bootstrap p-values.
     
     Args:
         alpha_range: Alpha values for ridge regression
         exclude_recent_drafts: Whether to exclude recent draft classes
         probability_thresholds: List of probability thresholds to test (default: [0.3, 0.4, 0.5, 0.6, 0.7])
+        n_bootstrap: Number of bootstrap samples for p-value calculation
     
     Returns:
-        dict: Results including confusion matrices, ROC curves, and optimal thresholds
+        dict: Results including confusion matrices, ROC curves, optimal thresholds, and p-values
     """
     print("\n" + "="*80)
-    print("PAYMENT PREDICTION WITH CONFUSION MATRIX ANALYSIS")
+    print("PAYMENT PREDICTION WITH CONFUSION MATRIX ANALYSIS AND P-VALUES")
     print("="*80)
     
     # Run the base payment prediction first
@@ -4676,7 +4749,8 @@ def payment_prediction_logistic_ridge(alpha_range=None, exclude_recent_drafts=Tr
         merged_df['Pts_adj'] = merged_df['Pts']
     
     # Create features (same as original)
-    team_metrics = ['W-L%', 'Pts_adj']
+    team_metrics = ['W-L%', 'Pts_adj'] #for right now I'm removing these for a min run to see if it helps with overfitting
+    #team_metrics = []
     all_metrics = qb_metrics + team_metrics
     
     # Create lags and averages (simplified version)
@@ -4854,15 +4928,110 @@ def payment_prediction_logistic_ridge(alpha_range=None, exclude_recent_drafts=Tr
         direction = "increases" if row['Coefficient'] > 0 else "decreases"
         print(f"  {i+1}. {row['Feature']}: {direction} payment probability")
     
-    # Save results
+    # Bootstrap significance testing for p-values
+    print(f"\n" + "="*80)
+    print("BOOTSTRAP P-VALUE CALCULATION")
+    print("="*80)
+    
+    print(f"Running {n_bootstrap} bootstrap samples for p-value calculation...")
+    
+    bootstrap_coefs = []
+    
+    for i in range(n_bootstrap):
+        if i % 200 == 0:
+            print(f"  Bootstrap sample {i}/{n_bootstrap}...")
+        
+        # Sample with replacement
+        indices = np.random.choice(len(X_train_scaled), len(X_train_scaled), replace=True)
+        X_boot = X_train_scaled[indices]
+        y_boot = y_train.iloc[indices].values
+        
+        # Fit model on bootstrap sample
+        model_boot = LogisticRegression(penalty='l2', C=1.0/best_alpha, max_iter=1000, random_state=42)
+        model_boot.fit(X_boot, y_boot)
+        
+        # Store coefficients
+        bootstrap_coefs.append(model_boot.coef_[0])  # Extract 1D array
+    
+    bootstrap_coefs = np.array(bootstrap_coefs)
+    print(f"Bootstrap complete!")
+    
+    # Calculate p-values for each feature
+    print(f"\nCalculating p-values for each feature...")
+    
+    # Fit logistic regression version of the model for comparison
+    logistic_model = LogisticRegression(penalty='l2', C=1.0/best_alpha, max_iter=1000, random_state=42)
+    logistic_model.fit(X_train_scaled, y_train)
+    
+    p_value_results = []
+    
+    for i, feature in enumerate(features):
+        coef_dist = bootstrap_coefs[:, i]
+        original_coef = logistic_model.coef_[0][i]
+        
+        # Calculate confidence intervals (95%)
+        ci_lower = np.percentile(coef_dist, 2.5)
+        ci_upper = np.percentile(coef_dist, 97.5)
+        
+        # Statistical significance test: CI doesn't include zero
+        is_significant = not (ci_lower <= 0 <= ci_upper)
+        
+        # Calculate p-value approximation (two-tailed)
+        if original_coef > 0:
+            p_value_approx = 2 * np.mean(coef_dist <= 0)
+        else:
+            p_value_approx = 2 * np.mean(coef_dist >= 0)
+        p_value_approx = min(p_value_approx, 1.0)
+        
+        # Standard error
+        se = np.std(coef_dist)
+        
+        # Z-statistic approximation (for logistic regression)
+        z_stat = original_coef / se if se > 0 else 0
+        
+        p_value_results.append({
+            'Feature': feature,
+            'Coefficient': original_coef,
+            'Std_Error': se,
+            'Z_Statistic': z_stat,
+            'P_Value_Bootstrap': p_value_approx,
+            'CI_Lower_95': ci_lower,
+            'CI_Upper_95': ci_upper,
+            'Significant_95': is_significant,
+            'Coefficient_Mean_Bootstrap': np.mean(coef_dist),
+            'Coefficient_Std_Bootstrap': np.std(coef_dist)
+        })
+    
+    p_values_df = pd.DataFrame(p_value_results)
+    p_values_df = p_values_df.sort_values('Z_Statistic', key=abs, ascending=False)
+    
+    print("\nBootstrap P-Values for Payment Prediction:")
+    print("(Bootstrap method with 95% confidence intervals)")
+    display(p_values_df[['Feature', 'Coefficient', 'P_Value_Bootstrap', 'Significant_95', 'CI_Lower_95', 'CI_Upper_95']])
+    
+    print(f"\n🔍 FEATURE SIGNIFICANCE WITH P-VALUES:")
+    for _, row in p_values_df.iterrows():
+        direction = "increases" if row['Coefficient'] > 0 else "decreases"
+        sig_marker = "***" if row['P_Value_Bootstrap'] < 0.001 else "**" if row['P_Value_Bootstrap'] < 0.01 else "*" if row['P_Value_Bootstrap'] < 0.05 else ""
+        print(f"  {row['Feature']}: {direction} payment probability (p = {row['P_Value_Bootstrap']:.4f}) {sig_marker}")
+    
+    # Save results with p-values
     threshold_df.to_csv('payment_prediction_confusion_matrix_analysis.csv', index=False)
     feature_importance.to_csv('payment_prediction_classification_importance.csv', index=False)
+    p_values_df.to_csv('payment_prediction_pvalues_bootstrap.csv', index=False)
+    
+    print(f"\n✓ Results saved to:")
+    print(f"  - payment_prediction_confusion_matrix_analysis.csv")
+    print(f"  - payment_prediction_classification_importance.csv")
+    print(f"  - payment_prediction_pvalues_bootstrap.csv (NEW: includes raw p-values)")
     
     # Combine with base results
     enhanced_results = base_results.copy()
     enhanced_results.update({
         'confusion_matrix_analysis': threshold_df,
         'optimal_threshold': best_threshold['threshold'],
+        'p_values_analysis': p_values_df,
+        'bootstrap_coefficients': bootstrap_coefs,
         'optimal_metrics': {
             'f1_score': best_threshold['test_f1_score'],
             'accuracy': best_threshold['test_accuracy'],
@@ -5293,20 +5462,18 @@ if __name__ == "__main__":
     print("="*80)
     train_df, test_df = create_train_test_split(test_size=0.2, split_by='temporal')
     
-    # STEP 8A: re-run wins prediction model to verify everything is working
+    '''# STEP 8A: re-run wins prediction model to verify everything is working
     print("\n" + "="*80)
     print("RUNNING WINS PREDICTION MODEL")
     print("="*80)
     wins_model_results = wins_prediction_linear_ridge(
-        train_df=train_df,
-        test_df=test_df,
-        #need to change this to be without adjustment, since the initial function doesnt adjust
         qb_metrics=['total_yards_adj', 'Pass_ANY/A_adj', 'Rush_Rushing_Succ%_adj']
     )
+
     if wins_model_results is None:
         print("✗ ERROR: Wins prediction model failed")
         exit(1)
-
+    '''
     # STEP 8B: re-run payment prediction model to verify everything is working
     print("\n" + "="*80)
     print("RUNNING PAYMENT PREDICTION MODEL")

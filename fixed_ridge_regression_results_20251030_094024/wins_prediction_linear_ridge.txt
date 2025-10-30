@@ -1,6 +1,0 @@
-================================================================================
-Wins Prediction: Linear Ridge Regression (Extended Features)
-Generated: 2025-10-30 09:40:24
-================================================================================
-
-Error running function: wins_prediction_linear_ridge() got an unexpected keyword argument 'alpha_range'
