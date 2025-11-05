@@ -1,11 +1,9 @@
 to reformat:
 //////////////////////////////////////////
 
-fix wins regression to also use adjusment when present (why not)
+fix my comp tool when there are insufficient years
 
-compare reduced payment era adjustment (ANY/A = eff, total yards=vol) to current era adjustment
-
-re-upload my regression visuals
+    create a loop to run the comp tool for all qbs
 
 organize, group, and sanitize the workflow of my code to be more comprehensible to others
 
