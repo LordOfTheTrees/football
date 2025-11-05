@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year
+BollKy00,Kyle Boller,0.8256991298757416,8.566487448112273,False,,2003
+YounVi00,Vince Young,0.9330137841874333,6.648213684328694,False,,2006
+BradSa00,Sam Bradford,1.240337859567547,6.236351742567642,False,,2010
+JoneDa05,Daniel Jones,1.29824454239854,5.913507831934611,True,2023.0,2019
+WeedBr00,Brandon Weeden,1.315844268604973,6.628576933739948,False,,2012

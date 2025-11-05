@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_2_total_yards_adj,got_paid,payment_year,draft_year
+RamsPa00,Patrick Ramsey,738.87985918032,1778.899443439496,False,,2002
+DarnSa00,Sam Darnold,822.1860078378643,2451.152462448575,False,,2018
+RoetBe00,Ben Roethlisberger,906.2875694839764,3793.117232088729,True,2008.0,2004
+LeftBy00,Byron Leftwich,911.027714798625,2306.9142145968526,False,,2003
+HarrJo00,Joey Harrington,939.6364378275356,3403.571262922836,False,,2002

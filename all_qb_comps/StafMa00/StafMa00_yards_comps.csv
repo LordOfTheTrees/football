@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
+TagoTu00,Tua Tagovailoa,1444.722230746902,4710.564790510043,True,2024.0,2020
+RoetBe00,Ben Roethlisberger,1547.7817880973837,3517.501773738741,True,2008.0,2004
+AlleJo02,Josh Allen,1552.938514855587,5211.704537754625,True,2021.0,2018
+CarrDa00,David Carr,1600.6831269994236,2945.265819183927,False,,2002
+RyanMa00,Matt Ryan,1607.5798961703726,4414.060783499942,True,2013.0,2008

@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
+YounVi00,Vince Young,1173.3759610561763,2250.024512669196,False,,2006
+MannEl00,Eli Manning,1273.808620459711,3566.734228582613,False,,2004
+DarnSa00,Sam Darnold,1335.5256709591008,2771.175198121366,False,,2018
+LockJa00,Jake Locker,1370.6701622205032,1166.1042437307517,False,,2011
+JoneDa05,Daniel Jones,1492.0201731214297,3933.9867485377777,True,2023.0,2019

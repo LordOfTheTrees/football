@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
+WentCa00,Carson Wentz,474.1474428653125,4339.88019904702,False,,2016
+FlacJo00,Joe Flacco,592.4791353767649,3830.837075189576,True,2013.0,2008
+DarnSa00,Sam Darnold,633.4330098995342,2771.175198121366,False,,2018
+RyanMa00,Matt Ryan,699.8184420321869,4414.060783499942,True,2013.0,2008
+MariMa01,Marcus Mariota,706.8935248558781,2931.9230340988997,False,,2015

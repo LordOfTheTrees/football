@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year
+YounVi00,Vince Young,1.5626253483007395,6.648213684328694,False,,2006
+BollKy00,Kyle Boller,1.5958245107142703,8.566487448112273,False,,2003
+RamsPa00,Patrick Ramsey,1.7394340597518025,8.137306451612902,False,,2002
+FreeJo00,Josh Freeman,2.3815279211288733,6.453937128671446,False,,2009
+BortBl00,Blake Bortles,2.408234702257321,6.297621769383697,True,2018.0,2014

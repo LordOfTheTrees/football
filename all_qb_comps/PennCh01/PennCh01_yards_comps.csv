@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
+RivePh00,Philip Rivers,527.6614773698058,3336.2844399517244,False,,2004
+LosmJ.00,J.P. Losman,868.3935237052872,1376.4137375499422,False,,2004
+GrosRe00,Rex Grossman,1670.0261781657398,3356.136681396701,False,,2003
+LockJa00,Jake Locker,1674.575174639051,1166.1042437307517,False,,2011
+RamsPa00,Patrick Ramsey,1876.145506996011,297.05470708507414,False,,2002

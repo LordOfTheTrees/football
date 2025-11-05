@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_1_total_yards_adj,got_paid,payment_year,draft_year
+LockJa00,Jake Locker,179.72485512083037,2548.575747601498,False,,2011
+TeboTi00,Tim Tebow,182.0603403466491,2474.816055334748,False,,2010
+RussJa00,JaMarcus Russell,335.6906065833945,2663.6800651038398,False,,2007
+ManzJo00,Johnny Manziel,523.1769624160273,1772.5523802011187,False,,2014
+BollKy00,Kyle Boller,639.4910093011852,2902.8596618597003,False,,2003

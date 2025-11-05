@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year
+TrubMi00,Mitchell Trubisky,0.5298532637082629,6.0480856319473055,False,,2017
+BortBl00,Blake Bortles,0.5594024615550766,6.297621769383697,True,2018.0,2014
+FlacJo00,Joe Flacco,0.5709310386328661,5.851190675834313,True,2013.0,2008
+LeftBy00,Byron Leftwich,0.7037569140679844,5.5381407957529705,False,,2003
+WentCa00,Carson Wentz,0.7347121800262989,6.322837577690994,False,,2016

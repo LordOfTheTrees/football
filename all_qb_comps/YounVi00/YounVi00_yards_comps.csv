@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
+WeedBr00,Brandon Weeden,918.6537250378806,1116.810459201861,False,,2012
+DarnSa00,Sam Darnold,1130.7669383264663,2771.175198121366,False,,2018
+JoneMa05,Mac Jones,1145.3821294923105,1764.0,False,,2021
+LeftBy00,Byron Leftwich,1146.6429944715217,1260.5208193039252,False,,2003
+VickMi00,Michael Vick,1173.3759610561763,3396.1767878016503,True,2004.0,2001

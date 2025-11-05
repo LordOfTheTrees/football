@@ -151,6 +151,18 @@ def export_comp_analysis_for_tableau(
         qb_ids.extend(anya_comps['player_id'].tolist())
     qb_ids = list(set(qb_ids))
     
+    # Create comp rank lookups
+    yards_rank_lookup = {}
+    anya_rank_lookup = {}
+    
+    if yards_comps is not None:
+        for idx, row in yards_comps.reset_index(drop=True).iterrows():
+            yards_rank_lookup[row['player_id']] = idx + 1
+    
+    if anya_comps is not None:
+        for idx, row in anya_comps.reset_index(drop=True).iterrows():
+            anya_rank_lookup[row['player_id']] = idx + 1
+    
     trajectory_rows = []
     for qb_id in qb_ids:
         qb_data = df[df['player_id'] == qb_id].sort_values('years_since_draft')
@@ -162,6 +174,12 @@ def export_comp_analysis_for_tableau(
         got_paid = qb_data.iloc[0]['got_paid']
         qb_type = 'target' if qb_id == target_qb_id else 'comp'
         
+        # Determine comp type and rank
+        is_yards_comp = qb_id in yards_rank_lookup
+        is_anya_comp = qb_id in anya_rank_lookup
+        yards_rank = yards_rank_lookup.get(qb_id, np.nan)
+        anya_rank = anya_rank_lookup.get(qb_id, np.nan)
+        
         for _, row in qb_data.iterrows():
             trajectory_rows.append({
                 'target_qb_id': target_qb_id,
@@ -169,6 +187,10 @@ def export_comp_analysis_for_tableau(
                 'qb_id': qb_id,
                 'qb_name': qb_name,
                 'qb_type': qb_type,
+                'yards_comp': is_yards_comp,
+                'anya_comp': is_anya_comp,
+                'yards_comp_rank': yards_rank,
+                'anya_comp_rank': anya_rank,
                 'decision_year': decision_year,
                 'years_since_draft': int(row['years_since_draft']),
                 'season': int(row['season']),
@@ -371,8 +393,8 @@ def run_interactive_comp_analysis():
     decision_year = int(decision_year_input) if decision_year_input else 4
     
     # Get number of comps
-    n_comps_input = input("\nNumber of comps (default=10): ").strip()
-    n_comps = int(n_comps_input) if n_comps_input else 10
+    n_comps_input = input("\nNumber of comps (default=5): ").strip()
+    n_comps = int(n_comps_input) if n_comps_input else 5
     
     # Run analysis
     output_dir = f'comp_analysis_output/{target_id}'
@@ -389,8 +411,8 @@ if __name__ == "__main__":
                        help='Run comparison for all QBs in database')
     parser.add_argument('--decision-year', type=int, default=4,
                        help='Decision year for analysis (default: 4)')
-    parser.add_argument('--n-comps', type=int, default=10,
-                       help='Number of comps to find (default: 10)')
+    parser.add_argument('--n-comps', type=int, default=5,
+                       help='Number of comps to find (default: 5)')
     parser.add_argument('--output-dir', type=str, default='all_qb_comps',
                        help='Output directory for -all mode (default: all_qb_comps)')
     

@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
+FreeJo00,Josh Freeman,413.0871954049086,4343.012745406038,False,,2009
+MannEl00,Eli Manning,472.03609860017554,3566.734228582613,False,,2004
+SancMa00,Mark Sanchez,659.2034120285434,3007.257398162935,True,2012.0,2009
+FlacJo00,Joe Flacco,743.6712370146338,3830.837075189576,True,2013.0,2008
+MariMa01,Marcus Mariota,768.8327412356764,2931.9230340988997,False,,2015

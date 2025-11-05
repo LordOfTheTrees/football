@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year
+LockJa00,Jake Locker,3.2431405790320063,4.417810095285718,False,,2011
+RyanMa00,Matt Ryan,3.796682971617629,7.011163564201466,True,2013.0,2008
+MayfBa00,Baker Mayfield,3.8581497159490143,5.442452887038458,False,,2018
+HerbJu00,Justin Herbert,4.0125316705747505,6.172268238118623,True,2023.0,2020
+WatsDe00,Deshaun Watson,4.0126721324654,8.28587731576781,True,2020.0,2017

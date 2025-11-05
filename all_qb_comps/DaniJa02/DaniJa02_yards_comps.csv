@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_0_total_yards_adj,got_paid,payment_year,draft_year
+WinsJa00,Jameis Winston,99.34082210649558,4359.659177893504,False,,2015
+MurrKy00,Kyler Murray,135.33607446646693,4323.663925533533,True,2022.0,2019
+HerbJu00,Justin Herbert,160.28525912989244,4619.285259129892,True,2023.0,2020
+StroCJ00,C.J. Stroud,172.56652204545844,4286.433477954542,False,,2023
+NixxBo00,Bo Nix,254.0,4205.0,False,,2024

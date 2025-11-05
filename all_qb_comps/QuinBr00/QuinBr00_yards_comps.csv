@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
+LockJa00,Jake Locker,1034.2114246922145,1166.1042437307517,False,,2011
+LosmJ.00,J.P. Losman,1058.2458671204442,1376.4137375499422,False,,2004
+PennCh01,Chad Pennington,1099.1777411589749,2310.41719205671,True,2004.0,2000
+GrosRe00,Rex Grossman,1238.5252717973578,3356.136681396701,False,,2003
+RamsPa00,Patrick Ramsey,1297.049779855129,297.05470708507414,False,,2002

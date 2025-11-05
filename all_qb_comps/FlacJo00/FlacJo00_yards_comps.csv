@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
+MayfBa00,Baker Mayfield,468.380983579508,3169.36152160552,False,,2018
+MariMa01,Marcus Mariota,471.01100111957913,2931.9230340988997,False,,2015
+RyanMa00,Matt Ryan,515.3312224987367,4414.060783499942,True,2013.0,2008
+TannRy00,Ryan Tannehill,523.7675212397397,4455.971272540269,True,2015.0,2012
+SancMa00,Mark Sanchez,545.231828665941,3007.257398162935,True,2012.0,2009

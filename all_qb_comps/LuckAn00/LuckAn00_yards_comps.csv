@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
+LawrTr00,Trevor Lawrence,561.4218868624729,2164.0,True,2024.0,2021
+MurrKy00,Kyler Murray,668.9577457748926,2800.9422646118705,True,2022.0,2019
+HerbJu00,Justin Herbert,822.461979671872,3370.991661493139,True,2023.0,2020
+WinsJa00,Jameis Winston,969.1394101006741,3326.2336535894965,False,,2015
+MayfBa00,Baker Mayfield,986.5005137265451,3169.36152160552,False,,2018

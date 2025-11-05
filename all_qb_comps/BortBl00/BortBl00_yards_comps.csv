@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
+TannRy00,Ryan Tannehill,362.8657565343273,4455.971272540269,True,2015.0,2012
+FlacJo00,Joe Flacco,592.5298959877645,3830.837075189576,True,2013.0,2008
+MayfBa00,Baker Mayfield,729.6953795105208,3169.36152160552,False,,2018
+WinsJa00,Jameis Winston,731.4721374329052,3326.2336535894965,False,,2015
+NewtCa00,Cam Newton,784.8466603980033,3766.465337019326,True,2015.0,2011

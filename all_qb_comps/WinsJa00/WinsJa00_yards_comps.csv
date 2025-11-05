@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
+MayfBa00,Baker Mayfield,286.79425188027466,3169.36152160552,False,,2018
+MurrKy00,Kyler Murray,449.4839388358216,2800.9422646118705,True,2022.0,2019
+NewtCa00,Cam Newton,455.4349856870429,3766.465337019326,True,2015.0,2011
+FlacJo00,Joe Flacco,650.4237802339193,3830.837075189576,True,2013.0,2008
+WentCa00,Carson Wentz,680.5505647890327,4339.88019904702,False,,2016

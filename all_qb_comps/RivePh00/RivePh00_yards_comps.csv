@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
+PennCh01,Chad Pennington,527.6614773698058,2310.41719205671,True,2004.0,2000
+LosmJ.00,J.P. Losman,1226.9303423991453,1376.4137375499422,False,,2004
+GrosRe00,Rex Grossman,1706.8437268948546,3356.136681396701,False,,2003
+RodgAa00,Aaron Rodgers,1763.8428745806614,4434.243873084627,True,2008.0,2005
+StafMa00,Matthew Stafford,1784.3279992107155,5261.409113309456,False,,2009

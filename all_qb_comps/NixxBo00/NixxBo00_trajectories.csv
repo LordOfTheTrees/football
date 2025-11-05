@@ -1,0 +1,34 @@
+target_qb_id,target_qb_name,qb_id,qb_name,qb_type,yards_comp,anya_comp,yards_comp_rank,anya_comp_rank,decision_year,years_since_draft,season,draft_year,total_yards_adj,Pass_ANY/A_adj,got_paid,payment_year
+NixxBo00,Bo Nix,MahoPa00,Patrick Mahomes,comp,False,True,,1.0,4,0,2017,2017,299.59388134376513,6.135364203666886,True,2020.0
+NixxBo00,Bo Nix,MahoPa00,Patrick Mahomes,comp,False,True,,1.0,4,1,2018,2017,5456.3240104253,8.997300283832566,True,2020.0
+NixxBo00,Bo Nix,MahoPa00,Patrick Mahomes,comp,False,True,,1.0,4,2,2019,2017,4306.434134925453,8.464118035311587,True,2020.0
+NixxBo00,Bo Nix,MahoPa00,Patrick Mahomes,comp,False,True,,1.0,4,3,2020,2017,5102.440259975425,8.396758885686841,True,2020.0
+NixxBo00,Bo Nix,WinsJa00,Jameis Winston,comp,True,False,4.0,,4,0,2015,2015,4359.659177893504,6.557301912947047,False,
+NixxBo00,Bo Nix,WinsJa00,Jameis Winston,comp,True,False,4.0,,4,1,2016,2015,4347.776823851235,6.076625072628171,False,
+NixxBo00,Bo Nix,WinsJa00,Jameis Winston,comp,True,False,4.0,,4,2,2017,2015,3708.2385517345615,6.794535564391428,False,
+NixxBo00,Bo Nix,WinsJa00,Jameis Winston,comp,True,False,4.0,,4,3,2018,2015,3326.2336535894965,6.457005153076689,False,
+NixxBo00,Bo Nix,JackLa00,Lamar Jackson,comp,False,True,,2.0,4,0,2018,2018,1926.8374601911655,6.062297941524979,True,2023.0
+NixxBo00,Bo Nix,JackLa00,Lamar Jackson,comp,False,True,,2.0,4,1,2019,2018,4391.569570871261,8.2722108244871,True,2023.0
+NixxBo00,Bo Nix,JackLa00,Lamar Jackson,comp,False,True,,2.0,4,2,2020,2018,3802.571366487232,6.753695622341158,True,2023.0
+NixxBo00,Bo Nix,JackLa00,Lamar Jackson,comp,False,True,,2.0,4,3,2021,2018,3678.435175680198,5.814672400569739,True,2023.0
+NixxBo00,Bo Nix,NixxBo00,Bo Nix,target,False,False,,,4,0,2024,2024,4205.0,6.12,False,
+NixxBo00,Bo Nix,MurrKy00,Kyler Murray,comp,True,False,3.0,,4,0,2019,2019,4323.663925533533,5.605710631978438,True,2022.0
+NixxBo00,Bo Nix,MurrKy00,Kyler Murray,comp,True,False,3.0,,4,1,2020,2019,4841.657853661309,6.501692054343353,True,2022.0
+NixxBo00,Bo Nix,MurrKy00,Kyler Murray,comp,True,False,3.0,,4,2,2021,2019,4243.96056169187,6.941390928015779,True,2022.0
+NixxBo00,Bo Nix,MurrKy00,Kyler Murray,comp,True,False,3.0,,4,3,2022,2019,2800.9422646118705,5.180594297586179,True,2022.0
+NixxBo00,Bo Nix,WillCa03,Caleb Williams,comp,True,False,5.0,,4,0,2024,2024,4030.0,5.09,False,
+NixxBo00,Bo Nix,RichAn03,Anthony Richardson,comp,False,True,,3.0,4,0,2023,2023,714.9069169079738,6.20232798603154,False,
+NixxBo00,Bo Nix,RichAn03,Anthony Richardson,comp,False,True,,3.0,4,1,2024,2023,2313.0,4.74,False,
+NixxBo00,Bo Nix,GrifRo01,Robert Griffin III,comp,True,False,1.0,,4,0,2012,2012,4147.763123883265,7.652525452567572,False,
+NixxBo00,Bo Nix,GrifRo01,Robert Griffin III,comp,True,False,1.0,,4,1,2013,2012,3803.601482476207,5.602493040864046,False,
+NixxBo00,Bo Nix,GrifRo01,Robert Griffin III,comp,True,False,1.0,,4,2,2014,2012,1921.2466394506653,5.274844848181792,False,
+NixxBo00,Bo Nix,CutlJa00,Jay Cutler,comp,False,True,,5.0,4,0,2006,2006,1070.39226239225,6.025580154180666,False,
+NixxBo00,Bo Nix,CutlJa00,Jay Cutler,comp,False,True,,5.0,4,1,2007,2006,3877.841443234312,6.520320689849516,False,
+NixxBo00,Bo Nix,CutlJa00,Jay Cutler,comp,False,True,,5.0,4,2,2008,2006,4936.687053992449,6.827117466745407,False,
+NixxBo00,Bo Nix,CutlJa00,Jay Cutler,comp,False,True,,5.0,4,3,2009,2006,3999.001900063447,4.947507858105074,False,
+NixxBo00,Bo Nix,StroCJ00,C.J. Stroud,comp,True,False,2.0,,4,0,2023,2023,4286.433477954542,7.484877230315928,False,
+NixxBo00,Bo Nix,StroCJ00,C.J. Stroud,comp,True,False,2.0,,4,1,2024,2023,3960.0,5.44,False,
+NixxBo00,Bo Nix,MariMa01,Marcus Mariota,comp,False,True,,4.0,4,0,2015,2015,3145.512027293315,6.21110895481009,False,
+NixxBo00,Bo Nix,MariMa01,Marcus Mariota,comp,False,True,,4.0,4,1,2016,2015,3857.310813170015,7.255368397753367,False,
+NixxBo00,Bo Nix,MariMa01,Marcus Mariota,comp,False,True,,4.0,4,2,2017,2015,3611.431005041849,5.587744919372652,False,
+NixxBo00,Bo Nix,MariMa01,Marcus Mariota,comp,False,True,,4.0,4,3,2018,2015,2931.9230340988997,5.819401195954696,False,

@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year
+RyanMa00,Matt Ryan,0.8810424297330466,7.011163564201466,True,2013.0,2008
+WinsJa00,Jameis Winston,1.0794950625682596,6.457005153076689,False,,2015
+HerbJu00,Justin Herbert,1.0988881109387907,6.172268238118623,True,2023.0,2020
+RoetBe00,Ben Roethlisberger,1.1635822524154908,6.779063574367354,True,2008.0,2004
+TagoTu00,Tua Tagovailoa,1.430258219482451,7.4948971462869,True,2024.0,2020

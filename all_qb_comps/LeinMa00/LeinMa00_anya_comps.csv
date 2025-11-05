@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year
+LuckAn00,Andrew Luck,1.181325435639959,5.1318014970889925,True,2016.0,2012
+MayfBa00,Baker Mayfield,1.23565817687237,5.442452887038458,False,,2018
+LeftBy00,Byron Leftwich,1.260809443198486,5.5381407957529705,False,,2003
+HarrJo00,Joey Harrington,1.2609592388094804,4.655827956989247,False,,2002
+CarrDa00,David Carr,1.296166261383944,3.917962365591397,False,,2002

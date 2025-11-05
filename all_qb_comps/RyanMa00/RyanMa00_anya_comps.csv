@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year
+WinsJa00,Jameis Winston,0.5038396371692897,6.457005153076689,False,,2015
+HerbJu00,Justin Herbert,0.7643993239656364,6.172268238118623,True,2023.0,2020
+WatsDe00,Deshaun Watson,0.8810424297330466,8.28587731576781,True,2020.0,2017
+MayfBa00,Baker Mayfield,0.8895020143169301,5.442452887038458,False,,2018
+NewtCa00,Cam Newton,1.0287152696080817,5.560523099147151,True,2015.0,2011

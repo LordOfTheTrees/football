@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
+HarrJo00,Joey Harrington,630.772651581421,2213.162906332414,False,,2002
+JoneDa05,Daniel Jones,633.4330098995342,3933.9867485377777,True,2023.0,2019
+TrubMi00,Mitchell Trubisky,661.8377672287571,2274.2651713440387,False,,2017
+JoneMa05,Mac Jones,688.2835842928711,1764.0,False,,2021
+MariMa01,Marcus Mariota,691.587315621877,2931.9230340988997,False,,2015

@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_2_total_yards_adj,got_paid,payment_year,draft_year
+GabbBl00,Blaine Gabbert,284.66526275330466,528.5069232151393,False,,2011
+YounVi00,Vince Young,566.2330076121167,256.96678275119393,False,,2006
+WeedBr00,Brandon Weeden,578.9088866738185,310.2761952481824,False,,2012
+ManuEJ00,EJ Manuel,769.2641973145041,640.3729697258377,False,,2013
+LeinMa00,Matt Leinart,814.065739684146,280.9921323580129,False,,2006

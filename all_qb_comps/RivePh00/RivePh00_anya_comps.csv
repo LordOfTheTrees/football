@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year
+WeedBr00,Brandon Weeden,1.5606277615553974,6.628576933739948,False,,2012
+MayfBa00,Baker Mayfield,1.5640530432318627,5.442452887038458,False,,2018
+LeinMa00,Matt Leinart,1.6684344036446785,3.762167433767401,False,,2006
+JoneDa05,Daniel Jones,1.6801759144806565,5.913507831934611,True,2023.0,2019
+BradSa00,Sam Bradford,1.6828491948181294,6.236351742567642,False,,2010

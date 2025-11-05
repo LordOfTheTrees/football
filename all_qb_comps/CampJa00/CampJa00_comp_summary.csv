@@ -1,0 +1,3 @@
+target_qb_id,target_qb_name,decision_year,metric,n_comps,payment_rate_pct,comps_paid,comps_not_paid
+CampJa00,Jason Campbell,4,total_yards_adj,5,40.0,2,3
+CampJa00,Jason Campbell,4,Pass_ANY/A_adj,5,60.0,3,2

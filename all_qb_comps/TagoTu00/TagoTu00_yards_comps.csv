@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
+FreeJo00,Josh Freeman,635.040676659652,4343.012745406038,False,,2009
+RoetBe00,Ben Roethlisberger,782.6300019283871,3517.501773738741,True,2008.0,2004
+RyanMa00,Matt Ryan,918.5528906160479,4414.060783499942,True,2013.0,2008
+GoffJa00,Jared Goff,929.9462500009486,4741.232968505829,False,,2016
+AlleJo02,Josh Allen,938.0601398416219,5211.704537754625,True,2021.0,2018

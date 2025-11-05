@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year
+BradSa00,Sam Bradford,0.3933686497375561,6.236351742567642,False,,2010
+TannRy00,Ryan Tannehill,0.4769823387579609,6.0176481840864975,True,2015.0,2012
+JoneDa05,Daniel Jones,0.5759244224377313,5.913507831934611,True,2023.0,2019
+FielJu00,Justin Fields,0.796740383825692,5.86,False,,2021
+LeftBy00,Byron Leftwich,0.9022653347307026,5.5381407957529705,False,,2003

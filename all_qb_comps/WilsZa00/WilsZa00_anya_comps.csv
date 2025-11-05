@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_2_Pass_ANY/A_adj,got_paid,payment_year,draft_year
+BollKy00,Kyle Boller,0.3833867303533969,4.385623655913977,False,,2003
+PondCh00,Christian Ponder,0.4304461207629565,4.856175537245296,False,,2011
+SancMa00,Mark Sanchez,0.6264569797691226,5.183949633853207,True,2012.0,2009
+FielJu00,Justin Fields,0.6497818533254819,5.300535548644078,False,,2021
+YounVi00,Vince Young,0.6564498630830577,3.604635394696138,False,,2006

@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
+JoneDa05,Daniel Jones,474.1474428653125,3933.9867485377777,True,2023.0,2019
+RyanMa00,Matt Ryan,502.1423444131085,4414.060783499942,True,2013.0,2008
+FlacJo00,Joe Flacco,550.0424733311843,3830.837075189576,True,2013.0,2008
+MayfBa00,Baker Mayfield,672.7583491452099,3169.36152160552,False,,2018
+WinsJa00,Jameis Winston,680.5505647890327,3326.2336535894965,False,,2015

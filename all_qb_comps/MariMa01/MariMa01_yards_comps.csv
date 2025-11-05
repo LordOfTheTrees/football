@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
+SancMa00,Mark Sanchez,301.03598143776225,3007.257398162935,True,2012.0,2009
+MayfBa00,Baker Mayfield,420.0600800489818,3169.36152160552,False,,2018
+FlacJo00,Joe Flacco,471.01100111957913,3830.837075189576,True,2013.0,2008
+TrubMi00,Mitchell Trubisky,485.9814436962762,2274.2651713440387,False,,2017
+HarrJo00,Joey Harrington,625.99285853614,2213.162906332414,False,,2002

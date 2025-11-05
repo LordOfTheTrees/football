@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
+CarrDa00,David Carr,675.8258430426835,2945.265819183927,False,,2002
+HarrJo00,Joey Harrington,848.4627236920302,2213.162906332414,False,,2002
+JoneMa05,Mac Jones,971.3148914062941,1764.0,False,,2021
+RoetBe00,Ben Roethlisberger,975.7191111282266,3517.501773738741,True,2008.0,2004
+FielJu00,Justin Fields,990.9250485543494,1395.0,False,,2021

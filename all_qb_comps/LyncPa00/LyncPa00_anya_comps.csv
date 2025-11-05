@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_1_Pass_ANY/A_adj,got_paid,payment_year,draft_year
+HarrJo00,Joey Harrington,1.0397575978584745,4.028136045916917,False,,2002
+RoseJo01,Josh Rosen,1.0824817516285035,2.171581596171827,False,,2018
+HaskDw00,Dwayne Haskins,1.089445448345627,4.183259228763553,False,,2019
+LeinMa00,Matt Leinart,1.1137031827932116,4.315831313757537,False,,2006
+YounVi00,Vince Young,1.2784475802022137,4.584923913656088,False,,2006

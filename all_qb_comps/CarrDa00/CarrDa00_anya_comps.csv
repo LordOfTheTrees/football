@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year
+SancMa00,Mark Sanchez,0.641957490788042,4.466534266826589,True,2012.0,2009
+MannEl00,Eli Manning,0.7457309202490789,4.988562813503916,False,,2004
+HarrJo00,Joey Harrington,0.8120026114875208,4.655827956989247,False,,2002
+ManuEJ00,EJ Manuel,0.9564952688525139,3.891885288990952,False,,2013
+FielJu00,Justin Fields,1.1316316767746095,5.86,False,,2021

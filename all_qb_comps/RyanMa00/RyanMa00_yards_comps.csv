@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
+WentCa00,Carson Wentz,502.1423444131085,4339.88019904702,False,,2016
+FlacJo00,Joe Flacco,515.3312224987367,3830.837075189576,True,2013.0,2008
+TannRy00,Ryan Tannehill,646.0185163716108,4455.971272540269,True,2015.0,2012
+RoetBe00,Ben Roethlisberger,652.0890218718807,3517.501773738741,True,2008.0,2004
+JoneDa05,Daniel Jones,699.8184420321869,3933.9867485377777,True,2023.0,2019

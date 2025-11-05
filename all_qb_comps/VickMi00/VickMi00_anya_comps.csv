@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year
+GrosRe00,Rex Grossman,0.5843675709732129,5.403317143421906,False,,2003
+SancMa00,Mark Sanchez,0.5977802941950001,4.466534266826589,True,2012.0,2009
+DarnSa00,Sam Darnold,0.631385595498558,4.376094280705599,False,,2018
+TrubMi00,Mitchell Trubisky,0.6943008868355571,6.0480856319473055,False,,2017
+MannEl00,Eli Manning,0.7087186220568024,4.988562813503916,False,,2004

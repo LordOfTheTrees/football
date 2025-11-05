@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
+GoffJa00,Jared Goff,374.44387550232886,4741.232968505829,False,,2016
+FreeJo00,Josh Freeman,728.8525260591188,4343.012745406038,False,,2009
+JackLa00,Lamar Jackson,772.3982754035361,3678.435175680198,True,2023.0,2018
+MannEl00,Eli Manning,789.1907409791324,3566.734228582613,False,,2004
+WatsDe00,Deshaun Watson,980.2336305379326,5323.8020699862445,True,2020.0,2017

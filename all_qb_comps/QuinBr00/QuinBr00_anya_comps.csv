@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year
+DarnSa00,Sam Darnold,0.6290245076482456,4.376094280705599,False,,2018
+ManuEJ00,EJ Manuel,0.7288032917448626,3.891885288990952,False,,2013
+JoneMa05,Mac Jones,0.9042107996202063,4.97,False,,2021
+PondCh00,Christian Ponder,1.0548770882846905,1.9997477567575077,False,,2011
+GrosRe00,Rex Grossman,1.1374972393108822,5.403317143421906,False,,2003

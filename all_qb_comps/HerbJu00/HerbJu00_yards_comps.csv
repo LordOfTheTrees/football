@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
+MurrKy00,Kyler Murray,530.6647677765055,2800.9422646118705,True,2022.0,2019
+NewtCa00,Cam Newton,568.6807327551699,3766.465337019326,True,2015.0,2011
+BortBl00,Blake Bortles,793.0188558518744,4085.278470432498,True,2018.0,2014
+WinsJa00,Jameis Winston,797.0694884524275,3326.2336535894965,False,,2015
+LuckAn00,Andrew Luck,822.461979671872,2128.087452992904,True,2016.0,2012

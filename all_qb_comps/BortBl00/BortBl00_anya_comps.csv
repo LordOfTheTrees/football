@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year
+FreeJo00,Josh Freeman,0.5230162965314769,6.453937128671446,False,,2009
+LawrTr00,Trevor Lawrence,0.5594024615550766,5.99,True,2024.0,2021
+TrubMi00,Mitchell Trubisky,0.6809432643752863,6.0480856319473055,False,,2017
+MannEl00,Eli Manning,0.7334634365293352,4.988562813503916,False,,2004
+VickMi00,Michael Vick,0.809048842395035,5.071610570788556,True,2004.0,2001

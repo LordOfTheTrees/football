@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
+RamsPa00,Patrick Ramsey,333.54136393559736,297.05470708507414,False,,2002
+PondCh00,Christian Ponder,450.4943006785271,244.52229956644837,False,,2011
+LockJa00,Jake Locker,587.7939393123004,1166.1042437307517,False,,2011
+FielJu00,Justin Fields,920.9090781767981,1395.0,False,,2021
+LeftBy00,Byron Leftwich,955.1817933730198,1260.5208193039252,False,,2003

@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
+GabbBl00,Blaine Gabbert,995.0473205274574,44.17839866116503,False,,2011
+WeedBr00,Brandon Weeden,1007.1829476952694,1116.810459201861,False,,2012
+PondCh00,Christian Ponder,1077.6663156880581,244.52229956644837,False,,2011
+YounVi00,Vince Young,1103.4268347132481,2250.024512669196,False,,2006
+LeftBy00,Byron Leftwich,1294.0001067013056,1260.5208193039252,False,,2003

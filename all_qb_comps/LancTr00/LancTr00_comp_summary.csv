@@ -1,0 +1,3 @@
+target_qb_id,target_qb_name,decision_year,metric,n_comps,payment_rate_pct,comps_paid,comps_not_paid
+LancTr00,Trey Lance,4,total_yards_adj,5,20.0,1,4
+LancTr00,Trey Lance,4,Pass_ANY/A_adj,5,0.0,0,5

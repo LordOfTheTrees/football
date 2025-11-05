@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
+BollKy00,Kyle Boller,333.54136393559736,545.1752543489476,False,,2003
+PondCh00,Christian Ponder,534.2978043029831,244.52229956644837,False,,2011
+LockJa00,Jake Locker,693.815612825592,1166.1042437307517,False,,2011
+GabbBl00,Blaine Gabbert,798.3575242977882,44.17839866116503,False,,2011
+ManuEJ00,EJ Manuel,968.7317170165727,156.33604090463902,False,,2013

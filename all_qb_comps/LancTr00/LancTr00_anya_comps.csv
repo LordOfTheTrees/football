@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_2_Pass_ANY/A_adj,got_paid,payment_year,draft_year
+GrifRo01,Robert Griffin III,0.9503238368645438,5.274844848181792,False,,2012
+TeboTi00,Tim Tebow,0.9926934696171806,3.2781902875791475,False,,2010
+LockJa00,Jake Locker,1.0182077166632542,5.80696358980069,False,,2011
+JoneMa05,Mac Jones,1.2077055198283249,4.508962186937306,False,,2021
+QuinBr00,Brady Quinn,1.4075267304742993,4.05077205882353,False,,2007
