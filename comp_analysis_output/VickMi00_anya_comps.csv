@@ -1,6 +1,0 @@
-player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank
-GrosRe00,Rex Grossman,0.5109135606561176,5.403317143421906,False,,2003,VickMi00,Michael Vick,4,Pass_ANY/A_adj,1
-DarnSa00,Sam Darnold,0.5785757352533827,4.376094280705599,False,,2018,VickMi00,Michael Vick,4,Pass_ANY/A_adj,2
-SancMa00,Mark Sanchez,0.6304148057992789,4.466534266826589,True,2012.0,2009,VickMi00,Michael Vick,4,Pass_ANY/A_adj,3
-MannEl00,Eli Manning,0.6631543251077272,4.988562813503916,False,,2004,VickMi00,Michael Vick,4,Pass_ANY/A_adj,4
-TrubMi00,Mitchell Trubisky,0.7014179302230068,6.0480856319473055,False,,2017,VickMi00,Michael Vick,4,Pass_ANY/A_adj,5

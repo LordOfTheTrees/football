@@ -5057,23 +5057,21 @@ def find_most_similar_qbs(
     year_weights=None
 ):
     """
-    Finds QBs with most similar trajectories through decision_year for a SINGLE metric.
-    Run this twice - once for yards, once for ANY/A.
+    Finds QBs with most similar trajectories - FIXED to handle insufficient data.
+    
+    Key fix: Uses available data instead of requiring full decision_year.
     
     Args:
         target_qb_id: QB to find comps for
-        decision_year: Evaluate through Year N (truncate all trajectories here)
+        decision_year: Desired evaluation year (will use less if needed)
         metric: 'total_yards_adj' or 'Pass_ANY/A_adj'
         n_comps: Number of similar QBs to return
         year_weights: Optional weights {0: weight, 1: weight, ...}
     
     Returns:
         DataFrame: Top N similar QBs with similarity scores and outcomes
+        None: If no data available for target QB
     """
-    print(f"\n{'='*70}")
-    print(f"FINDING COMPS: Decision Year {decision_year}, Metric: {metric}")
-    print('='*70)
-    
     # Load era-adjusted data
     if not os.path.exists('qb_seasons_payment_labeled_era_adjusted.csv'):
         print("✗ ERROR: qb_seasons_payment_labeled_era_adjusted.csv not found")
@@ -5087,9 +5085,6 @@ def find_most_similar_qbs(
     df = df.dropna(subset=['season', 'draft_year'])
     df['years_since_draft'] = df['season'] - df['draft_year']
     
-    # CRITICAL: Truncate all trajectories to Years 0 through (decision_year-1)
-    df = df[df['years_since_draft'] < decision_year]
-    
     # Get target QB's trajectory
     target_data = df[df['player_id'] == target_qb_id].sort_values('years_since_draft')
     
@@ -5099,31 +5094,42 @@ def find_most_similar_qbs(
     
     # Convert metric to numeric
     df[metric] = pd.to_numeric(df[metric], errors='coerce')
+    target_data = target_data.copy()
     target_data[metric] = pd.to_numeric(target_data[metric], errors='coerce')
     
-    target_trajectory = target_data[metric].dropna().values
+    # Get target trajectory - use ALL available years up to decision_year
+    target_trajectory_full = target_data[metric].dropna().values
     target_name = target_data.iloc[0]['player_name']
     
-    if len(target_trajectory) < decision_year:
-        print(f"⚠️  {target_name} only has {len(target_trajectory)} years of data (need {decision_year})")
+    # FIX: Determine actual years available (correctly)
+    target_years_available = len(target_trajectory_full)
+    
+    if target_years_available == 0:
+        print(f"✗ ERROR: No valid data for {target_name}")
         return None
     
-    # Truncate to decision year
-    target_trajectory = target_trajectory[:decision_year]
+    # Use minimum of (available years, decision_year)
+    comparison_years = min(target_years_available, decision_year)
+    target_trajectory = target_trajectory_full[:comparison_years]
     
-    # Load year weights if not provided
+    print(f"\nTarget QB: {target_name} ({target_qb_id})")
+    print(f"Available data: {target_years_available} year(s)")
+    print(f"Using: {comparison_years} year(s) for comparison")
+    
+    # Truncate ALL QB data to the comparison window
+    df_truncated = df[df['years_since_draft'] < comparison_years].copy()
+    
+    # Set up year weights
     if year_weights is None:
-        # Use uniform weights as default
-        year_weights = {i: 1.0/decision_year for i in range(decision_year)}
-        print(f"Using uniform weights (no year_weights provided)")
+        year_weights = {i: 1.0/comparison_years for i in range(comparison_years)}
     else:
-        print(f"Using custom year weights")
-    
-    # Display weights being used
-    print(f"\nYear weights:")
-    for year in range(decision_year):
-        weight = year_weights.get(year, 1.0/decision_year)
-        print(f"  Year {year}: {weight:.3f} ({weight*100:.1f}%)")
+        # Adapt provided weights to available years
+        adapted_weights = {}
+        total_weight = 0
+        for year in range(comparison_years):
+            adapted_weights[year] = year_weights.get(year, 1.0/comparison_years)
+            total_weight += adapted_weights[year]
+        year_weights = {k: v/total_weight for k, v in adapted_weights.items()}
     
     # Calculate similarity to all other QBs
     similarities = []
@@ -5132,20 +5138,24 @@ def find_most_similar_qbs(
         if player_id == target_qb_id:
             continue
         
-        player_data = df[df['player_id'] == player_id].sort_values('years_since_draft')
-        player_trajectory = player_data[metric].dropna().values
+        player_data = df_truncated[df_truncated['player_id'] == player_id].sort_values('years_since_draft')
         
-        # Skip if insufficient data
-        if len(player_trajectory) < decision_year:
+        if len(player_data) == 0:
             continue
         
-        # Truncate to decision_year
-        player_trajectory = player_trajectory[:decision_year]
+        player_trajectory = player_data[metric].dropna().values
+        
+        # Need at least the comparison window
+        if len(player_trajectory) < comparison_years:
+            continue
+        
+        # Use only the comparison window
+        player_trajectory = player_trajectory[:comparison_years]
         
         # Calculate weighted Euclidean distance
         distance = 0
-        for year in range(decision_year):
-            weight = year_weights.get(year, 1.0/decision_year)
+        for year in range(comparison_years):
+            weight = year_weights.get(year, 1.0/comparison_years)
             distance += weight * (target_trajectory[year] - player_trajectory[year])**2
         
         distance = np.sqrt(distance)
@@ -5155,42 +5165,27 @@ def find_most_similar_qbs(
         payment_year = player_data.iloc[0].get('payment_year', np.nan)
         draft_year = player_data.iloc[0].get('draft_year', np.nan)
         
-        # Get the actual Year (decision_year-1) value for reference
+        # Get the most recent year value
         year_value = player_trajectory[-1]
         
         similarities.append({
             'player_id': player_id,
             'player_name': player_data.iloc[0]['player_name'],
             'similarity_score': distance,
-            f'year_{decision_year-1}_{metric}': year_value,
+            f'year_{comparison_years-1}_{metric}': year_value,
             'got_paid': got_paid,
             'payment_year': payment_year,
             'draft_year': draft_year
         })
     
-    # Sort by similarity (lower distance = more similar)
+    # Sort by similarity
     results_df = pd.DataFrame(similarities).sort_values('similarity_score')
     
     if len(results_df) == 0:
         print(f"✗ ERROR: No comparable QBs found")
         return None
     
-    # Display results
-    metric_label = 'Yards' if 'yards' in metric else 'ANY/A'
-    
-    print(f"\nTop {n_comps} most similar QBs to {target_name}:")
-    print(f"Through Year {decision_year-1} | Metric: {metric_label}")
-    print("-" * 70)
-    
-    for idx, (i, row) in enumerate(results_df.head(n_comps).iterrows(), 1):
-        paid_status = "✓ PAID" if row['got_paid'] else "✗ NO PAY"
-        year_val = row[f'year_{decision_year-1}_{metric}']
-        print(f"{idx}. {row['player_name']:20s} | Similarity: {row['similarity_score']:7.1f} | "
-              f"Y{decision_year-1} {metric_label}: {year_val:6.1f} | {paid_status}")
-    
-    payment_rate = results_df.head(n_comps)['got_paid'].mean() * 100
-    print(f"\nPayment rate among top {n_comps} comps: {payment_rate:.1f}%")
-    
+    # Return top N
     return results_df.head(n_comps)
 
 def find_comps_both_metrics(

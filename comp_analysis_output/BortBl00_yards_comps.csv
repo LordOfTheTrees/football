@@ -1,6 +1,0 @@
-player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank
-TannRy00,Ryan Tannehill,418.0903360393938,4455.971272540269,True,2015.0,2012,BortBl00,Blake Bortles,4,total_yards_adj,1
-NewtCa00,Cam Newton,526.7773743813133,3766.465337019326,True,2015.0,2011,BortBl00,Blake Bortles,4,total_yards_adj,2
-FlacJo00,Joe Flacco,600.7275551310071,3830.837075189576,True,2013.0,2008,BortBl00,Blake Bortles,4,total_yards_adj,3
-JackLa00,Lamar Jackson,619.6138625208988,3678.435175680198,True,2023.0,2018,BortBl00,Blake Bortles,4,total_yards_adj,4
-FreeJo00,Josh Freeman,661.6622287809466,4343.012745406038,False,,2009,BortBl00,Blake Bortles,4,total_yards_adj,5
