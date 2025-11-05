@@ -1,0 +1,6 @@
+player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank
+BradSa00,Sam Bradford,0.4250858133735984,6.236351742567642,False,,2010,FielJu00,Justin Fields,4,Pass_ANY/A_adj,1
+JoneDa05,Daniel Jones,0.535488398372291,5.913507831934611,True,2023.0,2019,FielJu00,Justin Fields,4,Pass_ANY/A_adj,2
+TannRy00,Ryan Tannehill,0.6340883985289143,6.0176481840864975,True,2015.0,2012,FielJu00,Justin Fields,4,Pass_ANY/A_adj,3
+HarrJo00,Joey Harrington,0.667096944328208,4.655827956989247,False,,2002,FielJu00,Justin Fields,4,Pass_ANY/A_adj,4
+GrosRe00,Rex Grossman,0.7371261190540538,5.403317143421906,False,,2003,FielJu00,Justin Fields,4,Pass_ANY/A_adj,5
