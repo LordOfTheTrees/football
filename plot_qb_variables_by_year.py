@@ -235,11 +235,165 @@ def create_scatter_plot(df, variable, output_dir):
     return True
 
 
+def create_line_chart_avg(df, variable, output_dir):
+    """
+    Create line chart showing average value by career year (Y-0 through Y-5 only).
+    
+    Args:
+        df: DataFrame with QB data
+        variable: Column name to plot
+        output_dir: Directory to save plot
+    
+    Returns:
+        tuple: (bool success, DataFrame with stats) or (False, None)
+    """
+    
+    # Filter to years 0-5 only and valid data
+    plot_data = df[df['years_since_draft'].between(0, 5)][['years_since_draft', variable]].dropna()
+    
+    if len(plot_data) == 0:
+        print(f"  Skipping {variable}: no valid data for years 0-5")
+        return False, None
+    
+    # Calculate average by year
+    avg_by_year = plot_data.groupby('years_since_draft')[variable].agg(['mean', 'count', 'std']).reset_index()
+    
+    # Skip if we don't have data for most years
+    if len(avg_by_year) < 3:
+        print(f"  Skipping {variable}: insufficient year coverage")
+        return False, None
+    
+    # Create figure
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    # Plot the line
+    ax.plot(
+        avg_by_year['years_since_draft'],
+        avg_by_year['mean'],
+        marker='o',
+        linewidth=2.5,
+        markersize=8,
+        color='darkgreen',
+        label='Average'
+    )
+    
+    # Add error bars (standard error of the mean)
+    yerr = avg_by_year['std'] / np.sqrt(avg_by_year['count'])
+    ax.errorbar(
+        avg_by_year['years_since_draft'],
+        avg_by_year['mean'],
+        yerr=yerr,
+        fmt='none',
+        ecolor='gray',
+        alpha=0.4,
+        capsize=5
+    )
+    
+    # Formatting
+    ax.set_xlabel('Years Since Draft', fontsize=12, fontweight='bold')
+    ax.set_ylabel(f'Average {variable}', fontsize=12, fontweight='bold')
+    ax.set_title(f'Average {variable} by Career Year (Y-0 to Y-5)', fontsize=14, fontweight='bold')
+    ax.grid(True, alpha=0.3, linestyle='--')
+    
+    # Set x-axis to show Y-0, Y-1, etc.
+    ax.set_xticks(range(6))
+    ax.set_xticklabels([f'Y-{i}' for i in range(6)])
+    
+    # Add data points count annotation
+    for idx, row in avg_by_year.iterrows():
+        ax.annotate(
+            f"n={int(row['count'])}",
+            xy=(row['years_since_draft'], row['mean']),
+            xytext=(0, 10),
+            textcoords='offset points',
+            ha='center',
+            fontsize=8,
+            color='gray'
+        )
+    
+    # Add summary stats box
+    overall_mean = plot_data[variable].mean()
+    overall_std = plot_data[variable].std()
+    total_n = len(plot_data)
+    
+    stats_text = f'Overall Stats (Y-0 to Y-5):\n'
+    stats_text += f'Mean = {overall_mean:.2f}\n'
+    stats_text += f'Std Dev = {overall_std:.2f}\n'
+    stats_text += f'Total N = {total_n:,}'
+    
+    ax.text(
+        0.98, 0.02, stats_text,
+        transform=ax.transAxes,
+        fontsize=9,
+        verticalalignment='bottom',
+        horizontalalignment='right',
+        bbox=dict(boxstyle='round', facecolor='lightyellow', alpha=0.7)
+    )
+    
+    plt.tight_layout()
+    
+    # Save with clean filename
+    clean_var_name = variable.replace('/', '_').replace('%', 'pct').replace(' ', '_')
+    output_file = output_dir / f'line_{clean_var_name}.png'
+    plt.savefig(output_file, dpi=150, bbox_inches='tight')
+    plt.close()
+    
+    # Prepare data for CSV export
+    # Calculate confidence interval (using standard error)
+    csv_data = avg_by_year.copy()
+    csv_data['stat'] = variable
+    csv_data['year_relative'] = csv_data['years_since_draft'].apply(lambda x: f'Y-{int(x)}')
+    csv_data['average'] = csv_data['mean']
+    csv_data['std_error'] = csv_data['std'] / np.sqrt(csv_data['count'])
+    csv_data['lower_bound'] = csv_data['mean'] - csv_data['std_error']
+    csv_data['upper_bound'] = csv_data['mean'] + csv_data['std_error']
+    
+    # Select and rename columns for export
+    export_data = csv_data[['stat', 'lower_bound', 'average', 'upper_bound', 'year_relative']].copy()
+    
+    return True, export_data
+
+
+def export_all_line_data_to_csv(all_line_data, output_dir):
+    """
+    Export all line chart data to a single CSV file.
+    
+    Args:
+        all_line_data: List of DataFrames with line chart statistics
+        output_dir: Directory to save CSV
+    """
+    
+    if not all_line_data:
+        print("\nNo line chart data to export to CSV")
+        return
+    
+    # Combine all data
+    combined_df = pd.concat(all_line_data, ignore_index=True)
+    
+    # Sort by stat name and year
+    combined_df = combined_df.sort_values(['stat', 'year_relative'])
+    
+    # Save to CSV
+    output_file = output_dir / 'line_chart_averages_data.csv'
+    combined_df.to_csv(output_file, index=False)
+    
+    print(f"\n{'='*80}")
+    print("CSV EXPORT SUMMARY")
+    print("="*80)
+    print(f"Exported data for {combined_df['stat'].nunique()} statistics")
+    print(f"Total rows: {len(combined_df)}")
+    print(f"File saved: {output_file}")
+    print(f"\nColumns: {', '.join(combined_df.columns.tolist())}")
+    print(f"\nSample data:")
+    print(combined_df.head(12).to_string(index=False))
+    print("="*80)
+
+
 def main():
     """Main execution function"""
     
     print("="*80)
-    print("QB VARIABLE SCATTER PLOT GENERATOR")
+    print("QB VARIABLE SCATTER PLOT & LINE CHART GENERATOR")
     print("="*80)
     
     # Setup
@@ -261,35 +415,75 @@ def main():
     variables = identify_plottable_variables(df)
     print(f"\nFound {len(variables)} variables to plot")
     
-    # Generate plots
-    print("\n" + "-"*80)
-    print("Generating scatter plots...")
-    print("-"*80)
+    # Generate scatter plots
+    print("\n" + "="*80)
+    print("GENERATING SCATTER PLOTS (All Years)")
+    print("="*80)
     
-    success_count = 0
-    fail_count = 0
+    scatter_success = 0
+    scatter_fail = 0
     
     for i, var in enumerate(variables, 1):
         print(f"[{i}/{len(variables)}] {var}...", end=' ')
         
         try:
             if create_scatter_plot(df, var, output_dir):
-                success_count += 1
+                scatter_success += 1
                 print("✓")
             else:
-                fail_count += 1
+                scatter_fail += 1
                 print("✗")
         except Exception as e:
-            fail_count += 1
+            scatter_fail += 1
             print(f"✗ Error: {e}")
+    
+    # Generate line charts (Y-0 to Y-5 averages) and collect data for CSV
+    print("\n" + "="*80)
+    print("GENERATING LINE CHARTS (Y-0 to Y-5 Averages)")
+    print("="*80)
+    
+    line_success = 0
+    line_fail = 0
+    all_line_data = []  # Collect all line chart data for CSV export
+    
+    for i, var in enumerate(variables, 1):
+        print(f"[{i}/{len(variables)}] {var}...", end=' ')
+        
+        try:
+            success, line_data = create_line_chart_avg(df, var, output_dir)
+            if success:
+                line_success += 1
+                all_line_data.append(line_data)
+                print("✓")
+            else:
+                line_fail += 1
+                print("✗")
+        except Exception as e:
+            line_fail += 1
+            print(f"✗ Error: {e}")
+    
+    # Export all line chart data to CSV
+    if all_line_data:
+        print("\n" + "="*80)
+        print("EXPORTING LINE CHART DATA TO CSV")
+        print("="*80)
+        export_all_line_data_to_csv(all_line_data, output_dir)
     
     # Summary
     print("\n" + "="*80)
-    print("SCATTER PLOT GENERATION COMPLETE")
+    print("PLOT GENERATION COMPLETE")
     print("="*80)
-    print(f"Successfully created: {success_count} plots")
-    print(f"Failed: {fail_count} plots")
-    print(f"\nAll plots saved to: {output_dir.absolute()}/")
+    print(f"\nScatter Plots:")
+    print(f"  Successfully created: {scatter_success}")
+    print(f"  Failed: {scatter_fail}")
+    print(f"\nLine Charts (Y-0 to Y-5):")
+    print(f"  Successfully created: {line_success}")
+    print(f"  Failed: {line_fail}")
+    print(f"\nTotal plots created: {scatter_success + line_success}")
+    print(f"\nAll outputs saved to: {output_dir.absolute()}/")
+    print("  - Scatter plots: <statname>.png")
+    print("  - Line charts: line_<statname>.png")
+    print("  - CSV data: line_chart_averages_data.csv")
     print("="*80)
 
 
