@@ -1,11 +1,11 @@
-to reformat:
-//////////////////////////////////////////
 
-fix my comp tool to rule out people who havent had the opportunity to be paid yet
+adjust my comp tool to rule out people who havent had the opportunity to be paid yet
 
 formalize decision logic around payment timing...
 
 look into carson wentz & jared goff (traded before in effect?)
+
+//////////////////////////////////////////later//////////////////////////////////
 
 organize, group, and sanitize the workflow of my code to be more comprehensible to others
 
