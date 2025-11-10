@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_2_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+HarrJo00,Joey Harrington,446.69523247735526,3403.571262922836,False,,2002,YounBr01,Bryce Young,3,total_yards_adj,1,True
+TagoTu00,Tua Tagovailoa,504.4308532986423,3637.404563304288,True,2024.0,2020,YounBr01,Bryce Young,3,total_yards_adj,2,True
+DarnSa00,Sam Darnold,519.1891852141703,2451.152462448575,False,,2018,YounBr01,Bryce Young,3,total_yards_adj,3,True
+JoneDa05,Daniel Jones,538.780049197165,2747.989665361529,True,2023.0,2019,YounBr01,Bryce Young,3,total_yards_adj,4,True
+FielJu00,Justin Fields,543.1751111373899,3227.609208312437,False,,2021,YounBr01,Bryce Young,3,total_yards_adj,5,True
+RoetBe00,Ben Roethlisberger,564.4477100389108,3793.117232088729,True,2008.0,2004,YounBr01,Bryce Young,3,total_yards_adj,6,True
+LeftBy00,Byron Leftwich,656.9466655643662,2306.9142145968526,False,,2003,YounBr01,Bryce Young,3,total_yards_adj,7,True
+JoneMa05,Mac Jones,669.7583809594228,2221.926687051992,False,,2021,YounBr01,Bryce Young,3,total_yards_adj,8,True
+WilsZa00,Zach Wilson,693.797962638863,2488.638103458052,False,,2021,YounBr01,Bryce Young,3,total_yards_adj,9,True
+WentCa00,Carson Wentz,707.0255022980908,3218.5096183678384,False,,2016,YounBr01,Bryce Young,3,total_yards_adj,10,True

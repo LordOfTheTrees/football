@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_1_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+BurrJo01,Joe Burrow,122.6495128637402,4767.147148750797,True,2023.0,2020,MayeDr00,Drake Maye,2,total_yards_adj,1,True
+WatsDe00,Deshaun Watson,489.5363781739063,4792.703302880557,True,2020.0,2017,MayeDr00,Drake Maye,2,total_yards_adj,2,True
+BortBl00,Blake Bortles,510.3754518488839,4854.539408897631,True,2018.0,2014,MayeDr00,Drake Maye,2,total_yards_adj,3,True
+JackLa00,Lamar Jackson,624.9049026129967,4391.569570871261,True,2023.0,2018,MayeDr00,Drake Maye,2,total_yards_adj,4,True
+FreeJo00,Josh Freeman,741.4318467868682,3962.990322992428,False,,2009,MayeDr00,Drake Maye,2,total_yards_adj,5,True
+MariMa01,Marcus Mariota,754.1834660526697,3857.310813170015,False,,2015,MayeDr00,Drake Maye,2,total_yards_adj,6,True
+TannRy00,Ryan Tannehill,759.7591575227657,4276.47609798449,True,2015.0,2012,MayeDr00,Drake Maye,2,total_yards_adj,7,True
+TrubMi00,Mitchell Trubisky,806.9066595867806,3703.2677768652993,False,,2017,MayeDr00,Drake Maye,2,total_yards_adj,8,True
+FlacJo00,Joe Flacco,824.4920425261885,3821.91663749226,True,2013.0,2008,MayeDr00,Drake Maye,2,total_yards_adj,9,True
+AlleJo02,Josh Allen,833.3250269705447,3647.6480234400337,True,2021.0,2018,MayeDr00,Drake Maye,2,total_yards_adj,10,True

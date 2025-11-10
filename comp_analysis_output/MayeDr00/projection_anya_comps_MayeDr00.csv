@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_1_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+WentCa00,Carson Wentz,0.31889692913835066,7.534835707974373,False,,2016,MayeDr00,Drake Maye,2,Pass_ANY/A_adj,1,True
+BurrJo01,Joe Burrow,0.5585371426163128,7.555050125999782,True,2023.0,2020,MayeDr00,Drake Maye,2,Pass_ANY/A_adj,2,True
+JackLa00,Lamar Jackson,0.7111274478638281,8.2722108244871,True,2023.0,2018,MayeDr00,Drake Maye,2,Pass_ANY/A_adj,3,True
+TrubMi00,Mitchell Trubisky,0.9267571612294291,6.669539805450686,False,,2017,MayeDr00,Drake Maye,2,Pass_ANY/A_adj,4,True
+MariMa01,Marcus Mariota,0.9379909563619723,7.255368397753367,False,,2015,MayeDr00,Drake Maye,2,Pass_ANY/A_adj,5,True
+LawrTr00,Trevor Lawrence,0.9891340294294959,6.686581012000766,True,2024.0,2021,MayeDr00,Drake Maye,2,Pass_ANY/A_adj,6,True
+MahoPa00,Patrick Mahomes,1.026371984643137,8.997300283832566,True,2020.0,2017,MayeDr00,Drake Maye,2,Pass_ANY/A_adj,7,True
+FreeJo00,Josh Freeman,1.0929445551654153,7.138646688138917,False,,2009,MayeDr00,Drake Maye,2,Pass_ANY/A_adj,8,True
+MurrKy00,Kyler Murray,1.1047935611433495,6.501692054343353,True,2022.0,2019,MayeDr00,Drake Maye,2,Pass_ANY/A_adj,9,True
+FlacJo00,Joe Flacco,1.2098889611864474,6.30807251908397,True,2013.0,2008,MayeDr00,Drake Maye,2,Pass_ANY/A_adj,10,True

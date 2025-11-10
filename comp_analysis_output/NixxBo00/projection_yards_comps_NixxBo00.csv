@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_1_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+StroCJ00,C.J. Stroud,57.61380620898434,3960.0,False,,2023,NixxBo00,Bo Nix,2,total_yards_adj,1,True
+GrifRo01,Robert Griffin III,119.55835032709166,3803.601482476207,False,,2012,NixxBo00,Bo Nix,2,total_yards_adj,2,True
+MayfBa00,Baker Mayfield,206.6785527074965,4021.635831344833,False,,2018,NixxBo00,Bo Nix,2,total_yards_adj,3,True
+WentCa00,Carson Wentz,249.6479489426309,3663.401372213728,False,,2016,NixxBo00,Bo Nix,2,total_yards_adj,4,True
+WinsJa00,Jameis Winston,293.4311005790372,4347.776823851235,False,,2015,NixxBo00,Bo Nix,2,total_yards_adj,5,True
+LawrTr00,Trevor Lawrence,357.30172670964873,4427.6201483670775,True,2024.0,2021,NixxBo00,Bo Nix,2,total_yards_adj,6,True
+TannRy00,Ryan Tannehill,468.8439724432579,4276.47609798449,True,2015.0,2012,NixxBo00,Bo Nix,2,total_yards_adj,7,True
+LuckAn00,Andrew Luck,482.15101179279026,4325.927038168362,True,2016.0,2012,NixxBo00,Bo Nix,2,total_yards_adj,8,True
+JoneMa05,Mac Jones,623.1921107231705,3115.620989961302,False,,2021,NixxBo00,Bo Nix,2,total_yards_adj,9,True
+MurrKy00,Kyler Murray,627.1554973592765,4841.657853661309,True,2022.0,2019,NixxBo00,Bo Nix,2,total_yards_adj,10,True
