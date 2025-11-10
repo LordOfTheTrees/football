@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+LuckAn00,Andrew Luck,333.0130402398276,2128.087452992904,True,2016.0,2012,LawrTr00,Trevor Lawrence,4,total_yards_adj,1,False
+BurrJo01,Joe Burrow,446.5567861440269,2403.410771147845,True,2023.0,2020,LawrTr00,Trevor Lawrence,4,total_yards_adj,2,False
+MurrKy00,Kyler Murray,528.7516920700283,2800.9422646118705,True,2022.0,2019,LawrTr00,Trevor Lawrence,4,total_yards_adj,3,False
+TrubMi00,Mitchell Trubisky,670.8543327806167,2274.2651713440387,False,,2017,LawrTr00,Trevor Lawrence,4,total_yards_adj,4,False
+MariMa01,Marcus Mariota,726.0204715411525,2931.9230340988997,False,,2015,LawrTr00,Trevor Lawrence,4,total_yards_adj,5,False
+MayfBa00,Baker Mayfield,790.0378443184916,3169.36152160552,False,,2018,LawrTr00,Trevor Lawrence,4,total_yards_adj,6,False
+HarrJo00,Joey Harrington,880.7027499520945,2213.162906332414,False,,2002,LawrTr00,Trevor Lawrence,4,total_yards_adj,7,False
+WinsJa00,Jameis Winston,883.3477204848689,3326.2336535894965,False,,2015,LawrTr00,Trevor Lawrence,4,total_yards_adj,8,False
+SancMa00,Mark Sanchez,906.836544711074,3007.257398162935,True,2012.0,2009,LawrTr00,Trevor Lawrence,4,total_yards_adj,9,False
+JoneMa05,Mac Jones,968.7168646261673,1764.0,False,,2021,LawrTr00,Trevor Lawrence,4,total_yards_adj,10,False

@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+RyanMa00,Matt Ryan,608.4556028352315,4414.060783499942,True,2013.0,2008,TagoTu00,Tua Tagovailoa,4,total_yards_adj,1,False
+FreeJo00,Josh Freeman,683.783708212175,4343.012745406038,False,,2009,TagoTu00,Tua Tagovailoa,4,total_yards_adj,2,False
+GoffJa00,Jared Goff,737.2707942041571,4741.232968505829,False,,2016,TagoTu00,Tua Tagovailoa,4,total_yards_adj,3,False
+AlleJo02,Josh Allen,741.5613198583196,5211.704537754625,True,2021.0,2018,TagoTu00,Tua Tagovailoa,4,total_yards_adj,4,False
+JoneDa05,Daniel Jones,823.0380958527794,3933.9867485377777,True,2023.0,2019,TagoTu00,Tua Tagovailoa,4,total_yards_adj,5,False
+WentCa00,Carson Wentz,838.5875859267451,4339.88019904702,False,,2016,TagoTu00,Tua Tagovailoa,4,total_yards_adj,6,False
+CutlJa00,Jay Cutler,898.7977015876656,3999.001900063447,False,,2006,TagoTu00,Tua Tagovailoa,4,total_yards_adj,7,False
+RoetBe00,Ben Roethlisberger,936.697044273512,3517.501773738741,True,2008.0,2004,TagoTu00,Tua Tagovailoa,4,total_yards_adj,8,False
+FlacJo00,Joe Flacco,943.3039810514962,3830.837075189576,True,2013.0,2008,TagoTu00,Tua Tagovailoa,4,total_yards_adj,9,False
+TannRy00,Ryan Tannehill,986.5039731194801,4455.971272540269,True,2015.0,2012,TagoTu00,Tua Tagovailoa,4,total_yards_adj,10,False

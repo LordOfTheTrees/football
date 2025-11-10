@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+TagoTu00,Tua Tagovailoa,1354.1457261454925,4710.564790510043,True,2024.0,2020,StafMa00,Matthew Stafford,4,total_yards_adj,1,False
+RyanMa00,Matt Ryan,1575.303843828306,4414.060783499942,True,2013.0,2008,StafMa00,Matthew Stafford,4,total_yards_adj,2,False
+AlleJo02,Josh Allen,1649.4506750316764,5211.704537754625,True,2021.0,2018,StafMa00,Matthew Stafford,4,total_yards_adj,3,False
+RivePh00,Philip Rivers,1688.9632250277066,3336.2844399517244,False,,2004,StafMa00,Matthew Stafford,4,total_yards_adj,4,False
+RodgAa00,Aaron Rodgers,1725.291556209978,4434.243873084627,True,2008.0,2005,StafMa00,Matthew Stafford,4,total_yards_adj,5,False
+RoetBe00,Ben Roethlisberger,1734.2724032318927,3517.501773738741,True,2008.0,2004,StafMa00,Matthew Stafford,4,total_yards_adj,6,False
+GoffJa00,Jared Goff,1884.8279574299852,4741.232968505829,False,,2016,StafMa00,Matthew Stafford,4,total_yards_adj,7,False
+WentCa00,Carson Wentz,1938.525630187213,4339.88019904702,False,,2016,StafMa00,Matthew Stafford,4,total_yards_adj,8,False
+JoneDa05,Daniel Jones,1957.2154487153696,3933.9867485377777,True,2023.0,2019,StafMa00,Matthew Stafford,4,total_yards_adj,9,False
+FreeJo00,Josh Freeman,1974.401419342482,4343.012745406038,False,,2009,StafMa00,Matthew Stafford,4,total_yards_adj,10,False

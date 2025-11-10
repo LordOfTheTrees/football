@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+JackLa00,Lamar Jackson,331.4261508961253,3678.435175680198,True,2023.0,2018,MannEl00,Eli Manning,4,total_yards_adj,1,False
+CutlJa00,Jay Cutler,536.6525458217384,3999.001900063447,False,,2006,MannEl00,Eli Manning,4,total_yards_adj,2,False
+FreeJo00,Josh Freeman,662.132849685512,4343.012745406038,False,,2009,MannEl00,Eli Manning,4,total_yards_adj,3,False
+SancMa00,Mark Sanchez,684.8451330247054,3007.257398162935,True,2012.0,2009,MannEl00,Eli Manning,4,total_yards_adj,4,False
+FlacJo00,Joe Flacco,708.1139169495406,3830.837075189576,True,2013.0,2008,MannEl00,Eli Manning,4,total_yards_adj,5,False
+VickMi00,Michael Vick,724.1596303719564,3396.1767878016503,True,2004.0,2001,MannEl00,Eli Manning,4,total_yards_adj,6,False
+MariMa01,Marcus Mariota,780.867039089481,2931.9230340988997,False,,2015,MannEl00,Eli Manning,4,total_yards_adj,7,False
+JoneDa05,Daniel Jones,829.2934514556414,3933.9867485377777,True,2023.0,2019,MannEl00,Eli Manning,4,total_yards_adj,8,False
+MayfBa00,Baker Mayfield,905.9487200067623,3169.36152160552,False,,2018,MannEl00,Eli Manning,4,total_yards_adj,9,False
+BortBl00,Blake Bortles,941.9289676381493,4085.278470432498,True,2018.0,2014,MannEl00,Eli Manning,4,total_yards_adj,10,False

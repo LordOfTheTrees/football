@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+LeinMa00,Matt Leinart,816.3833207145256,446.8798684884654,False,,2006,WeedBr00,Brandon Weeden,4,total_yards_adj,1,False
+GabbBl00,Blaine Gabbert,876.2225355738143,44.17839866116503,False,,2011,WeedBr00,Brandon Weeden,4,total_yards_adj,2,False
+ManuEJ00,EJ Manuel,963.5579311617646,156.33604090463902,False,,2013,WeedBr00,Brandon Weeden,4,total_yards_adj,3,False
+LeftBy00,Byron Leftwich,966.9286844949289,1260.5208193039252,False,,2003,WeedBr00,Brandon Weeden,4,total_yards_adj,4,False
+RamsPa00,Patrick Ramsey,990.7572742480115,297.05470708507414,False,,2002,WeedBr00,Brandon Weeden,4,total_yards_adj,5,False
+JoneMa05,Mac Jones,998.75373089525,1764.0,False,,2021,WeedBr00,Brandon Weeden,4,total_yards_adj,6,False
+LockJa00,Jake Locker,1045.2359629325183,1166.1042437307517,False,,2011,WeedBr00,Brandon Weeden,4,total_yards_adj,7,False
+BollKy00,Kyle Boller,1086.3172895308282,545.1752543489476,False,,2003,WeedBr00,Brandon Weeden,4,total_yards_adj,8,False
+YounVi00,Vince Young,1092.1945206833798,2250.024512669196,False,,2006,WeedBr00,Brandon Weeden,4,total_yards_adj,9,False
+BradSa00,Sam Bradford,1152.1364947961438,1769.931567414443,False,,2010,WeedBr00,Brandon Weeden,4,total_yards_adj,10,False

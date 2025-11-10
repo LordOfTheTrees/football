@@ -1,0 +1,3 @@
+target_qb_id,target_qb_name,decision_year,metric,n_comps,payment_rate_pct,comps_paid,comps_not_paid,is_projection
+RivePh00,Philip Rivers,4,total_yards_adj,10,40.0,4,6,False
+RivePh00,Philip Rivers,4,Pass_ANY/A_adj,10,30.0,3,7,False

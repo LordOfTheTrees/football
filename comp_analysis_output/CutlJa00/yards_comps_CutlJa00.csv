@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+FreeJo00,Josh Freeman,489.3503707472589,4343.012745406038,False,,2009,CutlJa00,Jay Cutler,4,total_yards_adj,1,False
+MannEl00,Eli Manning,536.6525458217384,3566.734228582613,False,,2004,CutlJa00,Jay Cutler,4,total_yards_adj,2,False
+GoffJa00,Jared Goff,547.9389548593599,4741.232968505829,False,,2016,CutlJa00,Jay Cutler,4,total_yards_adj,3,False
+JackLa00,Lamar Jackson,548.3841906035408,3678.435175680198,True,2023.0,2018,CutlJa00,Jay Cutler,4,total_yards_adj,4,False
+FlacJo00,Joe Flacco,756.4446134130602,3830.837075189576,True,2013.0,2008,CutlJa00,Jay Cutler,4,total_yards_adj,5,False
+TannRy00,Ryan Tannehill,886.7390295528866,4455.971272540269,True,2015.0,2012,CutlJa00,Jay Cutler,4,total_yards_adj,6,False
+TagoTu00,Tua Tagovailoa,898.7977015876656,4710.564790510043,True,2024.0,2020,CutlJa00,Jay Cutler,4,total_yards_adj,7,False
+BortBl00,Blake Bortles,905.6275870653843,4085.278470432498,True,2018.0,2014,CutlJa00,Jay Cutler,4,total_yards_adj,8,False
+SancMa00,Mark Sanchez,961.0435654289413,3007.257398162935,True,2012.0,2009,CutlJa00,Jay Cutler,4,total_yards_adj,9,False
+JoneDa05,Daniel Jones,964.7133019549156,3933.9867485377777,True,2023.0,2019,CutlJa00,Jay Cutler,4,total_yards_adj,10,False

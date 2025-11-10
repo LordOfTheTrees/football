@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+StafMa00,Matthew Stafford,0.5724774901375541,5.951964240885889,False,,2009,AlleJo02,Josh Allen,4,Pass_ANY/A_adj,1,False
+TagoTu00,Tua Tagovailoa,0.749751253104113,7.4948971462869,True,2024.0,2020,AlleJo02,Josh Allen,4,Pass_ANY/A_adj,2,False
+LuckAn00,Andrew Luck,0.9134011359950824,5.1318014970889925,True,2016.0,2012,AlleJo02,Josh Allen,4,Pass_ANY/A_adj,3,False
+LeftBy00,Byron Leftwich,0.9695592945132069,5.5381407957529705,False,,2003,AlleJo02,Josh Allen,4,Pass_ANY/A_adj,4,False
+FlacJo00,Joe Flacco,0.9858699035270154,5.851190675834313,True,2013.0,2008,AlleJo02,Josh Allen,4,Pass_ANY/A_adj,5,False
+WentCa00,Carson Wentz,1.0262622544158748,6.322837577690994,False,,2016,AlleJo02,Josh Allen,4,Pass_ANY/A_adj,6,False
+MurrKy00,Kyler Murray,1.0288010009751816,5.180594297586179,True,2022.0,2019,AlleJo02,Josh Allen,4,Pass_ANY/A_adj,7,False
+WeedBr00,Brandon Weeden,1.0879434003218647,6.628576933739948,False,,2012,AlleJo02,Josh Allen,4,Pass_ANY/A_adj,8,False
+WinsJa00,Jameis Winston,1.0965569350503046,6.457005153076689,False,,2015,AlleJo02,Josh Allen,4,Pass_ANY/A_adj,9,False
+GoffJa00,Jared Goff,1.1270605381681467,6.52484516803256,False,,2016,AlleJo02,Josh Allen,4,Pass_ANY/A_adj,10,False

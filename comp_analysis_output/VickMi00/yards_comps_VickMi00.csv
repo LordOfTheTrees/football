@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+MannEl00,Eli Manning,724.1596303719564,3566.734228582613,False,,2004,VickMi00,Michael Vick,4,total_yards_adj,1,False
+JackLa00,Lamar Jackson,907.0571293631212,3678.435175680198,True,2023.0,2018,VickMi00,Michael Vick,4,total_yards_adj,2,False
+DarnSa00,Sam Darnold,966.9782786691325,2771.175198121366,False,,2018,VickMi00,Michael Vick,4,total_yards_adj,3,False
+SancMa00,Mark Sanchez,983.7410948098519,3007.257398162935,True,2012.0,2009,VickMi00,Michael Vick,4,total_yards_adj,4,False
+JoneDa05,Daniel Jones,984.2147292325006,3933.9867485377777,True,2023.0,2019,VickMi00,Michael Vick,4,total_yards_adj,5,False
+MariMa01,Marcus Mariota,1037.2499759222462,2931.9230340988997,False,,2015,VickMi00,Michael Vick,4,total_yards_adj,6,False
+FlacJo00,Joe Flacco,1107.5129111014628,3830.837075189576,True,2013.0,2008,VickMi00,Michael Vick,4,total_yards_adj,7,False
+YounVi00,Vince Young,1114.9206421816339,2250.024512669196,False,,2006,VickMi00,Michael Vick,4,total_yards_adj,8,False
+FreeJo00,Josh Freeman,1146.6253753486437,4343.012745406038,False,,2009,VickMi00,Michael Vick,4,total_yards_adj,9,False
+TrubMi00,Mitchell Trubisky,1163.3649224469852,2274.2651713440387,False,,2017,VickMi00,Michael Vick,4,total_yards_adj,10,False

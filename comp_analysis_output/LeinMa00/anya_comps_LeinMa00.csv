@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+LuckAn00,Andrew Luck,1.1081048680373586,5.1318014970889925,True,2016.0,2012,LeinMa00,Matt Leinart,4,Pass_ANY/A_adj,1,False
+MayfBa00,Baker Mayfield,1.1417983279197017,5.442452887038458,False,,2018,LeinMa00,Matt Leinart,4,Pass_ANY/A_adj,2,False
+CutlJa00,Jay Cutler,1.231216058754442,4.947507858105074,False,,2006,LeinMa00,Matt Leinart,4,Pass_ANY/A_adj,3,False
+LeftBy00,Byron Leftwich,1.2361481681381383,5.5381407957529705,False,,2003,LeinMa00,Matt Leinart,4,Pass_ANY/A_adj,4,False
+MurrKy00,Kyler Murray,1.2470032145304117,5.180594297586179,True,2022.0,2019,LeinMa00,Matt Leinart,4,Pass_ANY/A_adj,5,False
+CarrDa00,David Carr,1.2498631548909966,3.917962365591397,False,,2002,LeinMa00,Matt Leinart,4,Pass_ANY/A_adj,6,False
+HarrJo00,Joey Harrington,1.4068757374051475,4.655827956989247,False,,2002,LeinMa00,Matt Leinart,4,Pass_ANY/A_adj,7,False
+FlacJo00,Joe Flacco,1.4608200517804684,5.851190675834313,True,2013.0,2008,LeinMa00,Matt Leinart,4,Pass_ANY/A_adj,8,False
+TannRy00,Ryan Tannehill,1.4632238621308469,6.0176481840864975,True,2015.0,2012,LeinMa00,Matt Leinart,4,Pass_ANY/A_adj,9,False
+StafMa00,Matthew Stafford,1.470665105422283,5.951964240885889,False,,2009,LeinMa00,Matt Leinart,4,Pass_ANY/A_adj,10,False

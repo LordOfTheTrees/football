@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+RivePh00,Philip Rivers,280.4234217324781,3336.2844399517244,False,,2004,LoveJo03,Jordan Love,4,total_yards_adj,1,False
+PennCh01,Chad Pennington,912.9937208007142,2310.41719205671,True,2004.0,2000,LoveJo03,Jordan Love,4,total_yards_adj,2,False
+GrosRe00,Rex Grossman,1193.4734540624297,3356.136681396701,False,,2003,LoveJo03,Jordan Love,4,total_yards_adj,3,False
+RodgAa00,Aaron Rodgers,1369.6444186249664,4434.243873084627,True,2008.0,2005,LoveJo03,Jordan Love,4,total_yards_adj,4,False
+CarrDa00,David Carr,1434.0386094790647,2945.265819183927,False,,2002,LoveJo03,Jordan Love,4,total_yards_adj,5,False
+StafMa00,Matthew Stafford,1491.8502371163372,5261.409113309456,False,,2009,LoveJo03,Jordan Love,4,total_yards_adj,6,False
+RoetBe00,Ben Roethlisberger,1495.9767878208947,3517.501773738741,True,2008.0,2004,LoveJo03,Jordan Love,4,total_yards_adj,7,False
+LosmJ.00,J.P. Losman,1740.1155015722563,1376.4137375499422,False,,2004,LoveJo03,Jordan Love,4,total_yards_adj,8,False
+TagoTu00,Tua Tagovailoa,1741.307242551819,4710.564790510043,True,2024.0,2020,LoveJo03,Jordan Love,4,total_yards_adj,9,False
+DarnSa00,Sam Darnold,1913.6970593613858,2771.175198121366,False,,2018,LoveJo03,Jordan Love,4,total_yards_adj,10,False

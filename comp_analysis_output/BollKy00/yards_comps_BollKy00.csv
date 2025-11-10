@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+RamsPa00,Patrick Ramsey,353.82801167062473,297.05470708507414,False,,2002,BollKy00,Kyle Boller,4,total_yards_adj,1,False
+PondCh00,Christian Ponder,381.80846930047926,244.52229956644837,False,,2011,BollKy00,Kyle Boller,4,total_yards_adj,2,False
+LockJa00,Jake Locker,568.0774183028504,1166.1042437307517,False,,2011,BollKy00,Kyle Boller,4,total_yards_adj,3,False
+LeftBy00,Byron Leftwich,771.5825065268801,1260.5208193039252,False,,2003,BollKy00,Kyle Boller,4,total_yards_adj,4,False
+FielJu00,Justin Fields,815.8878796879463,1395.0,False,,2021,BollKy00,Kyle Boller,4,total_yards_adj,5,False
+GabbBl00,Blaine Gabbert,868.1075202158189,44.17839866116503,False,,2011,BollKy00,Kyle Boller,4,total_yards_adj,6,False
+WeedBr00,Brandon Weeden,1086.3172895308282,1116.810459201861,False,,2012,BollKy00,Kyle Boller,4,total_yards_adj,7,False
+LosmJ.00,J.P. Losman,1095.8420977248763,1376.4137375499422,False,,2004,BollKy00,Kyle Boller,4,total_yards_adj,8,False
+ManuEJ00,EJ Manuel,1187.6934568558468,156.33604090463902,False,,2013,BollKy00,Kyle Boller,4,total_yards_adj,9,False
+JoneMa05,Mac Jones,1200.0890492262556,1764.0,False,,2021,BollKy00,Kyle Boller,4,total_yards_adj,10,False

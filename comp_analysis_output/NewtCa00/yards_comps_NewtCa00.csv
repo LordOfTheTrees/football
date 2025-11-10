@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+WinsJa00,Jameis Winston,442.2212082458003,3326.2336535894965,False,,2015,NewtCa00,Cam Newton,4,total_yards_adj,1,False
+HerbJu00,Justin Herbert,499.0282333253582,3370.991661493139,True,2023.0,2020,NewtCa00,Cam Newton,4,total_yards_adj,2,False
+BortBl00,Blake Bortles,526.7773743813133,4085.278470432498,True,2018.0,2014,NewtCa00,Cam Newton,4,total_yards_adj,3,False
+MayfBa00,Baker Mayfield,673.3423142278273,3169.36152160552,False,,2018,NewtCa00,Cam Newton,4,total_yards_adj,4,False
+TannRy00,Ryan Tannehill,705.5039988314988,4455.971272540269,True,2015.0,2012,NewtCa00,Cam Newton,4,total_yards_adj,5,False
+FlacJo00,Joe Flacco,714.3691372512545,3830.837075189576,True,2013.0,2008,NewtCa00,Cam Newton,4,total_yards_adj,6,False
+MurrKy00,Kyler Murray,737.4597916969519,2800.9422646118705,True,2022.0,2019,NewtCa00,Cam Newton,4,total_yards_adj,7,False
+WentCa00,Carson Wentz,811.991561637144,4339.88019904702,False,,2016,NewtCa00,Cam Newton,4,total_yards_adj,8,False
+JackLa00,Lamar Jackson,946.3510628097222,3678.435175680198,True,2023.0,2018,NewtCa00,Cam Newton,4,total_yards_adj,9,False
+JoneDa05,Daniel Jones,957.2358572355088,3933.9867485377777,True,2023.0,2019,NewtCa00,Cam Newton,4,total_yards_adj,10,False

@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+TannRy00,Ryan Tannehill,0.20418794492914752,6.0176481840864975,True,2015.0,2012,JoneDa05,Daniel Jones,4,Pass_ANY/A_adj,1,False
+BradSa00,Sam Bradford,0.3301475332265014,6.236351742567642,False,,2010,JoneDa05,Daniel Jones,4,Pass_ANY/A_adj,2,False
+FielJu00,Justin Fields,0.535488398372291,5.86,False,,2021,JoneDa05,Daniel Jones,4,Pass_ANY/A_adj,3,False
+WeedBr00,Brandon Weeden,0.6281487304490901,6.628576933739948,False,,2012,JoneDa05,Daniel Jones,4,Pass_ANY/A_adj,4,False
+GrosRe00,Rex Grossman,0.7014606813559463,5.403317143421906,False,,2003,JoneDa05,Daniel Jones,4,Pass_ANY/A_adj,5,False
+LeftBy00,Byron Leftwich,0.8042338751548779,5.5381407957529705,False,,2003,JoneDa05,Daniel Jones,4,Pass_ANY/A_adj,6,False
+FlacJo00,Joe Flacco,0.8366677195775373,5.851190675834313,True,2013.0,2008,JoneDa05,Daniel Jones,4,Pass_ANY/A_adj,7,False
+TrubMi00,Mitchell Trubisky,0.8628703763255504,6.0480856319473055,False,,2017,JoneDa05,Daniel Jones,4,Pass_ANY/A_adj,8,False
+LawrTr00,Trevor Lawrence,0.8833188395669445,5.99,True,2024.0,2021,JoneDa05,Daniel Jones,4,Pass_ANY/A_adj,9,False
+BortBl00,Blake Bortles,0.8838386384770525,6.297621769383697,True,2018.0,2014,JoneDa05,Daniel Jones,4,Pass_ANY/A_adj,10,False

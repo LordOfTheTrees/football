@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+ManuEJ00,EJ Manuel,1.012282471263964,3.891885288990952,False,,2013,PondCh00,Christian Ponder,4,Pass_ANY/A_adj,1,False
+CarrDa00,David Carr,1.2228641720092515,3.917962365591397,False,,2002,PondCh00,Christian Ponder,4,Pass_ANY/A_adj,2,False
+SancMa00,Mark Sanchez,1.2677061878234983,4.466534266826589,True,2012.0,2009,PondCh00,Christian Ponder,4,Pass_ANY/A_adj,3,False
+DarnSa00,Sam Darnold,1.3286442823501179,4.376094280705599,False,,2018,PondCh00,Christian Ponder,4,Pass_ANY/A_adj,4,False
+HarrJo00,Joey Harrington,1.4514945602089453,4.655827956989247,False,,2002,PondCh00,Christian Ponder,4,Pass_ANY/A_adj,5,False
+MannEl00,Eli Manning,1.5987789477859984,4.988562813503916,False,,2004,PondCh00,Christian Ponder,4,Pass_ANY/A_adj,6,False
+VickMi00,Michael Vick,1.6343016061665514,5.071610570788556,True,2004.0,2001,PondCh00,Christian Ponder,4,Pass_ANY/A_adj,7,False
+JoneMa05,Mac Jones,1.6868520028741565,4.97,False,,2021,PondCh00,Christian Ponder,4,Pass_ANY/A_adj,8,False
+GrosRe00,Rex Grossman,1.7623708080367677,5.403317143421906,False,,2003,PondCh00,Christian Ponder,4,Pass_ANY/A_adj,9,False
+LeinMa00,Matt Leinart,1.8524395676777412,3.762167433767401,False,,2006,PondCh00,Christian Ponder,4,Pass_ANY/A_adj,10,False

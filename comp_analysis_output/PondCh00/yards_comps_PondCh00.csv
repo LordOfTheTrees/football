@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+BollKy00,Kyle Boller,381.80846930047926,545.1752543489476,False,,2003,PondCh00,Christian Ponder,4,total_yards_adj,1,False
+RamsPa00,Patrick Ramsey,524.3626393489282,297.05470708507414,False,,2002,PondCh00,Christian Ponder,4,total_yards_adj,2,False
+LeftBy00,Byron Leftwich,813.5941756959564,1260.5208193039252,False,,2003,PondCh00,Christian Ponder,4,total_yards_adj,3,False
+GabbBl00,Blaine Gabbert,907.0896907463103,44.17839866116503,False,,2011,PondCh00,Christian Ponder,4,total_yards_adj,4,False
+LockJa00,Jake Locker,922.2283529988536,1166.1042437307517,False,,2011,PondCh00,Christian Ponder,4,total_yards_adj,5,False
+FielJu00,Justin Fields,933.8116181928164,1395.0,False,,2021,PondCh00,Christian Ponder,4,total_yards_adj,6,False
+WeedBr00,Brandon Weeden,1188.6612747679146,1116.810459201861,False,,2012,PondCh00,Christian Ponder,4,total_yards_adj,7,False
+JoneMa05,Mac Jones,1257.6788485075447,1764.0,False,,2021,PondCh00,Christian Ponder,4,total_yards_adj,8,False
+ManuEJ00,EJ Manuel,1316.8488393520681,156.33604090463902,False,,2013,PondCh00,Christian Ponder,4,total_yards_adj,9,False
+LosmJ.00,J.P. Losman,1458.544779349694,1376.4137375499422,False,,2004,PondCh00,Christian Ponder,4,total_yards_adj,10,False

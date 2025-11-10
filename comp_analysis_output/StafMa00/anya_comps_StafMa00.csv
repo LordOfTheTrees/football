@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+AlleJo02,Josh Allen,0.5724774901375541,6.418271611701546,True,2021.0,2018,StafMa00,Matthew Stafford,4,Pass_ANY/A_adj,1,False
+LeftBy00,Byron Leftwich,0.7798517267051709,5.5381407957529705,False,,2003,StafMa00,Matthew Stafford,4,Pass_ANY/A_adj,2,False
+FlacJo00,Joe Flacco,0.7994220680813607,5.851190675834313,True,2013.0,2008,StafMa00,Matthew Stafford,4,Pass_ANY/A_adj,3,False
+LawrTr00,Trevor Lawrence,0.8721391330444899,5.99,True,2024.0,2021,StafMa00,Matthew Stafford,4,Pass_ANY/A_adj,4,False
+MurrKy00,Kyler Murray,0.8894751305611763,5.180594297586179,True,2022.0,2019,StafMa00,Matthew Stafford,4,Pass_ANY/A_adj,5,False
+LuckAn00,Andrew Luck,0.9390557022324865,5.1318014970889925,True,2016.0,2012,StafMa00,Matthew Stafford,4,Pass_ANY/A_adj,6,False
+WentCa00,Carson Wentz,0.9586688925274389,6.322837577690994,False,,2016,StafMa00,Matthew Stafford,4,Pass_ANY/A_adj,7,False
+WeedBr00,Brandon Weeden,0.9823992435801272,6.628576933739948,False,,2012,StafMa00,Matthew Stafford,4,Pass_ANY/A_adj,8,False
+TannRy00,Ryan Tannehill,1.0538827778205435,6.0176481840864975,True,2015.0,2012,StafMa00,Matthew Stafford,4,Pass_ANY/A_adj,9,False
+GoffJa00,Jared Goff,1.0571530930916035,6.52484516803256,False,,2016,StafMa00,Matthew Stafford,4,Pass_ANY/A_adj,10,False

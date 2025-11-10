@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+PondCh00,Christian Ponder,630.8022349668624,244.52229956644837,False,,2011,BridTe00,Teddy Bridgewater,4,total_yards_adj,1,False
+BollKy00,Kyle Boller,901.2356689023372,545.1752543489476,False,,2003,BridTe00,Teddy Bridgewater,4,total_yards_adj,2,False
+RamsPa00,Patrick Ramsey,935.1756626526169,297.05470708507414,False,,2002,BridTe00,Teddy Bridgewater,4,total_yards_adj,3,False
+GabbBl00,Blaine Gabbert,971.8445605373682,44.17839866116503,False,,2011,BridTe00,Teddy Bridgewater,4,total_yards_adj,4,False
+LeftBy00,Byron Leftwich,1065.8173762573583,1260.5208193039252,False,,2003,BridTe00,Teddy Bridgewater,4,total_yards_adj,5,False
+WeedBr00,Brandon Weeden,1166.060170148185,1116.810459201861,False,,2012,BridTe00,Teddy Bridgewater,4,total_yards_adj,6,False
+LockJa00,Jake Locker,1283.967353855752,1166.1042437307517,False,,2011,BridTe00,Teddy Bridgewater,4,total_yards_adj,7,False
+FielJu00,Justin Fields,1331.6072994653941,1395.0,False,,2021,BridTe00,Teddy Bridgewater,4,total_yards_adj,8,False
+JoneMa05,Mac Jones,1393.4460408039965,1764.0,False,,2021,BridTe00,Teddy Bridgewater,4,total_yards_adj,9,False
+ManuEJ00,EJ Manuel,1429.0620519923402,156.33604090463902,False,,2013,BridTe00,Teddy Bridgewater,4,total_yards_adj,10,False

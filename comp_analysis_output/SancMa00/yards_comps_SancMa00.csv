@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+MariMa01,Marcus Mariota,239.22610514648972,2931.9230340988997,False,,2015,SancMa00,Mark Sanchez,4,total_yards_adj,1,False
+DarnSa00,Sam Darnold,462.482402815151,2771.175198121366,False,,2018,SancMa00,Mark Sanchez,4,total_yards_adj,2,False
+MayfBa00,Baker Mayfield,483.5571422392111,3169.36152160552,False,,2018,SancMa00,Mark Sanchez,4,total_yards_adj,3,False
+TrubMi00,Mitchell Trubisky,558.0822661408872,2274.2651713440387,False,,2017,SancMa00,Mark Sanchez,4,total_yards_adj,4,False
+HarrJo00,Joey Harrington,629.3048934772326,2213.162906332414,False,,2002,SancMa00,Mark Sanchez,4,total_yards_adj,5,False
+RoetBe00,Ben Roethlisberger,633.9240253888079,3517.501773738741,True,2008.0,2004,SancMa00,Mark Sanchez,4,total_yards_adj,6,False
+FlacJo00,Joe Flacco,657.4121291004938,3830.837075189576,True,2013.0,2008,SancMa00,Mark Sanchez,4,total_yards_adj,7,False
+CarrDa00,David Carr,679.0708118833714,2945.265819183927,False,,2002,SancMa00,Mark Sanchez,4,total_yards_adj,8,False
+MannEl00,Eli Manning,684.8451330247054,3566.734228582613,False,,2004,SancMa00,Mark Sanchez,4,total_yards_adj,9,False
+JackLa00,Lamar Jackson,712.6754220433935,3678.435175680198,True,2023.0,2018,SancMa00,Mark Sanchez,4,total_yards_adj,10,False

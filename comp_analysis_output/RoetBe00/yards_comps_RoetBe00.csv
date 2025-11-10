@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+CarrDa00,David Carr,456.8545531059282,2945.265819183927,False,,2002,RoetBe00,Ben Roethlisberger,4,total_yards_adj,1,False
+JoneDa05,Daniel Jones,622.5444890237912,3933.9867485377777,True,2023.0,2019,RoetBe00,Ben Roethlisberger,4,total_yards_adj,2,False
+SancMa00,Mark Sanchez,633.9240253888079,3007.257398162935,True,2012.0,2009,RoetBe00,Ben Roethlisberger,4,total_yards_adj,3,False
+FlacJo00,Joe Flacco,709.0216175390367,3830.837075189576,True,2013.0,2008,RoetBe00,Ben Roethlisberger,4,total_yards_adj,4,False
+DarnSa00,Sam Darnold,727.2854855619584,2771.175198121366,False,,2018,RoetBe00,Ben Roethlisberger,4,total_yards_adj,5,False
+RyanMa00,Matt Ryan,753.8736553288052,4414.060783499942,True,2013.0,2008,RoetBe00,Ben Roethlisberger,4,total_yards_adj,6,False
+MariMa01,Marcus Mariota,809.3076343746646,2931.9230340988997,False,,2015,RoetBe00,Ben Roethlisberger,4,total_yards_adj,7,False
+MayfBa00,Baker Mayfield,864.8105302351898,3169.36152160552,False,,2018,RoetBe00,Ben Roethlisberger,4,total_yards_adj,8,False
+WentCa00,Carson Wentz,915.1171940363154,4339.88019904702,False,,2016,RoetBe00,Ben Roethlisberger,4,total_yards_adj,9,False
+TagoTu00,Tua Tagovailoa,936.697044273512,4710.564790510043,True,2024.0,2020,RoetBe00,Ben Roethlisberger,4,total_yards_adj,10,False

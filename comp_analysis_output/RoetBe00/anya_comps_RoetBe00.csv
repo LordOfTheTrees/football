@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+MariMa01,Marcus Mariota,0.7290133288084055,5.819401195954696,False,,2015,RoetBe00,Ben Roethlisberger,4,Pass_ANY/A_adj,1,False
+HerbJu00,Justin Herbert,0.8414956718747065,6.172268238118623,True,2023.0,2020,RoetBe00,Ben Roethlisberger,4,Pass_ANY/A_adj,2,False
+NewtCa00,Cam Newton,0.9258767803569089,5.560523099147151,True,2015.0,2011,RoetBe00,Ben Roethlisberger,4,Pass_ANY/A_adj,3,False
+TrubMi00,Mitchell Trubisky,1.0549081512384022,6.0480856319473055,False,,2017,RoetBe00,Ben Roethlisberger,4,Pass_ANY/A_adj,4,False
+JackLa00,Lamar Jackson,1.2116489409760034,5.814672400569739,True,2023.0,2018,RoetBe00,Ben Roethlisberger,4,Pass_ANY/A_adj,5,False
+RyanMa00,Matt Ryan,1.2188669449267895,7.011163564201466,True,2013.0,2008,RoetBe00,Ben Roethlisberger,4,Pass_ANY/A_adj,6,False
+WatsDe00,Deshaun Watson,1.2801340855937278,8.28587731576781,True,2020.0,2017,RoetBe00,Ben Roethlisberger,4,Pass_ANY/A_adj,7,False
+BurrJo01,Joe Burrow,1.3211562997008042,5.561053363889344,True,2023.0,2020,RoetBe00,Ben Roethlisberger,4,Pass_ANY/A_adj,8,False
+WinsJa00,Jameis Winston,1.325725068695338,6.457005153076689,False,,2015,RoetBe00,Ben Roethlisberger,4,Pass_ANY/A_adj,9,False
+LawrTr00,Trevor Lawrence,1.3470427598366463,5.99,True,2024.0,2021,RoetBe00,Ben Roethlisberger,4,Pass_ANY/A_adj,10,False

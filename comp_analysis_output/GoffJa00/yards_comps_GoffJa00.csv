@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+FreeJo00,Josh Freeman,489.205155915234,4343.012745406038,False,,2009,GoffJa00,Jared Goff,4,total_yards_adj,1,False
+CutlJa00,Jay Cutler,547.9389548593599,3999.001900063447,False,,2006,GoffJa00,Jared Goff,4,total_yards_adj,2,False
+AlleJo02,Josh Allen,625.0352019860615,5211.704537754625,True,2021.0,2018,GoffJa00,Jared Goff,4,total_yards_adj,3,False
+WatsDe00,Deshaun Watson,702.2397946185761,5323.8020699862445,True,2020.0,2017,GoffJa00,Jared Goff,4,total_yards_adj,4,False
+TagoTu00,Tua Tagovailoa,737.2707942041571,4710.564790510043,True,2024.0,2020,GoffJa00,Jared Goff,4,total_yards_adj,5,False
+TannRy00,Ryan Tannehill,821.2068858414256,4455.971272540269,True,2015.0,2012,GoffJa00,Jared Goff,4,total_yards_adj,6,False
+JackLa00,Lamar Jackson,907.6032355325428,3678.435175680198,True,2023.0,2018,GoffJa00,Jared Goff,4,total_yards_adj,7,False
+MahoPa00,Patrick Mahomes,909.0920569010143,5102.440259975425,True,2020.0,2017,GoffJa00,Jared Goff,4,total_yards_adj,8,False
+MannEl00,Eli Manning,957.0380103585628,3566.734228582613,False,,2004,GoffJa00,Jared Goff,4,total_yards_adj,9,False
+RyanMa00,Matt Ryan,971.7301523415422,4414.060783499942,True,2013.0,2008,GoffJa00,Jared Goff,4,total_yards_adj,10,False

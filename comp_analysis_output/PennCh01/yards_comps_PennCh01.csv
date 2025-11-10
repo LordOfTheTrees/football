@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+RivePh00,Philip Rivers,758.8178879223968,3336.2844399517244,False,,2004,PennCh01,Chad Pennington,4,total_yards_adj,1,False
+LosmJ.00,J.P. Losman,1041.4211912966432,1376.4137375499422,False,,2004,PennCh01,Chad Pennington,4,total_yards_adj,2,False
+GrosRe00,Rex Grossman,1205.9969904875659,3356.136681396701,False,,2003,PennCh01,Chad Pennington,4,total_yards_adj,3,False
+CarrDa00,David Carr,1564.7376536730123,2945.265819183927,False,,2002,PennCh01,Chad Pennington,4,total_yards_adj,4,False
+LockJa00,Jake Locker,1649.7232818625926,1166.1042437307517,False,,2011,PennCh01,Chad Pennington,4,total_yards_adj,5,False
+BradSa00,Sam Bradford,1661.4847819688002,1769.931567414443,False,,2010,PennCh01,Chad Pennington,4,total_yards_adj,6,False
+HarrJo00,Joey Harrington,1776.1497966919096,2213.162906332414,False,,2002,PennCh01,Chad Pennington,4,total_yards_adj,7,False
+RodgAa00,Aaron Rodgers,1790.2179212232172,4434.243873084627,True,2008.0,2005,PennCh01,Chad Pennington,4,total_yards_adj,8,False
+RoetBe00,Ben Roethlisberger,1820.577120056777,3517.501773738741,True,2008.0,2004,PennCh01,Chad Pennington,4,total_yards_adj,9,False
+LeinMa00,Matt Leinart,1843.7433514076552,446.8798684884654,False,,2006,PennCh01,Chad Pennington,4,total_yards_adj,10,False

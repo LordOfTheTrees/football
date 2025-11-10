@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+WinsJa00,Jameis Winston,0.47729812200703664,6.457005153076689,False,,2015,RyanMa00,Matt Ryan,4,Pass_ANY/A_adj,1,False
+HerbJu00,Justin Herbert,0.7157015556071528,6.172268238118623,True,2023.0,2020,RyanMa00,Matt Ryan,4,Pass_ANY/A_adj,2,False
+WatsDe00,Deshaun Watson,0.8525273882163367,8.28587731576781,True,2020.0,2017,RyanMa00,Matt Ryan,4,Pass_ANY/A_adj,3,False
+MayfBa00,Baker Mayfield,0.9056284022253795,5.442452887038458,False,,2018,RyanMa00,Matt Ryan,4,Pass_ANY/A_adj,4,False
+FlacJo00,Joe Flacco,0.9545543214364265,5.851190675834313,True,2013.0,2008,RyanMa00,Matt Ryan,4,Pass_ANY/A_adj,5,False
+TannRy00,Ryan Tannehill,0.992363138425387,6.0176481840864975,True,2015.0,2012,RyanMa00,Matt Ryan,4,Pass_ANY/A_adj,6,False
+NewtCa00,Cam Newton,0.9978729997094956,5.560523099147151,True,2015.0,2011,RyanMa00,Matt Ryan,4,Pass_ANY/A_adj,7,False
+WeedBr00,Brandon Weeden,1.0225848672424591,6.628576933739948,False,,2012,RyanMa00,Matt Ryan,4,Pass_ANY/A_adj,8,False
+LeftBy00,Byron Leftwich,1.0396732452618278,5.5381407957529705,False,,2003,RyanMa00,Matt Ryan,4,Pass_ANY/A_adj,9,False
+JoneDa05,Daniel Jones,1.085292156294129,5.913507831934611,True,2023.0,2019,RyanMa00,Matt Ryan,4,Pass_ANY/A_adj,10,False

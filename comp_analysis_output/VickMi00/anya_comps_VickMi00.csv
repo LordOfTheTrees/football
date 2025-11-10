@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+GrosRe00,Rex Grossman,0.5109135606561177,5.403317143421906,False,,2003,VickMi00,Michael Vick,4,Pass_ANY/A_adj,1,False
+DarnSa00,Sam Darnold,0.5785757352533827,4.376094280705599,False,,2018,VickMi00,Michael Vick,4,Pass_ANY/A_adj,2,False
+SancMa00,Mark Sanchez,0.630414805799279,4.466534266826589,True,2012.0,2009,VickMi00,Michael Vick,4,Pass_ANY/A_adj,3,False
+MannEl00,Eli Manning,0.6631543251077273,4.988562813503916,False,,2004,VickMi00,Michael Vick,4,Pass_ANY/A_adj,4,False
+TrubMi00,Mitchell Trubisky,0.7014179302230068,6.0480856319473055,False,,2017,VickMi00,Michael Vick,4,Pass_ANY/A_adj,5,False
+ManuEJ00,EJ Manuel,0.74148203446665,3.891885288990952,False,,2013,VickMi00,Michael Vick,4,Pass_ANY/A_adj,6,False
+JoneMa05,Mac Jones,0.7913174026439131,4.97,False,,2021,VickMi00,Michael Vick,4,Pass_ANY/A_adj,7,False
+BortBl00,Blake Bortles,0.8460011345096959,6.297621769383697,True,2018.0,2014,VickMi00,Michael Vick,4,Pass_ANY/A_adj,8,False
+FreeJo00,Josh Freeman,0.8993268108358732,6.453937128671446,False,,2009,VickMi00,Michael Vick,4,Pass_ANY/A_adj,9,False
+FielJu00,Justin Fields,0.9641143585732266,5.86,False,,2021,VickMi00,Michael Vick,4,Pass_ANY/A_adj,10,False

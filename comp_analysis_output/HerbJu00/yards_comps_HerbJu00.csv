@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+NewtCa00,Cam Newton,499.0282333253582,3766.465337019326,True,2015.0,2011,HerbJu00,Justin Herbert,4,total_yards_adj,1,False
+MurrKy00,Kyler Murray,543.8695633124715,2800.9422646118705,True,2022.0,2019,HerbJu00,Justin Herbert,4,total_yards_adj,2,False
+WinsJa00,Jameis Winston,642.3185906927476,3326.2336535894965,False,,2015,HerbJu00,Justin Herbert,4,total_yards_adj,3,False
+BortBl00,Blake Bortles,713.4462169454415,4085.278470432498,True,2018.0,2014,HerbJu00,Justin Herbert,4,total_yards_adj,4,False
+MayfBa00,Baker Mayfield,825.03581104476,3169.36152160552,False,,2018,HerbJu00,Justin Herbert,4,total_yards_adj,5,False
+BurrJo01,Joe Burrow,948.7850590586675,2403.410771147845,True,2023.0,2020,HerbJu00,Justin Herbert,4,total_yards_adj,6,False
+FlacJo00,Joe Flacco,1021.00221832307,3830.837075189576,True,2013.0,2008,HerbJu00,Justin Herbert,4,total_yards_adj,7,False
+TannRy00,Ryan Tannehill,1039.871119364177,4455.971272540269,True,2015.0,2012,HerbJu00,Justin Herbert,4,total_yards_adj,8,False
+MariMa01,Marcus Mariota,1041.2497518655523,2931.9230340988997,False,,2015,HerbJu00,Justin Herbert,4,total_yards_adj,9,False
+JackLa00,Lamar Jackson,1046.6816888613491,3678.435175680198,True,2023.0,2018,HerbJu00,Justin Herbert,4,total_yards_adj,10,False

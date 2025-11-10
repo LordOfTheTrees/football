@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+LockJa00,Jake Locker,779.6988364452376,1166.1042437307517,False,,2011,LosmJ.00,J.P. Losman,4,total_yards_adj,1,False
+PennCh01,Chad Pennington,1041.4211912966432,2310.41719205671,True,2004.0,2000,LosmJ.00,J.P. Losman,4,total_yards_adj,2,False
+BollKy00,Kyle Boller,1095.8420977248763,545.1752543489476,False,,2003,LosmJ.00,J.P. Losman,4,total_yards_adj,3,False
+RamsPa00,Patrick Ramsey,1112.7066601150204,297.05470708507414,False,,2002,LosmJ.00,J.P. Losman,4,total_yards_adj,4,False
+FielJu00,Justin Fields,1197.9257826520293,1395.0,False,,2021,LosmJ.00,J.P. Losman,4,total_yards_adj,5,False
+BradSa00,Sam Bradford,1229.2312528527484,1769.931567414443,False,,2010,LosmJ.00,J.P. Losman,4,total_yards_adj,6,False
+HarrJo00,Joey Harrington,1272.2612675539208,2213.162906332414,False,,2002,LosmJ.00,J.P. Losman,4,total_yards_adj,7,False
+LeftBy00,Byron Leftwich,1334.56785021306,1260.5208193039252,False,,2003,LosmJ.00,J.P. Losman,4,total_yards_adj,8,False
+ManuEJ00,EJ Manuel,1397.0135510427872,156.33604090463902,False,,2013,LosmJ.00,J.P. Losman,4,total_yards_adj,9,False
+WeedBr00,Brandon Weeden,1404.2751657352694,1116.810459201861,False,,2012,LosmJ.00,J.P. Losman,4,total_yards_adj,10,False

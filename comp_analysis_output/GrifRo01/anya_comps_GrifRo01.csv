@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+LockJa00,Jake Locker,0.5507860440848725,4.417810095285718,False,,2011,GrifRo01,Robert Griffin III,4,Pass_ANY/A_adj,1,False
+JoneMa05,Mac Jones,0.9061804552120123,4.97,False,,2021,GrifRo01,Robert Griffin III,4,Pass_ANY/A_adj,2,False
+ManuEJ00,EJ Manuel,1.083800141451273,3.891885288990952,False,,2013,GrifRo01,Robert Griffin III,4,Pass_ANY/A_adj,3,False
+NewtCa00,Cam Newton,1.1556413285601344,5.560523099147151,True,2015.0,2011,GrifRo01,Robert Griffin III,4,Pass_ANY/A_adj,4,False
+DarnSa00,Sam Darnold,1.1759067695604677,4.376094280705599,False,,2018,GrifRo01,Robert Griffin III,4,Pass_ANY/A_adj,5,False
+GrosRe00,Rex Grossman,1.2353966248654147,5.403317143421906,False,,2003,GrifRo01,Robert Griffin III,4,Pass_ANY/A_adj,6,False
+CutlJa00,Jay Cutler,1.3356903257593904,4.947507858105074,False,,2006,GrifRo01,Robert Griffin III,4,Pass_ANY/A_adj,7,False
+MariMa01,Marcus Mariota,1.3544115421723588,5.819401195954696,False,,2015,GrifRo01,Robert Griffin III,4,Pass_ANY/A_adj,8,False
+MayfBa00,Baker Mayfield,1.362950939999111,5.442452887038458,False,,2018,GrifRo01,Robert Griffin III,4,Pass_ANY/A_adj,9,False
+JoneDa05,Daniel Jones,1.3857681131129576,5.913507831934611,True,2023.0,2019,GrifRo01,Robert Griffin III,4,Pass_ANY/A_adj,10,False

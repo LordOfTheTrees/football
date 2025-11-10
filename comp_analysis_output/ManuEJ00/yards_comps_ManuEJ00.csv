@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+LeinMa00,Matt Leinart,300.560391553671,446.8798684884654,False,,2006,ManuEJ00,EJ Manuel,4,total_yards_adj,1,False
+GabbBl00,Blaine Gabbert,470.8442934404614,44.17839866116503,False,,2011,ManuEJ00,EJ Manuel,4,total_yards_adj,2,False
+RamsPa00,Patrick Ramsey,860.8609926664631,297.05470708507414,False,,2002,ManuEJ00,EJ Manuel,4,total_yards_adj,3,False
+WeedBr00,Brandon Weeden,963.5579311617646,1116.810459201861,False,,2012,ManuEJ00,EJ Manuel,4,total_yards_adj,4,False
+BollKy00,Kyle Boller,1187.6934568558468,545.1752543489476,False,,2003,ManuEJ00,EJ Manuel,4,total_yards_adj,5,False
+LockJa00,Jake Locker,1268.133684787815,1166.1042437307517,False,,2011,ManuEJ00,EJ Manuel,4,total_yards_adj,6,False
+PondCh00,Christian Ponder,1316.8488393520681,244.52229956644837,False,,2011,ManuEJ00,EJ Manuel,4,total_yards_adj,7,False
+LosmJ.00,J.P. Losman,1397.0135510427872,1376.4137375499422,False,,2004,ManuEJ00,EJ Manuel,4,total_yards_adj,8,False
+LeftBy00,Byron Leftwich,1588.8829946407743,1260.5208193039252,False,,2003,ManuEJ00,EJ Manuel,4,total_yards_adj,9,False
+BradSa00,Sam Bradford,1733.234743728352,1769.931567414443,False,,2010,ManuEJ00,EJ Manuel,4,total_yards_adj,10,False
