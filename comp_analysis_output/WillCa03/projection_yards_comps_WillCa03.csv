@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_1_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+LawrTr00,Trevor Lawrence,53.688274761934785,4427.6201483670775,True,2024.0,2021,WillCa03,Caleb Williams,2,total_yards_adj,1,True
+WinsJa00,Jameis Winston,256.75578759420307,4347.776823851235,False,,2015,WillCa03,Caleb Williams,2,total_yards_adj,2,True
+MurrKy00,Kyler Murray,318.5659979723328,4841.657853661309,True,2022.0,2019,WillCa03,Caleb Williams,2,total_yards_adj,3,True
+TannRy00,Ryan Tannehill,329.6410996301085,4276.47609798449,True,2015.0,2012,WillCa03,Caleb Williams,2,total_yards_adj,4,True
+MayfBa00,Baker Mayfield,347.2869422346515,4021.635831344833,False,,2018,WillCa03,Caleb Williams,2,total_yards_adj,5,True
+StroCJ00,C.J. Stroud,422.7044644996444,3960.0,False,,2023,WillCa03,Caleb Williams,2,total_yards_adj,6,True
+GrifRo01,Robert Griffin III,499.41918693422355,3803.601482476207,False,,2012,WillCa03,Caleb Williams,2,total_yards_adj,7,True
+BortBl00,Blake Bortles,500.01390683170416,4854.539408897631,True,2018.0,2014,WillCa03,Caleb Williams,2,total_yards_adj,8,True
+LuckAn00,Andrew Luck,545.850188068073,4325.927038168362,True,2016.0,2012,WillCa03,Caleb Williams,2,total_yards_adj,9,True
+WentCa00,Carson Wentz,591.6281420927629,3663.401372213728,False,,2016,WillCa03,Caleb Williams,2,total_yards_adj,10,True

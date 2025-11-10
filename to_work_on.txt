@@ -1,9 +1,11 @@
 to reformat:
 //////////////////////////////////////////
 
-fix my comp tool when there are insufficient years
+fix my comp tool to rule out people who havent had the opportunity to be paid yet
 
-    create a loop to run the comp tool for all qbs
+formalize decision logic around payment timing...
+
+look into carson wentz
 
 organize, group, and sanitize the workflow of my code to be more comprehensible to others
 
@@ -15,8 +17,6 @@ to investigate:
 //////////////////////////////////////////later//////////////////////////////////
 
 What is the probability for payment of the unsigned QBs in their last year at the team (year0-6)
-
-Who are the most similar profiles from the data set of all QBs?
 
 Add in all the other rounds of QBs
 
