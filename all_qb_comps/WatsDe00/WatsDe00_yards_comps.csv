@@ -1,6 +1,0 @@
-player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
-FreeJo00,Josh Freeman,668.0928592082379,4343.012745406038,False,,2009
-GoffJa00,Jared Goff,734.5881239877449,4741.232968505829,False,,2016
-AlleJo02,Josh Allen,768.2536256276564,5211.704537754625,True,2021.0,2018
-JackLa00,Lamar Jackson,886.6794523366015,3678.435175680198,True,2023.0,2018
-MahoPa00,Patrick Mahomes,921.8979974846293,5102.440259975425,True,2020.0,2017

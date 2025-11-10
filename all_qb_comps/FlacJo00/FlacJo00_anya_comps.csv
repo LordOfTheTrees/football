@@ -1,6 +1,0 @@
-player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year
-LeftBy00,Byron Leftwich,0.23293137830567667,5.5381407957529705,False,,2003
-MurrKy00,Kyler Murray,0.40097408601140283,5.180594297586179,True,2022.0,2019
-CutlJa00,Jay Cutler,0.5572160199915965,4.947507858105074,False,,2006
-LawrTr00,Trevor Lawrence,0.5709310386328661,5.99,True,2024.0,2021
-LuckAn00,Andrew Luck,0.5858080182583528,5.1318014970889925,True,2016.0,2012

@@ -1,6 +1,0 @@
-player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year
-DarnSa00,Sam Darnold,0.4956303784053307,4.376094280705599,False,,2018
-SancMa00,Mark Sanchez,0.49911248645968503,4.466534266826589,True,2012.0,2009
-VickMi00,Michael Vick,0.7382567482027537,5.071610570788556,True,2004.0,2001
-GrosRe00,Rex Grossman,0.7990718199473719,5.403317143421906,False,,2003
-JoneMa05,Mac Jones,0.8804644559506726,4.97,False,,2021

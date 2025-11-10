@@ -1,6 +1,0 @@
-player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year
-MurrKy00,Kyler Murray,0.304007977255468,5.180594297586179,True,2022.0,2019
-CutlJa00,Jay Cutler,0.37140866282753526,4.947507858105074,False,,2006
-LeftBy00,Byron Leftwich,0.4723686201431484,5.5381407957529705,False,,2003
-FlacJo00,Joe Flacco,0.5858080182583528,5.851190675834313,True,2013.0,2008
-MayfBa00,Baker Mayfield,0.7249690998586336,5.442452887038458,False,,2018

@@ -1,6 +1,0 @@
-player_id,player_name,similarity_score,year_1_total_yards_adj,got_paid,payment_year,draft_year
-GrifRo01,Robert Griffin III,147.8004793326015,3803.601482476207,False,,2012
-MayfBa00,Baker Mayfield,263.6429703153705,4021.635831344833,False,,2018
-WinsJa00,Jameis Winston,279.0455771444004,4347.776823851235,False,,2015
-WentCa00,Carson Wentz,282.99303648111396,3663.4013722137274,False,,2016
-LawrTr00,Trevor Lawrence,385.1723023614213,4427.6201483670775,True,2024.0,2021

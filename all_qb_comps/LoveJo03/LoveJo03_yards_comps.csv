@@ -1,6 +1,0 @@
-player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
-RivePh00,Philip Rivers,459.8116026930069,3336.2844399517244,False,,2004
-PennCh01,Chad Pennington,805.9924125053636,2310.41719205671,True,2004.0,2000
-LosmJ.00,J.P. Losman,1376.7671287589192,1376.4137375499422,False,,2004
-StafMa00,Matthew Stafford,1436.0745381059933,5261.409113309456,False,,2009
-TagoTu00,Tua Tagovailoa,1673.5717021905239,4710.564790510043,True,2024.0,2020

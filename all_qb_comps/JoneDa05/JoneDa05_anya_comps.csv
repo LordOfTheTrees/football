@@ -1,6 +1,0 @@
-player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year
-TannRy00,Ryan Tannehill,0.1779037985633288,6.0176481840864975,True,2015.0,2012
-BradSa00,Sam Bradford,0.37606050083187154,6.236351742567642,False,,2010
-WeedBr00,Brandon Weeden,0.5759244224377313,6.628576933739948,False,,2012
-GrosRe00,Rex Grossman,0.6145366092404704,5.403317143421906,False,,2003
-FielJu00,Justin Fields,0.6304448950054156,5.86,False,,2021

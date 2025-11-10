@@ -1,6 +1,0 @@
-player_id,player_name,similarity_score,year_1_Pass_ANY/A_adj,got_paid,payment_year,draft_year
-GrifRo01,Robert Griffin III,0.16509075497038134,5.602493040864046,False,,2012
-RyanMa00,Matt Ryan,0.2916546594379974,5.772092501122587,True,2013.0,2008
-MayfBa00,Baker Mayfield,0.45292781377109403,5.343100764534403,False,,2018
-TeboTi00,Tim Tebow,0.508676366364646,4.97864469785902,False,,2010
-LockJa00,Jake Locker,0.7051436205057003,5.224615770829265,False,,2011

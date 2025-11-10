@@ -1,6 +1,0 @@
-player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year
-JoneDa05,Daniel Jones,0.1779037985633288,5.913507831934611,True,2023.0,2019
-BradSa00,Sam Bradford,0.37815670036436144,6.236351742567642,False,,2010
-WeedBr00,Brandon Weeden,0.4769823387579609,6.628576933739948,False,,2012
-LeftBy00,Byron Leftwich,0.6155575782454175,5.5381407957529705,False,,2003
-FielJu00,Justin Fields,0.6804848462408161,5.86,False,,2021

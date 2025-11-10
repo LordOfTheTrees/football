@@ -1,6 +1,0 @@
-player_id,player_name,similarity_score,year_1_Pass_ANY/A_adj,got_paid,payment_year,draft_year
-WilsZa00,Zach Wilson,0.16246100178209077,4.989835980426998,False,,2021
-GabbBl00,Blaine Gabbert,0.2113369266079349,4.825086329530557,False,,2011
-CarrDa00,David Carr,0.21156020154761673,5.113436949480025,False,,2002
-SancMa00,Mark Sanchez,0.46774795355590837,5.533994118470803,True,2012.0,2009
-PondCh00,Christian Ponder,0.47758244037592223,5.111927979693733,False,,2011

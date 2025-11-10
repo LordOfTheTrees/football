@@ -1,6 +1,0 @@
-player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
-JackLa00,Lamar Jackson,413.0871954049086,3678.435175680198,True,2023.0,2018
-TagoTu00,Tua Tagovailoa,635.040676659652,4710.564790510043,True,2024.0,2020
-FlacJo00,Joe Flacco,654.9159511774922,3830.837075189576,True,2013.0,2008
-WatsDe00,Deshaun Watson,668.0928592082379,5323.8020699862445,True,2020.0,2017
-MannEl00,Eli Manning,675.1074029806116,3566.734228582613,False,,2004

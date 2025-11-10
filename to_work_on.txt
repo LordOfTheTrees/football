@@ -5,7 +5,7 @@ fix my comp tool to rule out people who havent had the opportunity to be paid ye
 
 formalize decision logic around payment timing...
 
-look into carson wentz
+look into carson wentz & jared goff (traded before in effect?)
 
 organize, group, and sanitize the workflow of my code to be more comprehensible to others
 

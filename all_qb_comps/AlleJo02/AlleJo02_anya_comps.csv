@@ -1,6 +1,0 @@
-player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year
-StafMa00,Matthew Stafford,0.5479829694950079,5.951964240885889,False,,2009
-TagoTu00,Tua Tagovailoa,0.7870489784674882,7.4948971462869,True,2024.0,2020
-LeftBy00,Byron Leftwich,0.9189313025466296,5.5381407957529705,False,,2003
-FlacJo00,Joe Flacco,0.9237425354239531,5.851190675834313,True,2013.0,2008
-LuckAn00,Andrew Luck,0.99215901064038,5.1318014970889925,True,2016.0,2012

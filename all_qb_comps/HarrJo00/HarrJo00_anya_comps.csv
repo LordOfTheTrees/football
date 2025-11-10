@@ -1,6 +1,0 @@
-player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year
-FielJu00,Justin Fields,0.6795781167492845,5.86,False,,2021
-SancMa00,Mark Sanchez,0.7631567912769545,4.466534266826589,True,2012.0,2009
-CarrDa00,David Carr,0.8120026114875208,3.917962365591397,False,,2002
-BradSa00,Sam Bradford,0.938074621861859,6.236351742567642,False,,2010
-ManuEJ00,EJ Manuel,1.0017026407554244,3.891885288990952,False,,2013

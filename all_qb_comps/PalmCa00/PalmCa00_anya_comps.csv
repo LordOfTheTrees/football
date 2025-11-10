@@ -1,6 +1,0 @@
-player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year
-WentCa00,Carson Wentz,0.038397781471170324,6.322837577690994,False,,2016
-BurrJo01,Joe Burrow,0.513719271689786,5.561053363889344,True,2023.0,2020
-JackLa00,Lamar Jackson,0.6534931203707579,5.814672400569739,True,2023.0,2018
-FlacJo00,Joe Flacco,0.7232619380662869,5.851190675834313,True,2013.0,2008
-LawrTr00,Trevor Lawrence,0.763232166881518,5.99,True,2024.0,2021

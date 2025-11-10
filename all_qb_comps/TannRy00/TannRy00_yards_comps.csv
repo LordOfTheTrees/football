@@ -1,6 +1,0 @@
-player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
-BortBl00,Blake Bortles,362.8657565343273,4085.278470432498,True,2018.0,2014
-FlacJo00,Joe Flacco,523.7675212397397,3830.837075189576,True,2013.0,2008
-RyanMa00,Matt Ryan,646.0185163716108,4414.060783499942,True,2013.0,2008
-AlleJo02,Josh Allen,710.9514387417078,5211.704537754625,True,2021.0,2018
-WentCa00,Carson Wentz,729.1305046170955,4339.88019904702,False,,2016

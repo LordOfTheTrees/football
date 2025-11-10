@@ -1,6 +1,0 @@
-player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
-TannRy00,Ryan Tannehill,296.381477887956,4455.971272540269,True,2015.0,2012
-FlacJo00,Joe Flacco,367.89655943250307,3830.837075189576,True,2013.0,2008
-BortBl00,Blake Bortles,435.55988242501127,4085.278470432498,True,2018.0,2014
-FreeJo00,Josh Freeman,531.6240528794947,4343.012745406038,False,,2009
-RyanMa00,Matt Ryan,599.6608073557562,4414.060783499942,True,2013.0,2008

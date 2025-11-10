@@ -1,6 +1,0 @@
-player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year
-AlleJo02,Josh Allen,0.7870489784674882,6.418271611701546,True,2021.0,2018
-WinsJa00,Jameis Winston,1.1136037649947472,6.457005153076689,False,,2015
-FlacJo00,Joe Flacco,1.2517489011527971,5.851190675834313,True,2013.0,2008
-WeedBr00,Brandon Weeden,1.258336948284007,6.628576933739948,False,,2012
-WentCa00,Carson Wentz,1.259843955795373,6.322837577690994,False,,2016

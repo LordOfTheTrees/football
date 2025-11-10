@@ -1,6 +1,0 @@
-player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
-RodgAa00,Aaron Rodgers,654.0263456028086,4434.243873084627,True,2008.0,2005
-LockJa00,Jake Locker,1554.238692453811,1166.1042437307517,False,,2011
-PennCh01,Chad Pennington,1670.0261781657398,2310.41719205671,True,2004.0,2000
-VickMi00,Michael Vick,1690.193187386947,3396.1767878016503,True,2004.0,2001
-RivePh00,Philip Rivers,1706.8437268948546,3336.2844399517244,False,,2004

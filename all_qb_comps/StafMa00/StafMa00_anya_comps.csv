@@ -1,6 +1,0 @@
-player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year
-AlleJo02,Josh Allen,0.5479829694950079,6.418271611701546,True,2021.0,2018
-LawrTr00,Trevor Lawrence,0.8146658361226612,5.99,True,2024.0,2021
-LeftBy00,Byron Leftwich,0.9173101266449627,5.5381407957529705,False,,2003
-FlacJo00,Joe Flacco,0.9293189938954077,5.851190675834313,True,2013.0,2008
-BortBl00,Blake Bortles,0.9553342926769789,6.297621769383697,True,2018.0,2014

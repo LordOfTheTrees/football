@@ -1,6 +1,0 @@
-player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year
-MariMa01,Marcus Mariota,301.03598143776225,2931.9230340988997,False,,2015
-TrubMi00,Mitchell Trubisky,419.863422293771,2274.2651713440387,False,,2017
-HarrJo00,Joey Harrington,478.7404680674048,2213.162906332414,False,,2002
-FlacJo00,Joe Flacco,545.231828665941,3830.837075189576,True,2013.0,2008
-RoetBe00,Ben Roethlisberger,553.7927730040626,3517.501773738741,True,2008.0,2004

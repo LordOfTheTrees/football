@@ -1,6 +1,0 @@
-player_id,player_name,similarity_score,year_0_Pass_ANY/A_adj,got_paid,payment_year,draft_year
-MayeDr00,Drake Maye,0.009999999999999787,5.1,False,,2024
-WeedBr00,Brandon Weeden,0.011683635045049101,5.101683635045049,False,,2012
-TrubMi00,Mitchell Trubisky,0.031254417936823486,5.121254417936823,False,,2017
-WentCa00,Carson Wentz,0.08224441800625204,5.172244418006252,False,,2016
-ManuEJ00,EJ Manuel,0.11114213339271739,4.9788578666072825,False,,2013

@@ -1,6 +1,0 @@
-player_id,player_name,similarity_score,year_1_total_yards_adj,got_paid,payment_year,draft_year
-RoetBe00,Ben Roethlisberger,160.96188671671916,2585.007982931816,True,2008.0,2004
-CarrDa00,David Carr,261.31019002630813,2292.4084381525545,False,,2002
-DarnSa00,Sam Darnold,341.89971646400795,3127.71375391385,False,,2018
-YounVi00,Vince Young,350.4244628305255,3080.6946743792846,False,,2006
-LeftBy00,Byron Leftwich,432.91714722647225,3263.0762356203104,False,,2003
