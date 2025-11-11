@@ -1,11 +1,11 @@
 player_id,player_name,similarity_score,year_0_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
-WinsJa00,Jameis Winston,0.057301912947046674,6.557301912947047,False,,2015,DaniJa02,Jayden Daniels,4,Pass_ANY/A_adj,1,False
-NewtCa00,Cam Newton,0.09448599698138427,6.405514003018616,True,2015.0,2011,DaniJa02,Jayden Daniels,4,Pass_ANY/A_adj,2,False
-PeniMi00,Michael Penix,0.20999999999999996,6.29,False,,2024,DaniJa02,Jayden Daniels,4,Pass_ANY/A_adj,3,False
-JoneMa05,Mac Jones,0.2426881779336023,6.257311822066398,False,,2021,DaniJa02,Jayden Daniels,4,Pass_ANY/A_adj,4,False
-MariMa01,Marcus Mariota,0.28889104518991005,6.21110895481009,False,,2015,DaniJa02,Jayden Daniels,4,Pass_ANY/A_adj,5,False
-RichAn03,Anthony Richardson,0.29767201396845966,6.20232798603154,False,,2023,DaniJa02,Jayden Daniels,4,Pass_ANY/A_adj,6,False
-MayfBa00,Baker Mayfield,0.3517123646283977,6.851712364628398,False,,2018,DaniJa02,Jayden Daniels,4,Pass_ANY/A_adj,7,False
-MahoPa00,Patrick Mahomes,0.36463579633311394,6.135364203666886,True,2020.0,2017,DaniJa02,Jayden Daniels,4,Pass_ANY/A_adj,8,False
-NixxBo00,Bo Nix,0.3799999999999999,6.12,False,,2024,DaniJa02,Jayden Daniels,4,Pass_ANY/A_adj,9,False
-HerbJu00,Justin Herbert,0.39481762041992763,6.894817620419928,True,2023.0,2020,DaniJa02,Jayden Daniels,4,Pass_ANY/A_adj,10,False
+WinsJa00,Jameis Winston,0.057301912947046674,6.557301912947047,FALSE,,2015,DaniJa02,Jayden Daniels,4,Pass_ANY/A_adj,1,FALSE
+NewtCa00,Cam Newton,0.094485997,6.405514003018616,TRUE,2015,2011,DaniJa02,Jayden Daniels,4,Pass_ANY/A_adj,2,FALSE
+PeniMi00,Michael Penix,0.20999999999999996,6.29,FALSE,,2024,DaniJa02,Jayden Daniels,4,Pass_ANY/A_adj,3,FALSE
+JoneMa05,Mac Jones,0.2426881779336023,6.257311822066398,FALSE,,2021,DaniJa02,Jayden Daniels,4,Pass_ANY/A_adj,4,FALSE
+MariMa01,Marcus Mariota,0.28889104518991005,6.211108955,FALSE,,2015,DaniJa02,Jayden Daniels,4,Pass_ANY/A_adj,5,FALSE
+RichAn03,Anthony Richardson,0.29767201396845966,6.202327986,FALSE,,2023,DaniJa02,Jayden Daniels,4,Pass_ANY/A_adj,6,FALSE
+MayfBa00,Baker Mayfield,0.3517123646283977,6.851712364628398,FALSE,,2018,DaniJa02,Jayden Daniels,4,Pass_ANY/A_adj,7,FALSE
+MahoPa00,Patrick Mahomes,0.36463579633311394,6.135364203666886,TRUE,2020,2017,DaniJa02,Jayden Daniels,4,Pass_ANY/A_adj,8,FALSE
+NixxBo00,Bo Nix,0.3799999999999999,6.12,FALSE,,2024,DaniJa02,Jayden Daniels,4,Pass_ANY/A_adj,9,FALSE
+HerbJu00,Justin Herbert,0.39481762041992763,6.894817620419928,TRUE,2023,2020,DaniJa02,Jayden Daniels,4,Pass_ANY/A_adj,10,FALSE
