@@ -1,11 +1,11 @@
 player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
 BollKy00,Kyle Boller,353.82801167062473,545.1752543489476,False,,2003,RamsPa00,Patrick Ramsey,4,total_yards_adj,1,False
-PondCh00,Christian Ponder,524.3626393489282,244.52229956644837,False,,2011,RamsPa00,Patrick Ramsey,4,total_yards_adj,2,False
-GabbBl00,Blaine Gabbert,556.2251287929514,44.17839866116503,False,,2011,RamsPa00,Patrick Ramsey,4,total_yards_adj,3,False
-LockJa00,Jake Locker,724.4314729166664,1166.1042437307517,False,,2011,RamsPa00,Patrick Ramsey,4,total_yards_adj,4,False
-ManuEJ00,EJ Manuel,860.8609926664631,156.33604090463902,False,,2013,RamsPa00,Patrick Ramsey,4,total_yards_adj,5,False
-LeftBy00,Byron Leftwich,979.8006151700349,1260.5208193039252,False,,2003,RamsPa00,Patrick Ramsey,4,total_yards_adj,6,False
-WeedBr00,Brandon Weeden,990.7572742480115,1116.810459201861,False,,2012,RamsPa00,Patrick Ramsey,4,total_yards_adj,7,False
-LeinMa00,Matt Leinart,1032.3933201725345,446.8798684884654,False,,2006,RamsPa00,Patrick Ramsey,4,total_yards_adj,8,False
-FielJu00,Justin Fields,1082.3302981334812,1395.0,False,,2021,RamsPa00,Patrick Ramsey,4,total_yards_adj,9,False
-LosmJ.00,J.P. Losman,1112.7066601150204,1376.4137375499422,False,,2004,RamsPa00,Patrick Ramsey,4,total_yards_adj,10,False
+GabbBl00,Blaine Gabbert,556.2251287929514,44.17839866116503,False,,2011,RamsPa00,Patrick Ramsey,4,total_yards_adj,2,False
+ManuEJ00,EJ Manuel,860.8609926664631,156.33604090463902,False,,2013,RamsPa00,Patrick Ramsey,4,total_yards_adj,3,False
+LeftBy00,Byron Leftwich,979.8006151700349,1260.5208193039252,False,,2003,RamsPa00,Patrick Ramsey,4,total_yards_adj,4,False
+WeedBr00,Brandon Weeden,990.7572742480115,1116.810459201861,False,,2012,RamsPa00,Patrick Ramsey,4,total_yards_adj,5,False
+LeinMa00,Matt Leinart,1032.3933201725345,446.8798684884654,False,,2006,RamsPa00,Patrick Ramsey,4,total_yards_adj,6,False
+LosmJ.00,J.P. Losman,1112.7066601150204,1376.4137375499422,False,,2004,RamsPa00,Patrick Ramsey,4,total_yards_adj,7,False
+BradSa00,Sam Bradford,1398.5480082926072,1769.931567414443,False,,2010,RamsPa00,Patrick Ramsey,4,total_yards_adj,8,False
+HarrJo00,Joey Harrington,1560.2125780014537,2213.162906332414,False,,2002,RamsPa00,Patrick Ramsey,4,total_yards_adj,9,False
+YounVi00,Vince Young,1595.9174153100314,2250.024512669196,False,,2006,RamsPa00,Patrick Ramsey,4,total_yards_adj,10,False

@@ -1,11 +1,11 @@
 player_id,player_name,similarity_score,year_0_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
-JoneMa05,Mac Jones,0.03268817793360235,6.257311822066398,False,,2021,PeniMi00,Michael Penix,4,Pass_ANY/A_adj,1,False
-MariMa01,Marcus Mariota,0.07889104518991008,6.21110895481009,False,,2015,PeniMi00,Michael Penix,4,Pass_ANY/A_adj,2,False
-RichAn03,Anthony Richardson,0.0876720139684597,6.20232798603154,False,,2023,PeniMi00,Michael Penix,4,Pass_ANY/A_adj,3,False
-NewtCa00,Cam Newton,0.1155140030186157,6.405514003018616,True,2015.0,2011,PeniMi00,Michael Penix,4,Pass_ANY/A_adj,4,False
-MahoPa00,Patrick Mahomes,0.15463579633311397,6.135364203666886,True,2020.0,2017,PeniMi00,Michael Penix,4,Pass_ANY/A_adj,5,False
-NixxBo00,Bo Nix,0.16999999999999993,6.12,False,,2024,PeniMi00,Michael Penix,4,Pass_ANY/A_adj,6,False
-DaniJa02,Jayden Daniels,0.20999999999999996,6.5,False,,2024,PeniMi00,Michael Penix,4,Pass_ANY/A_adj,7,False
-JackLa00,Lamar Jackson,0.22770205847502112,6.062297941524979,True,2023.0,2018,PeniMi00,Michael Penix,4,Pass_ANY/A_adj,8,False
-CutlJa00,Jay Cutler,0.26441984581933387,6.025580154180666,False,,2006,PeniMi00,Michael Penix,4,Pass_ANY/A_adj,9,False
-WinsJa00,Jameis Winston,0.26730191294704664,6.557301912947047,False,,2015,PeniMi00,Michael Penix,4,Pass_ANY/A_adj,10,False
+MariMa01,Marcus Mariota,0.07889104518991008,6.21110895481009,False,,2015,PeniMi00,Michael Penix,4,Pass_ANY/A_adj,1,False
+NewtCa00,Cam Newton,0.1155140030186157,6.405514003018616,True,2015.0,2011,PeniMi00,Michael Penix,4,Pass_ANY/A_adj,2,False
+MahoPa00,Patrick Mahomes,0.15463579633311397,6.135364203666886,True,2020.0,2017,PeniMi00,Michael Penix,4,Pass_ANY/A_adj,3,False
+JackLa00,Lamar Jackson,0.22770205847502112,6.062297941524979,True,2023.0,2018,PeniMi00,Michael Penix,4,Pass_ANY/A_adj,4,False
+CutlJa00,Jay Cutler,0.26441984581933387,6.025580154180666,False,,2006,PeniMi00,Michael Penix,4,Pass_ANY/A_adj,5,False
+WinsJa00,Jameis Winston,0.26730191294704664,6.557301912947047,False,,2015,PeniMi00,Michael Penix,4,Pass_ANY/A_adj,6,False
+QuinBr00,Brady Quinn,0.4631102406582892,5.826889759341711,False,,2007,PeniMi00,Michael Penix,4,Pass_ANY/A_adj,7,False
+LuckAn00,Andrew Luck,0.49170092884438255,5.7982990711556175,True,2016.0,2012,PeniMi00,Michael Penix,4,Pass_ANY/A_adj,8,False
+BurrJo01,Joe Burrow,0.5241583642102361,5.765841635789764,True,2023.0,2020,PeniMi00,Michael Penix,4,Pass_ANY/A_adj,9,False
+MayfBa00,Baker Mayfield,0.5617123646283977,6.851712364628398,False,,2018,PeniMi00,Michael Penix,4,Pass_ANY/A_adj,10,False

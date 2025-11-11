@@ -1,11 +1,11 @@
 player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
 MayfBa00,Baker Mayfield,1.113113583084014,5.442452887038458,False,,2018,LockJa00,Jake Locker,4,Pass_ANY/A_adj,1,False
-JoneMa05,Mac Jones,1.2255890212449074,4.97,False,,2021,LockJa00,Jake Locker,4,Pass_ANY/A_adj,2,False
-NewtCa00,Cam Newton,1.2331315208778462,5.560523099147151,True,2015.0,2011,LockJa00,Jake Locker,4,Pass_ANY/A_adj,3,False
-CutlJa00,Jay Cutler,1.327245260187758,4.947507858105074,False,,2006,LockJa00,Jake Locker,4,Pass_ANY/A_adj,4,False
-HerbJu00,Justin Herbert,1.3708475663616904,6.172268238118623,True,2023.0,2020,LockJa00,Jake Locker,4,Pass_ANY/A_adj,5,False
-JoneDa05,Daniel Jones,1.4304615153402906,5.913507831934611,True,2023.0,2019,LockJa00,Jake Locker,4,Pass_ANY/A_adj,6,False
-RyanMa00,Matt Ryan,1.456998060863058,7.011163564201466,True,2013.0,2008,LockJa00,Jake Locker,4,Pass_ANY/A_adj,7,False
-WinsJa00,Jameis Winston,1.4640108643383345,6.457005153076689,False,,2015,LockJa00,Jake Locker,4,Pass_ANY/A_adj,8,False
-LeftBy00,Byron Leftwich,1.4654575372418646,5.5381407957529705,False,,2003,LockJa00,Jake Locker,4,Pass_ANY/A_adj,9,False
-MariMa01,Marcus Mariota,1.4724077755645315,5.819401195954696,False,,2015,LockJa00,Jake Locker,4,Pass_ANY/A_adj,10,False
+NewtCa00,Cam Newton,1.2331315208778462,5.560523099147151,True,2015.0,2011,LockJa00,Jake Locker,4,Pass_ANY/A_adj,2,False
+CutlJa00,Jay Cutler,1.327245260187758,4.947507858105074,False,,2006,LockJa00,Jake Locker,4,Pass_ANY/A_adj,3,False
+HerbJu00,Justin Herbert,1.3708475663616904,6.172268238118623,True,2023.0,2020,LockJa00,Jake Locker,4,Pass_ANY/A_adj,4,False
+JoneDa05,Daniel Jones,1.4304615153402906,5.913507831934611,True,2023.0,2019,LockJa00,Jake Locker,4,Pass_ANY/A_adj,5,False
+RyanMa00,Matt Ryan,1.456998060863058,7.011163564201466,True,2013.0,2008,LockJa00,Jake Locker,4,Pass_ANY/A_adj,6,False
+WinsJa00,Jameis Winston,1.4640108643383345,6.457005153076689,False,,2015,LockJa00,Jake Locker,4,Pass_ANY/A_adj,7,False
+LeftBy00,Byron Leftwich,1.4654575372418646,5.5381407957529705,False,,2003,LockJa00,Jake Locker,4,Pass_ANY/A_adj,8,False
+MariMa01,Marcus Mariota,1.4724077755645315,5.819401195954696,False,,2015,LockJa00,Jake Locker,4,Pass_ANY/A_adj,9,False
+TannRy00,Ryan Tannehill,1.4793194737684505,6.0176481840864975,True,2015.0,2012,LockJa00,Jake Locker,4,Pass_ANY/A_adj,10,False

@@ -1,11 +1,11 @@
 player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
 JoneDa05,Daniel Jones,0.3301475332265014,5.913507831934611,True,2023.0,2019,BradSa00,Sam Bradford,4,Pass_ANY/A_adj,1,False
 TannRy00,Ryan Tannehill,0.33757319207635245,6.0176481840864975,True,2015.0,2012,BradSa00,Sam Bradford,4,Pass_ANY/A_adj,2,False
-FielJu00,Justin Fields,0.4250858133735984,5.86,False,,2021,BradSa00,Sam Bradford,4,Pass_ANY/A_adj,3,False
-WeedBr00,Brandon Weeden,0.45213446745984665,6.628576933739948,False,,2012,BradSa00,Sam Bradford,4,Pass_ANY/A_adj,4,False
-BortBl00,Blake Bortles,0.870889036743515,6.297621769383697,True,2018.0,2014,BradSa00,Sam Bradford,4,Pass_ANY/A_adj,5,False
-GrosRe00,Rex Grossman,0.9174441130477232,5.403317143421906,False,,2003,BradSa00,Sam Bradford,4,Pass_ANY/A_adj,6,False
-HarrJo00,Joey Harrington,0.9204739723043528,4.655827956989247,False,,2002,BradSa00,Sam Bradford,4,Pass_ANY/A_adj,7,False
-LeftBy00,Byron Leftwich,0.9342736450455417,5.5381407957529705,False,,2003,BradSa00,Sam Bradford,4,Pass_ANY/A_adj,8,False
-FlacJo00,Joe Flacco,0.9652856241422878,5.851190675834313,True,2013.0,2008,BradSa00,Sam Bradford,4,Pass_ANY/A_adj,9,False
-LawrTr00,Trevor Lawrence,0.9677587827797455,5.99,True,2024.0,2021,BradSa00,Sam Bradford,4,Pass_ANY/A_adj,10,False
+WeedBr00,Brandon Weeden,0.45213446745984665,6.628576933739948,False,,2012,BradSa00,Sam Bradford,4,Pass_ANY/A_adj,3,False
+BortBl00,Blake Bortles,0.870889036743515,6.297621769383697,True,2018.0,2014,BradSa00,Sam Bradford,4,Pass_ANY/A_adj,4,False
+GrosRe00,Rex Grossman,0.9174441130477232,5.403317143421906,False,,2003,BradSa00,Sam Bradford,4,Pass_ANY/A_adj,5,False
+HarrJo00,Joey Harrington,0.9204739723043528,4.655827956989247,False,,2002,BradSa00,Sam Bradford,4,Pass_ANY/A_adj,6,False
+LeftBy00,Byron Leftwich,0.9342736450455417,5.5381407957529705,False,,2003,BradSa00,Sam Bradford,4,Pass_ANY/A_adj,7,False
+FlacJo00,Joe Flacco,0.9652856241422878,5.851190675834313,True,2013.0,2008,BradSa00,Sam Bradford,4,Pass_ANY/A_adj,8,False
+TrubMi00,Mitchell Trubisky,1.0370561967957208,6.0480856319473055,False,,2017,BradSa00,Sam Bradford,4,Pass_ANY/A_adj,9,False
+SancMa00,Mark Sanchez,1.080832147551168,4.466534266826589,True,2012.0,2009,BradSa00,Sam Bradford,4,Pass_ANY/A_adj,10,False

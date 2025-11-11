@@ -1,11 +1,11 @@
 player_id,player_name,similarity_score,year_2_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
 GabbBl00,Blaine Gabbert,5.699779794349951,1.2370468210666965,False,,2011,RoseJo01,Josh Rosen,4,Pass_ANY/A_adj,1,False
-RussJa00,JaMarcus Russell,6.587260615586705,2.3809881567130677,False,,2007,RoseJo01,Josh Rosen,4,Pass_ANY/A_adj,2,False
-TeboTi00,Tim Tebow,7.306692138583501,3.2781902875791475,False,,2010,RoseJo01,Josh Rosen,4,Pass_ANY/A_adj,3,False
-YounVi00,Vince Young,7.3482609721744,3.604635394696138,False,,2006,RoseJo01,Josh Rosen,4,Pass_ANY/A_adj,4,False
-QuinBr00,Brady Quinn,7.782034541144997,4.05077205882353,False,,2007,RoseJo01,Josh Rosen,4,Pass_ANY/A_adj,5,False
-WilsZa00,Zach Wilson,7.85805773065804,4.298543951546899,False,,2021,RoseJo01,Josh Rosen,4,Pass_ANY/A_adj,6,False
-BollKy00,Kyle Boller,7.862442956042181,4.385623655913977,False,,2003,RoseJo01,Josh Rosen,4,Pass_ANY/A_adj,7,False
-DarnSa00,Sam Darnold,7.885166089332746,4.193339371483465,False,,2018,RoseJo01,Josh Rosen,4,Pass_ANY/A_adj,8,False
-RamsPa00,Patrick Ramsey,7.955606432771853,4.353045623387302,False,,2002,RoseJo01,Josh Rosen,4,Pass_ANY/A_adj,9,False
-VickMi00,Michael Vick,8.12820041629326,4.466430641586634,True,2004.0,2001,RoseJo01,Josh Rosen,4,Pass_ANY/A_adj,10,False
+YounVi00,Vince Young,7.3482609721744,3.604635394696138,False,,2006,RoseJo01,Josh Rosen,4,Pass_ANY/A_adj,2,False
+QuinBr00,Brady Quinn,7.782034541144997,4.05077205882353,False,,2007,RoseJo01,Josh Rosen,4,Pass_ANY/A_adj,3,False
+BollKy00,Kyle Boller,7.862442956042181,4.385623655913977,False,,2003,RoseJo01,Josh Rosen,4,Pass_ANY/A_adj,4,False
+DarnSa00,Sam Darnold,7.885166089332746,4.193339371483465,False,,2018,RoseJo01,Josh Rosen,4,Pass_ANY/A_adj,5,False
+RamsPa00,Patrick Ramsey,7.955606432771853,4.353045623387302,False,,2002,RoseJo01,Josh Rosen,4,Pass_ANY/A_adj,6,False
+VickMi00,Michael Vick,8.12820041629326,4.466430641586634,True,2004.0,2001,RoseJo01,Josh Rosen,4,Pass_ANY/A_adj,7,False
+GrosRe00,Rex Grossman,8.21703019102786,4.676612903225806,False,,2003,RoseJo01,Josh Rosen,4,Pass_ANY/A_adj,8,False
+ManuEJ00,EJ Manuel,8.436072959436238,4.989251455503188,False,,2013,RoseJo01,Josh Rosen,4,Pass_ANY/A_adj,9,False
+HarrJo00,Joey Harrington,8.523339955970462,5.342374174157143,False,,2002,RoseJo01,Josh Rosen,4,Pass_ANY/A_adj,10,False

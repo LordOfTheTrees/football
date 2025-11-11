@@ -1,11 +1,11 @@
 player_id,player_name,similarity_score,year_1_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
-CutlJa00,Jay Cutler,211.17391100723768,3877.841443234312,False,,2006,PeniMi00,Michael Penix,2,total_yards_adj,1,True
-GoffJa00,Jared Goff,244.3008344050554,3928.348342109573,False,,2016,PeniMi00,Michael Penix,2,total_yards_adj,2,True
-VickMi00,Michael Vick,253.87585525476862,3944.469375493284,True,2004.0,2001,PeniMi00,Michael Penix,2,total_yards_adj,3,True
-MannEl00,Eli Manning,255.47278262523935,4047.1070376626058,False,,2004,PeniMi00,Michael Penix,2,total_yards_adj,4,True
-JackLa00,Lamar Jackson,860.2543672663774,4391.569570871261,True,2023.0,2018,PeniMi00,Michael Penix,2,total_yards_adj,5,True
-BollKy00,Kyle Boller,870.1144845513268,2902.8596618597003,False,,2003,PeniMi00,Michael Penix,2,total_yards_adj,6,True
-FreeJo00,Josh Freeman,929.1642054599835,3962.990322992428,False,,2009,PeniMi00,Michael Penix,2,total_yards_adj,7,True
-RussJa00,JaMarcus Russell,963.5387276359901,2663.68006510384,False,,2007,PeniMi00,Michael Penix,2,total_yards_adj,8,True
-LockJa00,Jake Locker,1011.269906900722,2548.575747601498,False,,2011,PeniMi00,Michael Penix,2,total_yards_adj,9,True
-WatsDe00,Deshaun Watson,1040.5605811152113,4792.703302880557,True,2020.0,2017,PeniMi00,Michael Penix,2,total_yards_adj,10,True
+CutlJa00,Jay Cutler,211.39082110360997,3877.841443234312,False,,2006,PeniMi00,Michael Penix,2,total_yards_adj,1,True
+GoffJa00,Jared Goff,244.3850432184767,3928.348342109573,False,,2016,PeniMi00,Michael Penix,2,total_yards_adj,2,True
+VickMi00,Michael Vick,253.92514744673664,3944.469375493284,True,2004.0,2001,PeniMi00,Michael Penix,2,total_yards_adj,3,True
+MannEl00,Eli Manning,255.320848393977,4047.1070376626058,False,,2004,PeniMi00,Michael Penix,2,total_yards_adj,4,True
+JackLa00,Lamar Jackson,860.0090155515836,4391.569570871261,True,2023.0,2018,PeniMi00,Michael Penix,2,total_yards_adj,5,True
+BollKy00,Kyle Boller,870.727199853181,2902.8596618597003,False,,2003,PeniMi00,Michael Penix,2,total_yards_adj,6,True
+FreeJo00,Josh Freeman,929.167708427865,3962.990322992428,False,,2009,PeniMi00,Michael Penix,2,total_yards_adj,7,True
+WatsDe00,Deshaun Watson,1040.1649482980793,4792.703302880557,True,2020.0,2017,PeniMi00,Michael Penix,2,total_yards_adj,8,True
+MahoPa00,Patrick Mahomes,1105.836781860906,5456.3240104253,True,2020.0,2017,PeniMi00,Michael Penix,2,total_yards_adj,9,True
+TagoTu00,Tua Tagovailoa,1162.1610337244406,2803.433330656791,True,2024.0,2020,PeniMi00,Michael Penix,2,total_yards_adj,10,True

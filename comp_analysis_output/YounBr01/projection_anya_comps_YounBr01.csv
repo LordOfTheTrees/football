@@ -1,11 +1,11 @@
 player_id,player_name,similarity_score,year_2_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
-WilsZa00,Zach Wilson,0.25654558383944503,4.298543951546899,False,,2021,YounBr01,Bryce Young,3,Pass_ANY/A_adj,1,True
-PondCh00,Christian Ponder,0.3069400622138209,4.856175537245296,False,,2011,YounBr01,Bryce Young,3,Pass_ANY/A_adj,2,True
-BollKy00,Kyle Boller,0.4573690657197642,4.385623655913977,False,,2003,YounBr01,Bryce Young,3,Pass_ANY/A_adj,3,True
-SancMa00,Mark Sanchez,0.5266486823045753,5.183949633853207,True,2012.0,2009,YounBr01,Bryce Young,3,Pass_ANY/A_adj,4,True
-RamsPa00,Patrick Ramsey,0.5934102792824273,4.353045623387302,False,,2002,YounBr01,Bryce Young,3,Pass_ANY/A_adj,5,True
-MannEl00,Eli Manning,0.5993872055010516,5.175154039477027,False,,2004,YounBr01,Bryce Young,3,Pass_ANY/A_adj,6,True
-FielJu00,Justin Fields,0.6188262297449733,5.300535548644078,False,,2021,YounBr01,Bryce Young,3,Pass_ANY/A_adj,7,True
-ManuEJ00,EJ Manuel,0.619031882616694,4.989251455503188,False,,2013,YounBr01,Bryce Young,3,Pass_ANY/A_adj,8,True
-GrosRe00,Rex Grossman,0.6386727104851696,4.676612903225806,False,,2003,YounBr01,Bryce Young,3,Pass_ANY/A_adj,9,True
-VickMi00,Michael Vick,0.6643946957617435,4.466430641586634,True,2004.0,2001,YounBr01,Bryce Young,3,Pass_ANY/A_adj,10,True
+BollKy00,Kyle Boller,0.4573690657197642,4.385623655913977,False,,2003,YounBr01,Bryce Young,3,Pass_ANY/A_adj,1,True
+SancMa00,Mark Sanchez,0.5266486823045753,5.183949633853207,True,2012.0,2009,YounBr01,Bryce Young,3,Pass_ANY/A_adj,2,True
+RamsPa00,Patrick Ramsey,0.5934102792824273,4.353045623387302,False,,2002,YounBr01,Bryce Young,3,Pass_ANY/A_adj,3,True
+MannEl00,Eli Manning,0.5993872055010516,5.175154039477027,False,,2004,YounBr01,Bryce Young,3,Pass_ANY/A_adj,4,True
+ManuEJ00,EJ Manuel,0.619031882616694,4.989251455503188,False,,2013,YounBr01,Bryce Young,3,Pass_ANY/A_adj,5,True
+GrosRe00,Rex Grossman,0.6386727104851696,4.676612903225806,False,,2003,YounBr01,Bryce Young,3,Pass_ANY/A_adj,6,True
+VickMi00,Michael Vick,0.6643946957617435,4.466430641586634,True,2004.0,2001,YounBr01,Bryce Young,3,Pass_ANY/A_adj,7,True
+DarnSa00,Sam Darnold,0.7033139016960963,4.193339371483465,False,,2018,YounBr01,Bryce Young,3,Pass_ANY/A_adj,8,True
+BortBl00,Blake Bortles,0.797578415375303,5.314506543452397,True,2018.0,2014,YounBr01,Bryce Young,3,Pass_ANY/A_adj,9,True
+HarrJo00,Joey Harrington,0.8232811119127891,5.342374174157143,False,,2002,YounBr01,Bryce Young,3,Pass_ANY/A_adj,10,True

@@ -5138,6 +5138,11 @@ def find_most_similar_qbs(
         if player_id == target_qb_id:
             continue
         
+        # Skip QBs still in decision window (less than 4 years since draft)
+        player_full_data = df[df['player_id'] == player_id]
+        if len(player_full_data) > 0 and player_full_data['years_since_draft'].max() < 4:
+            continue
+        
         player_data = df_truncated[df_truncated['player_id'] == player_id].sort_values('years_since_draft')
         
         if len(player_data) == 0:

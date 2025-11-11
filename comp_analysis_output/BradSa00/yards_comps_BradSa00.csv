@@ -1,11 +1,11 @@
 player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
-JoneMa05,Mac Jones,667.1623059414055,1764.0,False,,2021,BradSa00,Sam Bradford,4,total_yards_adj,1,False
-HarrJo00,Joey Harrington,706.9489535863361,2213.162906332414,False,,2002,BradSa00,Sam Bradford,4,total_yards_adj,2,False
-FielJu00,Justin Fields,818.5085184598812,1395.0,False,,2021,BradSa00,Sam Bradford,4,total_yards_adj,3,False
-LeftBy00,Byron Leftwich,818.7340738352027,1260.5208193039252,False,,2003,BradSa00,Sam Bradford,4,total_yards_adj,4,False
-CarrDa00,David Carr,889.5311578190087,2945.265819183927,False,,2002,BradSa00,Sam Bradford,4,total_yards_adj,5,False
-TrubMi00,Mitchell Trubisky,944.5512523846169,2274.2651713440387,False,,2017,BradSa00,Sam Bradford,4,total_yards_adj,6,False
-DarnSa00,Sam Darnold,985.9699189841668,2771.175198121366,False,,2018,BradSa00,Sam Bradford,4,total_yards_adj,7,False
-WeedBr00,Brandon Weeden,1152.1364947961438,1116.810459201861,False,,2012,BradSa00,Sam Bradford,4,total_yards_adj,8,False
-SancMa00,Mark Sanchez,1180.0231251365158,3007.257398162935,True,2012.0,2009,BradSa00,Sam Bradford,4,total_yards_adj,9,False
-LawrTr00,Trevor Lawrence,1197.9013988151917,2164.0,True,2024.0,2021,BradSa00,Sam Bradford,4,total_yards_adj,10,False
+HarrJo00,Joey Harrington,706.9489535863361,2213.162906332414,False,,2002,BradSa00,Sam Bradford,4,total_yards_adj,1,False
+LeftBy00,Byron Leftwich,818.7340738352027,1260.5208193039252,False,,2003,BradSa00,Sam Bradford,4,total_yards_adj,2,False
+CarrDa00,David Carr,889.5311578190087,2945.265819183927,False,,2002,BradSa00,Sam Bradford,4,total_yards_adj,3,False
+TrubMi00,Mitchell Trubisky,944.5512523846169,2274.2651713440387,False,,2017,BradSa00,Sam Bradford,4,total_yards_adj,4,False
+DarnSa00,Sam Darnold,985.9699189841668,2771.175198121366,False,,2018,BradSa00,Sam Bradford,4,total_yards_adj,5,False
+WeedBr00,Brandon Weeden,1152.1364947961438,1116.810459201861,False,,2012,BradSa00,Sam Bradford,4,total_yards_adj,6,False
+SancMa00,Mark Sanchez,1180.0231251365158,3007.257398162935,True,2012.0,2009,BradSa00,Sam Bradford,4,total_yards_adj,7,False
+YounVi00,Vince Young,1203.044161047931,2250.024512669196,False,,2006,BradSa00,Sam Bradford,4,total_yards_adj,8,False
+MariMa01,Marcus Mariota,1221.3388878604396,2931.9230340988997,False,,2015,BradSa00,Sam Bradford,4,total_yards_adj,9,False
+LuckAn00,Andrew Luck,1224.8624034348059,2128.087452992904,True,2016.0,2012,BradSa00,Sam Bradford,4,total_yards_adj,10,False

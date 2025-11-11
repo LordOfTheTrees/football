@@ -1,11 +1,11 @@
 player_id,player_name,similarity_score,year_0_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
-MayeDr00,Drake Maye,0.009999999999999787,5.1,False,,2024,WillCa03,Caleb Williams,4,Pass_ANY/A_adj,1,False
-WeedBr00,Brandon Weeden,0.011683635045049101,5.101683635045049,False,,2012,WillCa03,Caleb Williams,4,Pass_ANY/A_adj,2,False
-TrubMi00,Mitchell Trubisky,0.031254417936823486,5.121254417936823,False,,2017,WillCa03,Caleb Williams,4,Pass_ANY/A_adj,3,False
-WentCa00,Carson Wentz,0.08224441800625204,5.172244418006252,False,,2016,WillCa03,Caleb Williams,4,Pass_ANY/A_adj,4,False
-ManuEJ00,EJ Manuel,0.11114213339271739,4.9788578666072825,False,,2013,WillCa03,Caleb Williams,4,Pass_ANY/A_adj,5,False
-LyncPa00,Paxton Lynch,0.12098718977395428,4.969012810226046,False,,2016,WillCa03,Caleb Williams,4,Pass_ANY/A_adj,6,False
-RamsPa00,Patrick Ramsey,0.14909541300076867,5.2390954130007685,False,,2002,WillCa03,Caleb Williams,4,Pass_ANY/A_adj,7,False
-DarnSa00,Sam Darnold,0.21324561161784494,5.303245611617845,False,,2018,WillCa03,Caleb Williams,4,Pass_ANY/A_adj,8,False
-BradSa00,Sam Bradford,0.2246111188909108,4.865388881109089,False,,2010,WillCa03,Caleb Williams,4,Pass_ANY/A_adj,9,False
-TannRy00,Ryan Tannehill,0.2677922512621693,5.357792251262169,True,2015.0,2012,WillCa03,Caleb Williams,4,Pass_ANY/A_adj,10,False
+WeedBr00,Brandon Weeden,0.011683635045049101,5.101683635045049,False,,2012,WillCa03,Caleb Williams,4,Pass_ANY/A_adj,1,False
+TrubMi00,Mitchell Trubisky,0.031254417936823486,5.121254417936823,False,,2017,WillCa03,Caleb Williams,4,Pass_ANY/A_adj,2,False
+WentCa00,Carson Wentz,0.08224441800625204,5.172244418006252,False,,2016,WillCa03,Caleb Williams,4,Pass_ANY/A_adj,3,False
+ManuEJ00,EJ Manuel,0.11114213339271739,4.9788578666072825,False,,2013,WillCa03,Caleb Williams,4,Pass_ANY/A_adj,4,False
+RamsPa00,Patrick Ramsey,0.14909541300076867,5.2390954130007685,False,,2002,WillCa03,Caleb Williams,4,Pass_ANY/A_adj,5,False
+DarnSa00,Sam Darnold,0.21324561161784494,5.303245611617845,False,,2018,WillCa03,Caleb Williams,4,Pass_ANY/A_adj,6,False
+BradSa00,Sam Bradford,0.2246111188909108,4.865388881109089,False,,2010,WillCa03,Caleb Williams,4,Pass_ANY/A_adj,7,False
+TannRy00,Ryan Tannehill,0.2677922512621693,5.357792251262169,True,2015.0,2012,WillCa03,Caleb Williams,4,Pass_ANY/A_adj,8,False
+GrosRe00,Rex Grossman,0.27389100414843437,5.363891004148434,False,,2003,WillCa03,Caleb Williams,4,Pass_ANY/A_adj,9,False
+LeinMa00,Matt Leinart,0.3029460932425936,5.392946093242593,False,,2006,WillCa03,Caleb Williams,4,Pass_ANY/A_adj,10,False

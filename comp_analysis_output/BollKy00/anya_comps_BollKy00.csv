@@ -1,11 +1,11 @@
 player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
 RamsPa00,Patrick Ramsey,0.6993806926972582,8.137306451612902,False,,2002,BollKy00,Kyle Boller,4,Pass_ANY/A_adj,1,False
 YounVi00,Vince Young,1.124687551025594,6.648213684328694,False,,2006,BollKy00,Kyle Boller,4,Pass_ANY/A_adj,2,False
-FielJu00,Justin Fields,1.4821640119131254,5.86,False,,2021,BollKy00,Kyle Boller,4,Pass_ANY/A_adj,3,False
-BradSa00,Sam Bradford,1.504784985579989,6.236351742567642,False,,2010,BollKy00,Kyle Boller,4,Pass_ANY/A_adj,4,False
-BortBl00,Blake Bortles,1.529892443083248,6.297621769383697,True,2018.0,2014,BollKy00,Kyle Boller,4,Pass_ANY/A_adj,5,False
-WeedBr00,Brandon Weeden,1.6631392620886543,6.628576933739948,False,,2012,BollKy00,Kyle Boller,4,Pass_ANY/A_adj,6,False
-JoneDa05,Daniel Jones,1.6825233021086279,5.913507831934611,True,2023.0,2019,BollKy00,Kyle Boller,4,Pass_ANY/A_adj,7,False
-FreeJo00,Josh Freeman,1.6851126462981274,6.453937128671446,False,,2009,BollKy00,Kyle Boller,4,Pass_ANY/A_adj,8,False
-TannRy00,Ryan Tannehill,1.7386523727763097,6.0176481840864975,True,2015.0,2012,BollKy00,Kyle Boller,4,Pass_ANY/A_adj,9,False
-TrubMi00,Mitchell Trubisky,1.771704778788336,6.0480856319473055,False,,2017,BollKy00,Kyle Boller,4,Pass_ANY/A_adj,10,False
+BradSa00,Sam Bradford,1.504784985579989,6.236351742567642,False,,2010,BollKy00,Kyle Boller,4,Pass_ANY/A_adj,3,False
+BortBl00,Blake Bortles,1.529892443083248,6.297621769383697,True,2018.0,2014,BollKy00,Kyle Boller,4,Pass_ANY/A_adj,4,False
+WeedBr00,Brandon Weeden,1.6631392620886543,6.628576933739948,False,,2012,BollKy00,Kyle Boller,4,Pass_ANY/A_adj,5,False
+JoneDa05,Daniel Jones,1.6825233021086279,5.913507831934611,True,2023.0,2019,BollKy00,Kyle Boller,4,Pass_ANY/A_adj,6,False
+FreeJo00,Josh Freeman,1.6851126462981274,6.453937128671446,False,,2009,BollKy00,Kyle Boller,4,Pass_ANY/A_adj,7,False
+TannRy00,Ryan Tannehill,1.7386523727763097,6.0176481840864975,True,2015.0,2012,BollKy00,Kyle Boller,4,Pass_ANY/A_adj,8,False
+TrubMi00,Mitchell Trubisky,1.771704778788336,6.0480856319473055,False,,2017,BollKy00,Kyle Boller,4,Pass_ANY/A_adj,9,False
+GrosRe00,Rex Grossman,1.7765691411595124,5.403317143421906,False,,2003,BollKy00,Kyle Boller,4,Pass_ANY/A_adj,10,False

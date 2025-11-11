@@ -1,11 +1,11 @@
 player_id,player_name,similarity_score,year_2_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
 RyanMa00,Matt Ryan,0.3828723806900839,6.408324044251506,True,2013.0,2008,StroCJ00,C.j. Stroud,3,Pass_ANY/A_adj,1,True
-LockJa00,Jake Locker,0.39104939419223655,5.80696358980069,False,,2011,StroCJ00,C.j. Stroud,3,Pass_ANY/A_adj,2,True
-GrifRo01,Robert Griffin III,0.5495813215853464,5.274844848181792,False,,2012,StroCJ00,C.j. Stroud,3,Pass_ANY/A_adj,3,True
-TannRy00,Ryan Tannehill,0.7837475469192486,5.9482292968858514,True,2015.0,2012,StroCJ00,C.j. Stroud,3,Pass_ANY/A_adj,4,True
-WinsJa00,Jameis Winston,0.7841787909658305,6.794535564391428,False,,2015,StroCJ00,C.j. Stroud,3,Pass_ANY/A_adj,5,True
-JoneDa05,Daniel Jones,0.8186545551808712,5.653712610934591,True,2023.0,2019,StroCJ00,C.j. Stroud,3,Pass_ANY/A_adj,6,True
-MayfBa00,Baker Mayfield,0.8257627029996348,7.015779333058874,False,,2018,StroCJ00,C.j. Stroud,3,Pass_ANY/A_adj,7,True
-NewtCa00,Cam Newton,0.8395063637066201,5.817187117247523,True,2015.0,2011,StroCJ00,C.j. Stroud,3,Pass_ANY/A_adj,8,True
-HerbJu00,Justin Herbert,0.8803731194060752,6.24482490910582,True,2023.0,2020,StroCJ00,C.j. Stroud,3,Pass_ANY/A_adj,9,True
-LeftBy00,Byron Leftwich,0.9416427035099159,6.671967741935482,False,,2003,StroCJ00,C.j. Stroud,3,Pass_ANY/A_adj,10,True
+GrifRo01,Robert Griffin III,0.5495813215853464,5.274844848181792,False,,2012,StroCJ00,C.j. Stroud,3,Pass_ANY/A_adj,2,True
+TannRy00,Ryan Tannehill,0.7837475469192486,5.9482292968858514,True,2015.0,2012,StroCJ00,C.j. Stroud,3,Pass_ANY/A_adj,3,True
+WinsJa00,Jameis Winston,0.7841787909658305,6.794535564391428,False,,2015,StroCJ00,C.j. Stroud,3,Pass_ANY/A_adj,4,True
+JoneDa05,Daniel Jones,0.8186545551808712,5.653712610934591,True,2023.0,2019,StroCJ00,C.j. Stroud,3,Pass_ANY/A_adj,5,True
+MayfBa00,Baker Mayfield,0.8257627029996348,7.015779333058874,False,,2018,StroCJ00,C.j. Stroud,3,Pass_ANY/A_adj,6,True
+NewtCa00,Cam Newton,0.8395063637066201,5.817187117247523,True,2015.0,2011,StroCJ00,C.j. Stroud,3,Pass_ANY/A_adj,7,True
+HerbJu00,Justin Herbert,0.8803731194060752,6.24482490910582,True,2023.0,2020,StroCJ00,C.j. Stroud,3,Pass_ANY/A_adj,8,True
+LeftBy00,Byron Leftwich,0.9416427035099159,6.671967741935482,False,,2003,StroCJ00,C.j. Stroud,3,Pass_ANY/A_adj,9,True
+FlacJo00,Joe Flacco,0.9734108949333837,6.572903794986696,True,2013.0,2008,StroCJ00,C.j. Stroud,3,Pass_ANY/A_adj,10,True

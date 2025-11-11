@@ -1,11 +1,11 @@
 player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
 LeftBy00,Byron Leftwich,462.52091431662467,1260.5208193039252,False,,2003,JoneMa05,Mac Jones,4,total_yards_adj,1,False
-FielJu00,Justin Fields,658.3670827658725,1395.0,False,,2021,JoneMa05,Mac Jones,4,total_yards_adj,2,False
-HarrJo00,Joey Harrington,660.4813352933261,2213.162906332414,False,,2002,JoneMa05,Mac Jones,4,total_yards_adj,3,False
-BradSa00,Sam Bradford,667.1623059414055,1769.931567414443,False,,2010,JoneMa05,Mac Jones,4,total_yards_adj,4,False
-YounVi00,Vince Young,734.2164454871489,2250.024512669196,False,,2006,JoneMa05,Mac Jones,4,total_yards_adj,5,False
-TrubMi00,Mitchell Trubisky,740.4616017612881,2274.2651713440387,False,,2017,JoneMa05,Mac Jones,4,total_yards_adj,6,False
-DarnSa00,Sam Darnold,795.1431386327562,2771.175198121366,False,,2018,JoneMa05,Mac Jones,4,total_yards_adj,7,False
-LawrTr00,Trevor Lawrence,968.7168646261673,2164.0,True,2024.0,2021,JoneMa05,Mac Jones,4,total_yards_adj,8,False
-WeedBr00,Brandon Weeden,998.75373089525,1116.810459201861,False,,2012,JoneMa05,Mac Jones,4,total_yards_adj,9,False
-MariMa01,Marcus Mariota,1053.9449454568496,2931.9230340988997,False,,2015,JoneMa05,Mac Jones,4,total_yards_adj,10,False
+HarrJo00,Joey Harrington,660.4813352933261,2213.162906332414,False,,2002,JoneMa05,Mac Jones,4,total_yards_adj,2,False
+BradSa00,Sam Bradford,667.1623059414055,1769.931567414443,False,,2010,JoneMa05,Mac Jones,4,total_yards_adj,3,False
+YounVi00,Vince Young,734.2164454871489,2250.024512669196,False,,2006,JoneMa05,Mac Jones,4,total_yards_adj,4,False
+TrubMi00,Mitchell Trubisky,740.4616017612881,2274.2651713440387,False,,2017,JoneMa05,Mac Jones,4,total_yards_adj,5,False
+DarnSa00,Sam Darnold,795.1431386327562,2771.175198121366,False,,2018,JoneMa05,Mac Jones,4,total_yards_adj,6,False
+WeedBr00,Brandon Weeden,998.75373089525,1116.810459201861,False,,2012,JoneMa05,Mac Jones,4,total_yards_adj,7,False
+MariMa01,Marcus Mariota,1053.9449454568496,2931.9230340988997,False,,2015,JoneMa05,Mac Jones,4,total_yards_adj,8,False
+SancMa00,Mark Sanchez,1104.3476728894022,3007.257398162935,True,2012.0,2009,JoneMa05,Mac Jones,4,total_yards_adj,9,False
+LuckAn00,Andrew Luck,1111.300627200132,2128.087452992904,True,2016.0,2012,JoneMa05,Mac Jones,4,total_yards_adj,10,False

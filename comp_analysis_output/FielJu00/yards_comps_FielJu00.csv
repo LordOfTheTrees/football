@@ -1,11 +1,11 @@
 player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
 LeftBy00,Byron Leftwich,375.2328681647987,1260.5208193039252,False,,2003,FielJu00,Justin Fields,4,total_yards_adj,1,False
 HarrJo00,Joey Harrington,621.8441385285645,2213.162906332414,False,,2002,FielJu00,Justin Fields,4,total_yards_adj,2,False
-JoneMa05,Mac Jones,658.3670827658725,1764.0,False,,2021,FielJu00,Justin Fields,4,total_yards_adj,3,False
-TrubMi00,Mitchell Trubisky,670.7054304613822,2274.2651713440387,False,,2017,FielJu00,Justin Fields,4,total_yards_adj,4,False
-BollKy00,Kyle Boller,815.8878796879463,545.1752543489476,False,,2003,FielJu00,Justin Fields,4,total_yards_adj,5,False
-BradSa00,Sam Bradford,818.5085184598812,1769.931567414443,False,,2010,FielJu00,Justin Fields,4,total_yards_adj,6,False
-LockJa00,Jake Locker,866.7750842581042,1166.1042437307517,False,,2011,FielJu00,Justin Fields,4,total_yards_adj,7,False
-PondCh00,Christian Ponder,933.8116181928164,244.52229956644837,False,,2011,FielJu00,Justin Fields,4,total_yards_adj,8,False
-LawrTr00,Trevor Lawrence,996.4026979595732,2164.0,True,2024.0,2021,FielJu00,Justin Fields,4,total_yards_adj,9,False
-DarnSa00,Sam Darnold,1071.565026485824,2771.175198121366,False,,2018,FielJu00,Justin Fields,4,total_yards_adj,10,False
+TrubMi00,Mitchell Trubisky,670.7054304613822,2274.2651713440387,False,,2017,FielJu00,Justin Fields,4,total_yards_adj,3,False
+BollKy00,Kyle Boller,815.8878796879463,545.1752543489476,False,,2003,FielJu00,Justin Fields,4,total_yards_adj,4,False
+BradSa00,Sam Bradford,818.5085184598812,1769.931567414443,False,,2010,FielJu00,Justin Fields,4,total_yards_adj,5,False
+DarnSa00,Sam Darnold,1071.565026485824,2771.175198121366,False,,2018,FielJu00,Justin Fields,4,total_yards_adj,6,False
+YounVi00,Vince Young,1072.2432168104317,2250.024512669196,False,,2006,FielJu00,Justin Fields,4,total_yards_adj,7,False
+RamsPa00,Patrick Ramsey,1082.3302981334812,297.05470708507414,False,,2002,FielJu00,Justin Fields,4,total_yards_adj,8,False
+BurrJo01,Joe Burrow,1137.6677854131576,2403.410771147845,True,2023.0,2020,FielJu00,Justin Fields,4,total_yards_adj,9,False
+LuckAn00,Andrew Luck,1185.5075648842376,2128.087452992904,True,2016.0,2012,FielJu00,Justin Fields,4,total_yards_adj,10,False

@@ -1,11 +1,11 @@
 player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
-FielJu00,Justin Fields,0.6670969443282081,5.86,False,,2021,HarrJo00,Joey Harrington,4,Pass_ANY/A_adj,1,False
-SancMa00,Mark Sanchez,0.6972494136628786,4.466534266826589,True,2012.0,2009,HarrJo00,Joey Harrington,4,Pass_ANY/A_adj,2,False
-CarrDa00,David Carr,0.7721278347315678,3.917962365591397,False,,2002,HarrJo00,Joey Harrington,4,Pass_ANY/A_adj,3,False
-MannEl00,Eli Manning,0.9113440972098206,4.988562813503916,False,,2004,HarrJo00,Joey Harrington,4,Pass_ANY/A_adj,4,False
-ManuEJ00,EJ Manuel,0.9189322704131532,3.891885288990952,False,,2013,HarrJo00,Joey Harrington,4,Pass_ANY/A_adj,5,False
-BradSa00,Sam Bradford,0.9204739723043528,6.236351742567642,False,,2010,HarrJo00,Joey Harrington,4,Pass_ANY/A_adj,6,False
-JoneDa05,Daniel Jones,0.9332085859743472,5.913507831934611,True,2023.0,2019,HarrJo00,Joey Harrington,4,Pass_ANY/A_adj,7,False
-GrosRe00,Rex Grossman,0.9932401975994628,5.403317143421906,False,,2003,HarrJo00,Joey Harrington,4,Pass_ANY/A_adj,8,False
-TannRy00,Ryan Tannehill,1.0373158241962084,6.0176481840864975,True,2015.0,2012,HarrJo00,Joey Harrington,4,Pass_ANY/A_adj,9,False
-DarnSa00,Sam Darnold,1.1021541110029311,4.376094280705599,False,,2018,HarrJo00,Joey Harrington,4,Pass_ANY/A_adj,10,False
+SancMa00,Mark Sanchez,0.6972494136628786,4.466534266826589,True,2012.0,2009,HarrJo00,Joey Harrington,4,Pass_ANY/A_adj,1,False
+CarrDa00,David Carr,0.7721278347315678,3.917962365591397,False,,2002,HarrJo00,Joey Harrington,4,Pass_ANY/A_adj,2,False
+MannEl00,Eli Manning,0.9113440972098206,4.988562813503916,False,,2004,HarrJo00,Joey Harrington,4,Pass_ANY/A_adj,3,False
+ManuEJ00,EJ Manuel,0.9189322704131532,3.891885288990952,False,,2013,HarrJo00,Joey Harrington,4,Pass_ANY/A_adj,4,False
+BradSa00,Sam Bradford,0.9204739723043528,6.236351742567642,False,,2010,HarrJo00,Joey Harrington,4,Pass_ANY/A_adj,5,False
+JoneDa05,Daniel Jones,0.9332085859743472,5.913507831934611,True,2023.0,2019,HarrJo00,Joey Harrington,4,Pass_ANY/A_adj,6,False
+GrosRe00,Rex Grossman,0.9932401975994628,5.403317143421906,False,,2003,HarrJo00,Joey Harrington,4,Pass_ANY/A_adj,7,False
+TannRy00,Ryan Tannehill,1.0373158241962084,6.0176481840864975,True,2015.0,2012,HarrJo00,Joey Harrington,4,Pass_ANY/A_adj,8,False
+DarnSa00,Sam Darnold,1.1021541110029311,4.376094280705599,False,,2018,HarrJo00,Joey Harrington,4,Pass_ANY/A_adj,9,False
+VickMi00,Michael Vick,1.1536509919117652,5.071610570788556,True,2004.0,2001,HarrJo00,Joey Harrington,4,Pass_ANY/A_adj,10,False

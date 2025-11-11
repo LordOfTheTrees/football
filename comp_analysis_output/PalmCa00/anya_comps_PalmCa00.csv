@@ -4,8 +4,8 @@ BurrJo01,Joe Burrow,0.49032702090257185,5.561053363889344,True,2023.0,2020,PalmC
 JackLa00,Lamar Jackson,0.5852815603467119,5.814672400569739,True,2023.0,2018,PalmCa00,Carson Palmer,4,Pass_ANY/A_adj,3,False
 FlacJo00,Joe Flacco,0.6909741151938827,5.851190675834313,True,2013.0,2008,PalmCa00,Carson Palmer,4,Pass_ANY/A_adj,4,False
 MurrKy00,Kyler Murray,0.7775700507894023,5.180594297586179,True,2022.0,2019,PalmCa00,Carson Palmer,4,Pass_ANY/A_adj,5,False
-LawrTr00,Trevor Lawrence,0.8155926933604993,5.99,True,2024.0,2021,PalmCa00,Carson Palmer,4,Pass_ANY/A_adj,6,False
-LeftBy00,Byron Leftwich,0.8605446541136302,5.5381407957529705,False,,2003,PalmCa00,Carson Palmer,4,Pass_ANY/A_adj,7,False
-WinsJa00,Jameis Winston,0.88326254514126,6.457005153076689,False,,2015,PalmCa00,Carson Palmer,4,Pass_ANY/A_adj,8,False
-HerbJu00,Justin Herbert,0.8906109790033808,6.172268238118623,True,2023.0,2020,PalmCa00,Carson Palmer,4,Pass_ANY/A_adj,9,False
-CutlJa00,Jay Cutler,0.9211614634472002,4.947507858105074,False,,2006,PalmCa00,Carson Palmer,4,Pass_ANY/A_adj,10,False
+LeftBy00,Byron Leftwich,0.8605446541136302,5.5381407957529705,False,,2003,PalmCa00,Carson Palmer,4,Pass_ANY/A_adj,6,False
+WinsJa00,Jameis Winston,0.88326254514126,6.457005153076689,False,,2015,PalmCa00,Carson Palmer,4,Pass_ANY/A_adj,7,False
+HerbJu00,Justin Herbert,0.8906109790033808,6.172268238118623,True,2023.0,2020,PalmCa00,Carson Palmer,4,Pass_ANY/A_adj,8,False
+CutlJa00,Jay Cutler,0.9211614634472002,4.947507858105074,False,,2006,PalmCa00,Carson Palmer,4,Pass_ANY/A_adj,9,False
+LuckAn00,Andrew Luck,0.9333569468185955,5.1318014970889925,True,2016.0,2012,PalmCa00,Carson Palmer,4,Pass_ANY/A_adj,10,False

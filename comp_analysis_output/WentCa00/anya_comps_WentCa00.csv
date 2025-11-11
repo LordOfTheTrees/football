@@ -3,9 +3,9 @@ BurrJo01,Joe Burrow,0.46379010188492836,5.561053363889344,True,2023.0,2020,WentC
 JackLa00,Lamar Jackson,0.5673298004965692,5.814672400569739,True,2023.0,2018,WentCa00,Carson Wentz,4,Pass_ANY/A_adj,2,False
 FlacJo00,Joe Flacco,0.6640362175754466,5.851190675834313,True,2013.0,2008,WentCa00,Carson Wentz,4,Pass_ANY/A_adj,3,False
 MurrKy00,Kyler Murray,0.7598225594519586,5.180594297586179,True,2022.0,2019,WentCa00,Carson Wentz,4,Pass_ANY/A_adj,4,False
-LawrTr00,Trevor Lawrence,0.7770545996488177,5.99,True,2024.0,2021,WentCa00,Carson Wentz,4,Pass_ANY/A_adj,5,False
-LeftBy00,Byron Leftwich,0.8383758127757742,5.5381407957529705,False,,2003,WentCa00,Carson Wentz,4,Pass_ANY/A_adj,6,False
-HerbJu00,Justin Herbert,0.8626677463749893,6.172268238118623,True,2023.0,2020,WentCa00,Carson Wentz,4,Pass_ANY/A_adj,7,False
-WinsJa00,Jameis Winston,0.8727232780648244,6.457005153076689,False,,2015,WentCa00,Carson Wentz,4,Pass_ANY/A_adj,8,False
-CutlJa00,Jay Cutler,0.9003615026974627,4.947507858105074,False,,2006,WentCa00,Carson Wentz,4,Pass_ANY/A_adj,9,False
-LuckAn00,Andrew Luck,0.9311509463793128,5.1318014970889925,True,2016.0,2012,WentCa00,Carson Wentz,4,Pass_ANY/A_adj,10,False
+LeftBy00,Byron Leftwich,0.8383758127757742,5.5381407957529705,False,,2003,WentCa00,Carson Wentz,4,Pass_ANY/A_adj,5,False
+HerbJu00,Justin Herbert,0.8626677463749893,6.172268238118623,True,2023.0,2020,WentCa00,Carson Wentz,4,Pass_ANY/A_adj,6,False
+WinsJa00,Jameis Winston,0.8727232780648244,6.457005153076689,False,,2015,WentCa00,Carson Wentz,4,Pass_ANY/A_adj,7,False
+CutlJa00,Jay Cutler,0.9003615026974627,4.947507858105074,False,,2006,WentCa00,Carson Wentz,4,Pass_ANY/A_adj,8,False
+LuckAn00,Andrew Luck,0.9311509463793128,5.1318014970889925,True,2016.0,2012,WentCa00,Carson Wentz,4,Pass_ANY/A_adj,9,False
+StafMa00,Matthew Stafford,0.9586688925274389,5.951964240885889,False,,2009,WentCa00,Carson Wentz,4,Pass_ANY/A_adj,10,False

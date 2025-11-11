@@ -1,11 +1,11 @@
 player_id,player_name,similarity_score,year_1_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
 TrubMi00,Mitchell Trubisky,0.1784756953961096,6.669539805450686,False,,2017,WillCa03,Caleb Williams,2,Pass_ANY/A_adj,1,True
-LawrTr00,Trevor Lawrence,0.40482630992218854,6.686581012000766,True,2024.0,2021,WillCa03,Caleb Williams,2,Pass_ANY/A_adj,2,True
-WentCa00,Carson Wentz,0.4386268870540971,7.534835707974373,False,,2016,WillCa03,Caleb Williams,2,Pass_ANY/A_adj,3,True
-MurrKy00,Kyler Murray,0.4695417943778189,6.501692054343353,True,2022.0,2019,WillCa03,Caleb Williams,2,Pass_ANY/A_adj,4,True
-FlacJo00,Joe Flacco,0.5070263950724363,6.30807251908397,True,2013.0,2008,WillCa03,Caleb Williams,2,Pass_ANY/A_adj,5,True
-VickMi00,Michael Vick,0.6502524225132877,6.201164830158594,True,2004.0,2001,WillCa03,Caleb Williams,2,Pass_ANY/A_adj,6,True
-BurrJo01,Joe Burrow,0.6557631352856468,7.555050125999782,True,2023.0,2020,WillCa03,Caleb Williams,2,Pass_ANY/A_adj,7,True
-LuckAn00,Andrew Luck,0.7164667529258484,6.195457632780314,True,2016.0,2012,WillCa03,Caleb Williams,2,Pass_ANY/A_adj,8,True
-LeftBy00,Byron Leftwich,0.7180310227642984,5.977627243598832,False,,2003,WillCa03,Caleb Williams,2,Pass_ANY/A_adj,9,True
-CutlJa00,Jay Cutler,0.7193934166570771,6.520320689849516,False,,2006,WillCa03,Caleb Williams,2,Pass_ANY/A_adj,10,True
+WentCa00,Carson Wentz,0.4386268870540971,7.534835707974373,False,,2016,WillCa03,Caleb Williams,2,Pass_ANY/A_adj,2,True
+MurrKy00,Kyler Murray,0.4695417943778189,6.501692054343353,True,2022.0,2019,WillCa03,Caleb Williams,2,Pass_ANY/A_adj,3,True
+FlacJo00,Joe Flacco,0.5070263950724363,6.30807251908397,True,2013.0,2008,WillCa03,Caleb Williams,2,Pass_ANY/A_adj,4,True
+VickMi00,Michael Vick,0.6502524225132877,6.201164830158594,True,2004.0,2001,WillCa03,Caleb Williams,2,Pass_ANY/A_adj,5,True
+BurrJo01,Joe Burrow,0.6557631352856468,7.555050125999782,True,2023.0,2020,WillCa03,Caleb Williams,2,Pass_ANY/A_adj,6,True
+LuckAn00,Andrew Luck,0.7164667529258484,6.195457632780314,True,2016.0,2012,WillCa03,Caleb Williams,2,Pass_ANY/A_adj,7,True
+LeftBy00,Byron Leftwich,0.7180310227642984,5.977627243598832,False,,2003,WillCa03,Caleb Williams,2,Pass_ANY/A_adj,8,True
+CutlJa00,Jay Cutler,0.7193934166570771,6.520320689849516,False,,2006,WillCa03,Caleb Williams,2,Pass_ANY/A_adj,9,True
+TagoTu00,Tua Tagovailoa,0.8002334449028111,5.844852361126329,True,2024.0,2020,WillCa03,Caleb Williams,2,Pass_ANY/A_adj,10,True

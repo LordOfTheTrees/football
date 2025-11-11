@@ -1,11 +1,11 @@
 player_id,player_name,similarity_score,year_1_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
-StroCJ00,C.J. Stroud,155.8014835148653,3960.0,False,,2023,DaniJa02,Jayden Daniels,2,total_yards_adj,1,True
-WinsJa00,Jameis Winston,190.73229186179765,4347.776823851235,False,,2015,DaniJa02,Jayden Daniels,2,total_yards_adj,2,True
-LuckAn00,Andrew Luck,279.98152734415504,4325.927038168362,True,2016.0,2012,DaniJa02,Jayden Daniels,2,total_yards_adj,3,True
-GrifRo01,Robert Griffin III,302.44923800537475,3803.601482476207,False,,2012,DaniJa02,Jayden Daniels,2,total_yards_adj,4,True
-MayfBa00,Baker Mayfield,385.73742595613675,4021.635831344833,False,,2018,DaniJa02,Jayden Daniels,2,total_yards_adj,5,True
-LawrTr00,Trevor Lawrence,395.9513962082317,4427.6201483670775,True,2024.0,2021,DaniJa02,Jayden Daniels,2,total_yards_adj,6,True
-WentCa00,Carson Wentz,437.44907718733936,3663.401372213728,False,,2016,DaniJa02,Jayden Daniels,2,total_yards_adj,7,True
-MurrKy00,Kyler Murray,535.1780881498514,4841.657853661309,True,2022.0,2019,DaniJa02,Jayden Daniels,2,total_yards_adj,8,True
-NewtCa00,Cam Newton,575.6100675267627,4762.437858306812,True,2015.0,2011,DaniJa02,Jayden Daniels,2,total_yards_adj,9,True
-TannRy00,Ryan Tannehill,606.0630518538061,4276.47609798449,True,2015.0,2012,DaniJa02,Jayden Daniels,2,total_yards_adj,10,True
+WinsJa00,Jameis Winston,190.73229186179765,4347.776823851235,False,,2015,DaniJa02,Jayden Daniels,2,total_yards_adj,1,True
+LuckAn00,Andrew Luck,279.98152734415504,4325.927038168362,True,2016.0,2012,DaniJa02,Jayden Daniels,2,total_yards_adj,2,True
+GrifRo01,Robert Griffin III,302.44923800537475,3803.601482476207,False,,2012,DaniJa02,Jayden Daniels,2,total_yards_adj,3,True
+MayfBa00,Baker Mayfield,385.73742595613675,4021.635831344833,False,,2018,DaniJa02,Jayden Daniels,2,total_yards_adj,4,True
+WentCa00,Carson Wentz,437.44907718733936,3663.401372213728,False,,2016,DaniJa02,Jayden Daniels,2,total_yards_adj,5,True
+MurrKy00,Kyler Murray,535.1780881498514,4841.657853661309,True,2022.0,2019,DaniJa02,Jayden Daniels,2,total_yards_adj,6,True
+NewtCa00,Cam Newton,575.6100675267627,4762.437858306812,True,2015.0,2011,DaniJa02,Jayden Daniels,2,total_yards_adj,7,True
+TannRy00,Ryan Tannehill,606.0630518538061,4276.47609798449,True,2015.0,2012,DaniJa02,Jayden Daniels,2,total_yards_adj,8,True
+FlacJo00,Joe Flacco,848.1716791398533,3821.91663749226,True,2013.0,2008,DaniJa02,Jayden Daniels,2,total_yards_adj,9,True
+RyanMa00,Matt Ryan,891.6221013545162,3088.575314844521,True,2013.0,2008,DaniJa02,Jayden Daniels,2,total_yards_adj,10,True

@@ -2,10 +2,10 @@ player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_y
 BollKy00,Kyle Boller,568.0774183028504,545.1752543489476,False,,2003,LockJa00,Jake Locker,4,total_yards_adj,1,False
 RamsPa00,Patrick Ramsey,724.4314729166664,297.05470708507414,False,,2002,LockJa00,Jake Locker,4,total_yards_adj,2,False
 LosmJ.00,J.P. Losman,779.6988364452376,1376.4137375499422,False,,2004,LockJa00,Jake Locker,4,total_yards_adj,3,False
-FielJu00,Justin Fields,866.7750842581042,1395.0,False,,2021,LockJa00,Jake Locker,4,total_yards_adj,4,False
-LeftBy00,Byron Leftwich,886.425210130657,1260.5208193039252,False,,2003,LockJa00,Jake Locker,4,total_yards_adj,5,False
-PondCh00,Christian Ponder,922.2283529988536,244.52229956644837,False,,2011,LockJa00,Jake Locker,4,total_yards_adj,6,False
-WeedBr00,Brandon Weeden,1045.2359629325183,1116.810459201861,False,,2012,LockJa00,Jake Locker,4,total_yards_adj,7,False
-GabbBl00,Blaine Gabbert,1103.0990516391057,44.17839866116503,False,,2011,LockJa00,Jake Locker,4,total_yards_adj,8,False
-HarrJo00,Joey Harrington,1142.3515495127967,2213.162906332414,False,,2002,LockJa00,Jake Locker,4,total_yards_adj,9,False
-YounVi00,Vince Young,1146.5219046693949,2250.024512669196,False,,2006,LockJa00,Jake Locker,4,total_yards_adj,10,False
+LeftBy00,Byron Leftwich,886.425210130657,1260.5208193039252,False,,2003,LockJa00,Jake Locker,4,total_yards_adj,4,False
+WeedBr00,Brandon Weeden,1045.2359629325183,1116.810459201861,False,,2012,LockJa00,Jake Locker,4,total_yards_adj,5,False
+GabbBl00,Blaine Gabbert,1103.0990516391057,44.17839866116503,False,,2011,LockJa00,Jake Locker,4,total_yards_adj,6,False
+HarrJo00,Joey Harrington,1142.3515495127967,2213.162906332414,False,,2002,LockJa00,Jake Locker,4,total_yards_adj,7,False
+YounVi00,Vince Young,1146.5219046693949,2250.024512669196,False,,2006,LockJa00,Jake Locker,4,total_yards_adj,8,False
+ManuEJ00,EJ Manuel,1268.133684787815,156.33604090463902,False,,2013,LockJa00,Jake Locker,4,total_yards_adj,9,False
+BradSa00,Sam Bradford,1268.4160700299958,1769.931567414443,False,,2010,LockJa00,Jake Locker,4,total_yards_adj,10,False

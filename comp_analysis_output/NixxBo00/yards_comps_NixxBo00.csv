@@ -1,11 +1,11 @@
 player_id,player_name,similarity_score,year_0_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
 GrifRo01,Robert Griffin III,57.2368761167354,4147.763123883265,False,,2012,NixxBo00,Bo Nix,4,total_yards_adj,1,False
-StroCJ00,C.J. Stroud,81.43347795454156,4286.433477954542,False,,2023,NixxBo00,Bo Nix,4,total_yards_adj,2,False
-MurrKy00,Kyler Murray,118.66392553353307,4323.663925533533,True,2022.0,2019,NixxBo00,Bo Nix,4,total_yards_adj,3,False
-WinsJa00,Jameis Winston,154.65917789350442,4359.659177893504,False,,2015,NixxBo00,Bo Nix,4,total_yards_adj,4,False
-WillCa03,Caleb Williams,175.0,4030.0,False,,2024,NixxBo00,Bo Nix,4,total_yards_adj,5,False
-WentCa00,Carson Wentz,187.2659291696691,4017.734070830331,False,,2016,NixxBo00,Bo Nix,4,total_yards_adj,6,False
-LawrTr00,Trevor Lawrence,197.9350991151582,4007.064900884842,True,2024.0,2021,NixxBo00,Bo Nix,4,total_yards_adj,7,False
-JoneMa05,Mac Jones,243.29809799309987,3961.7019020069,False,,2021,NixxBo00,Bo Nix,4,total_yards_adj,8,False
-DaniJa02,Jayden Daniels,254.0,4459.0,False,,2024,NixxBo00,Bo Nix,4,total_yards_adj,9,False
-MayfBa00,Baker Mayfield,286.28415269138486,3918.715847308615,False,,2018,NixxBo00,Bo Nix,4,total_yards_adj,10,False
+MurrKy00,Kyler Murray,118.66392553353307,4323.663925533533,True,2022.0,2019,NixxBo00,Bo Nix,4,total_yards_adj,2,False
+WinsJa00,Jameis Winston,154.65917789350442,4359.659177893504,False,,2015,NixxBo00,Bo Nix,4,total_yards_adj,3,False
+WentCa00,Carson Wentz,187.2659291696691,4017.734070830331,False,,2016,NixxBo00,Bo Nix,4,total_yards_adj,4,False
+MayfBa00,Baker Mayfield,286.28415269138486,3918.715847308615,False,,2018,NixxBo00,Bo Nix,4,total_yards_adj,5,False
+HerbJu00,Justin Herbert,414.28525912989244,4619.285259129892,True,2023.0,2020,NixxBo00,Bo Nix,4,total_yards_adj,6,False
+BradSa00,Sam Bradford,491.31968422072623,3713.6803157792738,False,,2010,NixxBo00,Bo Nix,4,total_yards_adj,7,False
+RyanMa00,Matt Ryan,503.00699971450695,3701.993000285493,True,2013.0,2008,NixxBo00,Bo Nix,4,total_yards_adj,8,False
+LuckAn00,Andrew Luck,577.0661271371437,4782.066127137144,True,2016.0,2012,NixxBo00,Bo Nix,4,total_yards_adj,9,False
+TannRy00,Ryan Tannehill,584.1009341940626,3620.8990658059374,True,2015.0,2012,NixxBo00,Bo Nix,4,total_yards_adj,10,False

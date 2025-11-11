@@ -1,11 +1,11 @@
 player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
 DarnSa00,Sam Darnold,726.5066798627458,2771.175198121366,False,,2018,YounVi00,Vince Young,4,total_yards_adj,1,False
-JoneMa05,Mac Jones,734.2164454871489,1764.0,False,,2021,YounVi00,Vince Young,4,total_yards_adj,2,False
-HarrJo00,Joey Harrington,892.6202864739599,2213.162906332414,False,,2002,YounVi00,Vince Young,4,total_yards_adj,3,False
-LeftBy00,Byron Leftwich,935.007540458874,1260.5208193039252,False,,2003,YounVi00,Vince Young,4,total_yards_adj,4,False
-TrubMi00,Mitchell Trubisky,942.6517534800828,2274.2651713440387,False,,2017,YounVi00,Vince Young,4,total_yards_adj,5,False
-FielJu00,Justin Fields,1072.2432168104317,1395.0,False,,2021,YounVi00,Vince Young,4,total_yards_adj,6,False
-WeedBr00,Brandon Weeden,1092.1945206833798,1116.810459201861,False,,2012,YounVi00,Vince Young,4,total_yards_adj,7,False
-VickMi00,Michael Vick,1114.9206421816339,3396.1767878016503,True,2004.0,2001,YounVi00,Vince Young,4,total_yards_adj,8,False
-SancMa00,Mark Sanchez,1142.5123659051721,3007.257398162935,True,2012.0,2009,YounVi00,Vince Young,4,total_yards_adj,9,False
-MariMa01,Marcus Mariota,1145.596132989884,2931.9230340988997,False,,2015,YounVi00,Vince Young,4,total_yards_adj,10,False
+HarrJo00,Joey Harrington,892.6202864739599,2213.162906332414,False,,2002,YounVi00,Vince Young,4,total_yards_adj,2,False
+LeftBy00,Byron Leftwich,935.007540458874,1260.5208193039252,False,,2003,YounVi00,Vince Young,4,total_yards_adj,3,False
+TrubMi00,Mitchell Trubisky,942.6517534800828,2274.2651713440387,False,,2017,YounVi00,Vince Young,4,total_yards_adj,4,False
+WeedBr00,Brandon Weeden,1092.1945206833798,1116.810459201861,False,,2012,YounVi00,Vince Young,4,total_yards_adj,5,False
+VickMi00,Michael Vick,1114.9206421816339,3396.1767878016503,True,2004.0,2001,YounVi00,Vince Young,4,total_yards_adj,6,False
+SancMa00,Mark Sanchez,1142.5123659051721,3007.257398162935,True,2012.0,2009,YounVi00,Vince Young,4,total_yards_adj,7,False
+MariMa01,Marcus Mariota,1145.596132989884,2931.9230340988997,False,,2015,YounVi00,Vince Young,4,total_yards_adj,8,False
+BradSa00,Sam Bradford,1203.044161047931,1769.931567414443,False,,2010,YounVi00,Vince Young,4,total_yards_adj,9,False
+CarrDa00,David Carr,1251.8614400508238,2945.265819183927,False,,2002,YounVi00,Vince Young,4,total_yards_adj,10,False

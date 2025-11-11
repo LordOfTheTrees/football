@@ -1,11 +1,11 @@
 player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
 DarnSa00,Sam Darnold,0.6088557009568812,4.376094280705599,False,,2018,QuinBr00,Brady Quinn,4,Pass_ANY/A_adj,1,False
 ManuEJ00,EJ Manuel,0.7599973922257869,3.891885288990952,False,,2013,QuinBr00,Brady Quinn,4,Pass_ANY/A_adj,2,False
-JoneMa05,Mac Jones,0.9110176418143067,4.97,False,,2021,QuinBr00,Brady Quinn,4,Pass_ANY/A_adj,3,False
-PondCh00,Christian Ponder,1.0029578686795169,1.9997477567575077,False,,2011,QuinBr00,Brady Quinn,4,Pass_ANY/A_adj,4,False
-SancMa00,Mark Sanchez,1.134250464376853,4.466534266826589,True,2012.0,2009,QuinBr00,Brady Quinn,4,Pass_ANY/A_adj,5,False
-VickMi00,Michael Vick,1.15164465351113,5.071610570788556,True,2004.0,2001,QuinBr00,Brady Quinn,4,Pass_ANY/A_adj,6,False
-GrosRe00,Rex Grossman,1.151974382972671,5.403317143421906,False,,2003,QuinBr00,Brady Quinn,4,Pass_ANY/A_adj,7,False
-HarrJo00,Joey Harrington,1.3692839573693785,4.655827956989247,False,,2002,QuinBr00,Brady Quinn,4,Pass_ANY/A_adj,8,False
-MannEl00,Eli Manning,1.5080472704484555,4.988562813503916,False,,2004,QuinBr00,Brady Quinn,4,Pass_ANY/A_adj,9,False
-CarrDa00,David Carr,1.541489460490221,3.917962365591397,False,,2002,QuinBr00,Brady Quinn,4,Pass_ANY/A_adj,10,False
+SancMa00,Mark Sanchez,1.134250464376853,4.466534266826589,True,2012.0,2009,QuinBr00,Brady Quinn,4,Pass_ANY/A_adj,3,False
+VickMi00,Michael Vick,1.15164465351113,5.071610570788556,True,2004.0,2001,QuinBr00,Brady Quinn,4,Pass_ANY/A_adj,4,False
+GrosRe00,Rex Grossman,1.151974382972671,5.403317143421906,False,,2003,QuinBr00,Brady Quinn,4,Pass_ANY/A_adj,5,False
+HarrJo00,Joey Harrington,1.3692839573693785,4.655827956989247,False,,2002,QuinBr00,Brady Quinn,4,Pass_ANY/A_adj,6,False
+MannEl00,Eli Manning,1.5080472704484555,4.988562813503916,False,,2004,QuinBr00,Brady Quinn,4,Pass_ANY/A_adj,7,False
+CarrDa00,David Carr,1.541489460490221,3.917962365591397,False,,2002,QuinBr00,Brady Quinn,4,Pass_ANY/A_adj,8,False
+JoneDa05,Daniel Jones,1.664242139861472,5.913507831934611,True,2023.0,2019,QuinBr00,Brady Quinn,4,Pass_ANY/A_adj,9,False
+TrubMi00,Mitchell Trubisky,1.6798066731949512,6.0480856319473055,False,,2017,QuinBr00,Brady Quinn,4,Pass_ANY/A_adj,10,False

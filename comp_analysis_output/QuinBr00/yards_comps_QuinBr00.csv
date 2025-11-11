@@ -2,10 +2,10 @@ player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_y
 LosmJ.00,J.P. Losman,755.0804928477338,1376.4137375499422,False,,2004,QuinBr00,Brady Quinn,4,total_yards_adj,1,False
 PennCh01,Chad Pennington,972.7598095760505,2310.41719205671,True,2004.0,2000,QuinBr00,Brady Quinn,4,total_yards_adj,2,False
 LeinMa00,Matt Leinart,1069.970560579264,446.8798684884654,False,,2006,QuinBr00,Brady Quinn,4,total_yards_adj,3,False
-LockJa00,Jake Locker,1076.4318585218653,1166.1042437307517,False,,2011,QuinBr00,Brady Quinn,4,total_yards_adj,4,False
-ManuEJ00,EJ Manuel,1087.5431769587835,156.33604090463902,False,,2013,QuinBr00,Brady Quinn,4,total_yards_adj,5,False
-RamsPa00,Patrick Ramsey,1285.7884511682294,297.05470708507414,False,,2002,QuinBr00,Brady Quinn,4,total_yards_adj,6,False
-WeedBr00,Brandon Weeden,1330.318752203025,1116.810459201861,False,,2012,QuinBr00,Brady Quinn,4,total_yards_adj,7,False
-GabbBl00,Blaine Gabbert,1339.718351117897,44.17839866116503,False,,2011,QuinBr00,Brady Quinn,4,total_yards_adj,8,False
-BollKy00,Kyle Boller,1420.4112824048657,545.1752543489476,False,,2003,QuinBr00,Brady Quinn,4,total_yards_adj,9,False
-GrosRe00,Rex Grossman,1597.4713530733743,3356.136681396701,False,,2003,QuinBr00,Brady Quinn,4,total_yards_adj,10,False
+ManuEJ00,EJ Manuel,1087.5431769587835,156.33604090463902,False,,2013,QuinBr00,Brady Quinn,4,total_yards_adj,4,False
+RamsPa00,Patrick Ramsey,1285.7884511682294,297.05470708507414,False,,2002,QuinBr00,Brady Quinn,4,total_yards_adj,5,False
+WeedBr00,Brandon Weeden,1330.318752203025,1116.810459201861,False,,2012,QuinBr00,Brady Quinn,4,total_yards_adj,6,False
+GabbBl00,Blaine Gabbert,1339.718351117897,44.17839866116503,False,,2011,QuinBr00,Brady Quinn,4,total_yards_adj,7,False
+BollKy00,Kyle Boller,1420.4112824048657,545.1752543489476,False,,2003,QuinBr00,Brady Quinn,4,total_yards_adj,8,False
+GrosRe00,Rex Grossman,1597.4713530733743,3356.136681396701,False,,2003,QuinBr00,Brady Quinn,4,total_yards_adj,9,False
+BradSa00,Sam Bradford,1647.2447545006967,1769.931567414443,False,,2010,QuinBr00,Brady Quinn,4,total_yards_adj,10,False
