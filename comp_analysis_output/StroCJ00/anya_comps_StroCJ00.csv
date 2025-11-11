@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_1_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+GrifRo01,Robert Griffin III,0.16476454237599847,5.602493040864046,False,,2012,StroCJ00,C.j. Stroud,4,Pass_ANY/A_adj,1,False
+RyanMa00,Matt Ryan,0.29707208815309666,5.772092501122587,True,2013.0,2008,StroCJ00,C.j. Stroud,4,Pass_ANY/A_adj,2,False
+MayfBa00,Baker Mayfield,0.4247245842703795,5.343100764534403,False,,2018,StroCJ00,C.j. Stroud,4,Pass_ANY/A_adj,3,False
+TeboTi00,Tim Tebow,0.5029386965507265,4.97864469785902,False,,2010,StroCJ00,C.j. Stroud,4,Pass_ANY/A_adj,4,False
+LockJa00,Jake Locker,0.6634909725714359,5.224615770829265,False,,2011,StroCJ00,C.j. Stroud,4,Pass_ANY/A_adj,5,False
+WinsJa00,Jameis Winston,0.7772195972161882,6.076625072628171,False,,2015,StroCJ00,C.j. Stroud,4,Pass_ANY/A_adj,6,False
+JoneMa05,Mac Jones,0.8124777076001044,5.381392526174791,False,,2021,StroCJ00,C.j. Stroud,4,Pass_ANY/A_adj,7,False
+LancTr00,Trey Lance,0.95518617376862,4.2569224460785655,False,,2021,StroCJ00,C.j. Stroud,4,Pass_ANY/A_adj,8,False
+RichAn03,Anthony Richardson,0.9972196772347729,4.74,False,,2023,StroCJ00,C.j. Stroud,4,Pass_ANY/A_adj,9,False
+QuinBr00,Brady Quinn,1.1033674594205238,5.267518771618998,False,,2007,StroCJ00,C.j. Stroud,4,Pass_ANY/A_adj,10,False

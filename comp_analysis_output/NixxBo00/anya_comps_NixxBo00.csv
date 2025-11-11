@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_0_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+MahoPa00,Patrick Mahomes,0.015364203666885956,6.135364203666886,True,2020.0,2017,NixxBo00,Bo Nix,4,Pass_ANY/A_adj,1,False
+JackLa00,Lamar Jackson,0.05770205847502119,6.062297941524979,True,2023.0,2018,NixxBo00,Bo Nix,4,Pass_ANY/A_adj,2,False
+RichAn03,Anthony Richardson,0.08232798603154023,6.20232798603154,False,,2023,NixxBo00,Bo Nix,4,Pass_ANY/A_adj,3,False
+MariMa01,Marcus Mariota,0.09110895481008985,6.21110895481009,False,,2015,NixxBo00,Bo Nix,4,Pass_ANY/A_adj,4,False
+CutlJa00,Jay Cutler,0.09441984581933394,6.025580154180666,False,,2006,NixxBo00,Bo Nix,4,Pass_ANY/A_adj,5,False
+JoneMa05,Mac Jones,0.13731182206639758,6.257311822066398,False,,2021,NixxBo00,Bo Nix,4,Pass_ANY/A_adj,6,False
+PeniMi00,Michael Penix,0.16999999999999993,6.29,False,,2024,NixxBo00,Bo Nix,4,Pass_ANY/A_adj,7,False
+NewtCa00,Cam Newton,0.2855140030186156,6.405514003018616,True,2015.0,2011,NixxBo00,Bo Nix,4,Pass_ANY/A_adj,8,False
+QuinBr00,Brady Quinn,0.2931102406582893,5.826889759341711,False,,2007,NixxBo00,Bo Nix,4,Pass_ANY/A_adj,9,False
+LuckAn00,Andrew Luck,0.3217009288443826,5.7982990711556175,True,2016.0,2012,NixxBo00,Bo Nix,4,Pass_ANY/A_adj,10,False

@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_1_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+WilsZa00,Zach Wilson,0.15774029166719594,4.989835980426998,False,,2021,YounBr01,Bryce Young,4,Pass_ANY/A_adj,1,False
+CarrDa00,David Carr,0.19773646249497373,5.113436949480025,False,,2002,YounBr01,Bryce Young,4,Pass_ANY/A_adj,2,False
+GabbBl00,Blaine Gabbert,0.22199147090594326,4.825086329530557,False,,2011,YounBr01,Bryce Young,4,Pass_ANY/A_adj,3,False
+PondCh00,Christian Ponder,0.4463683111793737,5.111927979693733,False,,2011,YounBr01,Bryce Young,4,Pass_ANY/A_adj,4,False
+SancMa00,Mark Sanchez,0.4624440796507423,5.533994118470803,True,2012.0,2009,YounBr01,Bryce Young,4,Pass_ANY/A_adj,5,False
+FielJu00,Justin Fields,0.5156944182857242,4.648478991826358,False,,2021,YounBr01,Bryce Young,4,Pass_ANY/A_adj,6,False
+StafMa00,Matthew Stafford,0.59763071565538,5.904298557624983,False,,2009,YounBr01,Bryce Young,4,Pass_ANY/A_adj,7,False
+MannEl00,Eli Manning,0.600868297041976,5.850962365591397,False,,2004,YounBr01,Bryce Young,4,Pass_ANY/A_adj,8,False
+BollKy00,Kyle Boller,0.6025209272051762,4.332217653897411,False,,2003,YounBr01,Bryce Young,4,Pass_ANY/A_adj,9,False
+RussJa00,JaMarcus Russell,0.6627421242980875,5.4740881352119,False,,2007,YounBr01,Bryce Young,4,Pass_ANY/A_adj,10,False

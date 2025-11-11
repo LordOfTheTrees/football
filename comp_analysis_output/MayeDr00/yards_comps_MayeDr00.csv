@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_0_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+LeinMa00,Matt Leinart,29.926705760824916,2726.926705760825,False,,2006,MayeDr00,Drake Maye,4,total_yards_adj,1,False
+SancMa00,Mark Sanchez,40.721061432198894,2656.278938567801,True,2012.0,2009,MayeDr00,Drake Maye,4,total_yards_adj,2,False
+PickKe00,Kenny Pickett,41.83541965543782,2655.164580344562,False,,2022,MayeDr00,Drake Maye,4,total_yards_adj,3,False
+AlleJo02,Josh Allen,51.995427118725274,2748.9954271187253,True,2021.0,2018,MayeDr00,Drake Maye,4,total_yards_adj,4,False
+WilsZa00,Zach Wilson,157.68012947700208,2539.319870522998,False,,2021,MayeDr00,Drake Maye,4,total_yards_adj,5,False
+BurrJo01,Joe Burrow,163.520193290502,2860.520193290502,True,2023.0,2020,MayeDr00,Drake Maye,4,total_yards_adj,6,False
+YounVi00,Vince Young,192.74397825424876,2889.7439782542488,False,,2006,MayeDr00,Drake Maye,4,total_yards_adj,7,False
+TrubMi00,Mitchell Trubisky,209.55556340091607,2487.444436599084,False,,2017,MayeDr00,Drake Maye,4,total_yards_adj,8,False
+StafMa00,Matthew Stafford,223.01471407900863,2473.9852859209914,False,,2009,MayeDr00,Drake Maye,4,total_yards_adj,9,False
+RoetBe00,Ben Roethlisberger,223.81767286829336,2920.8176728682934,True,2008.0,2004,MayeDr00,Drake Maye,4,total_yards_adj,10,False

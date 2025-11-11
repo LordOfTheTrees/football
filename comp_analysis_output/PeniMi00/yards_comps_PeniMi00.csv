@@ -1,0 +1,11 @@
+player_id,player_name,similarity_score,year_0_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
+LancTr00,Trey Lance,8.780619224600514,777.2193807753995,False,,2021,PeniMi00,Michael Penix,4,total_yards_adj,1,False
+RichAn03,Anthony Richardson,71.09308309202618,714.9069169079738,False,,2023,PeniMi00,Michael Penix,4,total_yards_adj,2,False
+TeboTi00,Tim Tebow,129.17548481161964,915.1754848116196,False,,2010,PeniMi00,Michael Penix,4,total_yards_adj,3,False
+LockJa00,Jake Locker,166.51904516945206,619.480954830548,False,,2011,PeniMi00,Michael Penix,4,total_yards_adj,4,False
+LyncPa00,Paxton Lynch,252.6182133841727,533.3817866158273,False,,2016,PeniMi00,Michael Penix,4,total_yards_adj,5,False
+CutlJa00,Jay Cutler,284.3922623922499,1070.39226239225,False,,2006,PeniMi00,Michael Penix,4,total_yards_adj,6,False
+GrosRe00,Rex Grossman,324.128429281648,461.871570718352,False,,2003,PeniMi00,Michael Penix,4,total_yards_adj,7,False
+GoffJa00,Jared Goff,343.0936287557265,1129.0936287557265,False,,2016,PeniMi00,Michael Penix,4,total_yards_adj,8,False
+MannEl00,Eli Manning,352.74916866257513,1138.7491686625751,False,,2004,PeniMi00,Michael Penix,4,total_yards_adj,9,False
+VickMi00,Michael Vick,358.1956842620957,1144.1956842620957,True,2004.0,2001,PeniMi00,Michael Penix,4,total_yards_adj,10,False
