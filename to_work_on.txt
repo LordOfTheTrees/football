@@ -67,6 +67,10 @@ to investigate:
 
 What is the probability for payment of the unsigned QBs in their last year at the team (year0-6)
 
+is injury removal and performance extrapolation more predictive of behavior or not adjusting?
+
+whether or not teams use the 5th year option for those with L&H or H&L production in practice
+
 Add in all the other rounds of QBs
 
 What is the most predictive with % of salary cap at signing
@@ -85,3 +89,5 @@ compare_qb_to_slot_average(qb_trajectory, slot_average)
 Calculates how QB performed vs. their draft slot expectation
 Identifies years above/below average
 Returns: Comparison metrics
+
+diving in to on field data
