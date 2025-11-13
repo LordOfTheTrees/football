@@ -1,11 +1,11 @@
 player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
-GoffJa00,Jared Goff,489.205155915234,4741.232968505829,False,,2016,FreeJo00,Josh Freeman,4,total_yards_adj,1,False
+GoffJa00,Jared Goff,489.205155915234,4741.232968505829,True,2019.0,2016,FreeJo00,Josh Freeman,4,total_yards_adj,1,False
 CutlJa00,Jay Cutler,489.3503707472589,3999.001900063447,False,,2006,FreeJo00,Josh Freeman,4,total_yards_adj,2,False
 TannRy00,Ryan Tannehill,521.941917675704,4455.971272540269,True,2015.0,2012,FreeJo00,Josh Freeman,4,total_yards_adj,3,False
 FlacJo00,Joe Flacco,531.4295826921231,3830.837075189576,True,2013.0,2008,FreeJo00,Josh Freeman,4,total_yards_adj,4,False
 JackLa00,Lamar Jackson,544.9241740791953,3678.435175680198,True,2023.0,2018,FreeJo00,Josh Freeman,4,total_yards_adj,5,False
-WentCa00,Carson Wentz,644.2187143805506,4339.88019904702,False,,2016,FreeJo00,Josh Freeman,4,total_yards_adj,6,False
+WentCa00,Carson Wentz,644.2187143805506,4339.88019904702,True,2019.0,2016,FreeJo00,Josh Freeman,4,total_yards_adj,6,False
 BortBl00,Blake Bortles,661.6622287809466,4085.278470432498,True,2018.0,2014,FreeJo00,Josh Freeman,4,total_yards_adj,7,False
-MannEl00,Eli Manning,662.132849685512,3566.734228582613,False,,2004,FreeJo00,Josh Freeman,4,total_yards_adj,8,False
+MannEl00,Eli Manning,662.132849685512,3566.734228582613,True,2009.0,2004,FreeJo00,Josh Freeman,4,total_yards_adj,8,False
 JoneDa05,Daniel Jones,666.2734465451102,3933.9867485377777,True,2023.0,2019,FreeJo00,Josh Freeman,4,total_yards_adj,9,False
 RyanMa00,Matt Ryan,679.5851992813243,4414.060783499942,True,2013.0,2008,FreeJo00,Josh Freeman,4,total_yards_adj,10,False

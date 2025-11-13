@@ -1,5 +1,5 @@
 player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
-MannEl00,Eli Manning,724.1596303719564,3566.734228582613,False,,2004,VickMi00,Michael Vick,4,total_yards_adj,1,False
+MannEl00,Eli Manning,724.1596303719564,3566.734228582613,True,2009.0,2004,VickMi00,Michael Vick,4,total_yards_adj,1,False
 JackLa00,Lamar Jackson,907.0571293631212,3678.435175680198,True,2023.0,2018,VickMi00,Michael Vick,4,total_yards_adj,2,False
 DarnSa00,Sam Darnold,966.9782786691325,2771.175198121366,False,,2018,VickMi00,Michael Vick,4,total_yards_adj,3,False
 SancMa00,Mark Sanchez,983.7410948098519,3007.257398162935,True,2012.0,2009,VickMi00,Michael Vick,4,total_yards_adj,4,False

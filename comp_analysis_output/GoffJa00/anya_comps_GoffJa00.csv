@@ -1,6 +1,6 @@
 player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
-StafMa00,Matthew Stafford,1.0571530930916035,5.951964240885889,False,,2009,GoffJa00,Jared Goff,4,Pass_ANY/A_adj,1,False
-WentCa00,Carson Wentz,1.062969630811393,6.322837577690994,False,,2016,GoffJa00,Jared Goff,4,Pass_ANY/A_adj,2,False
+StafMa00,Matthew Stafford,1.0571530930916035,5.951964240885889,True,2013.0,2009,GoffJa00,Jared Goff,4,Pass_ANY/A_adj,1,False
+WentCa00,Carson Wentz,1.062969630811393,6.322837577690994,True,2019.0,2016,GoffJa00,Jared Goff,4,Pass_ANY/A_adj,2,False
 AlleJo02,Josh Allen,1.1270605381681467,6.418271611701546,True,2021.0,2018,GoffJa00,Jared Goff,4,Pass_ANY/A_adj,3,False
 BurrJo01,Joe Burrow,1.4046347107833657,5.561053363889344,True,2023.0,2020,GoffJa00,Jared Goff,4,Pass_ANY/A_adj,4,False
 JackLa00,Lamar Jackson,1.485401346318713,5.814672400569739,True,2023.0,2018,GoffJa00,Jared Goff,4,Pass_ANY/A_adj,5,False

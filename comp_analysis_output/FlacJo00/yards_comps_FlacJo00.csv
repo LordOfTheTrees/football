@@ -1,6 +1,6 @@
 player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
 JoneDa05,Daniel Jones,389.1805390121609,3933.9867485377777,True,2023.0,2019,FlacJo00,Joe Flacco,4,total_yards_adj,1,False
-WentCa00,Carson Wentz,478.04096570359786,4339.88019904702,False,,2016,FlacJo00,Joe Flacco,4,total_yards_adj,2,False
+WentCa00,Carson Wentz,478.04096570359786,4339.88019904702,True,2019.0,2016,FlacJo00,Joe Flacco,4,total_yards_adj,2,False
 JackLa00,Lamar Jackson,529.3697101571105,3678.435175680198,True,2023.0,2018,FlacJo00,Joe Flacco,4,total_yards_adj,3,False
 FreeJo00,Josh Freeman,531.4295826921231,4343.012745406038,False,,2009,FlacJo00,Joe Flacco,4,total_yards_adj,4,False
 MayfBa00,Baker Mayfield,535.0053499389757,3169.36152160552,False,,2018,FlacJo00,Joe Flacco,4,total_yards_adj,5,False

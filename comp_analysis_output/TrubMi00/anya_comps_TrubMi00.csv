@@ -8,4 +8,4 @@ NewtCa00,Cam Newton,0.727914109023744,5.560523099147151,True,2015.0,2011,TrubMi0
 JoneDa05,Daniel Jones,0.8628703763255504,5.913507831934611,True,2023.0,2019,TrubMi00,Mitchell Trubisky,4,Pass_ANY/A_adj,7,False
 TannRy00,Ryan Tannehill,0.8896131676790063,6.0176481840864975,True,2015.0,2012,TrubMi00,Mitchell Trubisky,4,Pass_ANY/A_adj,8,False
 FlacJo00,Joe Flacco,0.9476393883728107,5.851190675834313,True,2013.0,2008,TrubMi00,Mitchell Trubisky,4,Pass_ANY/A_adj,9,False
-MannEl00,Eli Manning,0.9631337862211103,4.988562813503916,False,,2004,TrubMi00,Mitchell Trubisky,4,Pass_ANY/A_adj,10,False
+MannEl00,Eli Manning,0.9631337862211103,4.988562813503916,True,2009.0,2004,TrubMi00,Mitchell Trubisky,4,Pass_ANY/A_adj,10,False

@@ -1,3 +1,3 @@
 target_qb_id,target_qb_name,decision_year,metric,n_comps,payment_rate_pct,comps_paid,comps_not_paid,is_projection
-FreeJo00,Josh Freeman,4,total_yards_adj,10,60.0,6,4,False
-FreeJo00,Josh Freeman,4,Pass_ANY/A_adj,10,60.0,6,4,False
+FreeJo00,Josh Freeman,4,total_yards_adj,10,90.0,9,1,False
+FreeJo00,Josh Freeman,4,Pass_ANY/A_adj,10,70.0,7,3,False

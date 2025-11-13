@@ -1,5 +1,5 @@
 player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
-MannEl00,Eli Manning,331.4261508961253,3566.734228582613,False,,2004,JackLa00,Lamar Jackson,4,total_yards_adj,1,False
+MannEl00,Eli Manning,331.4261508961253,3566.734228582613,True,2009.0,2004,JackLa00,Lamar Jackson,4,total_yards_adj,1,False
 FlacJo00,Joe Flacco,529.3697101571105,3830.837075189576,True,2013.0,2008,JackLa00,Lamar Jackson,4,total_yards_adj,2,False
 FreeJo00,Josh Freeman,544.9241740791953,4343.012745406038,False,,2009,JackLa00,Lamar Jackson,4,total_yards_adj,3,False
 CutlJa00,Jay Cutler,548.3841906035408,3999.001900063447,False,,2006,JackLa00,Lamar Jackson,4,total_yards_adj,4,False

@@ -1,8 +1,8 @@
 player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
 AlleJo02,Josh Allen,0.749751253104113,6.418271611701546,True,2021.0,2018,TagoTu00,Tua Tagovailoa,4,Pass_ANY/A_adj,1,False
 WinsJa00,Jameis Winston,1.2132601406665922,6.457005153076689,False,,2015,TagoTu00,Tua Tagovailoa,4,Pass_ANY/A_adj,2,False
-StafMa00,Matthew Stafford,1.2816031514004462,5.951964240885889,False,,2009,TagoTu00,Tua Tagovailoa,4,Pass_ANY/A_adj,3,False
-WentCa00,Carson Wentz,1.3149425025358996,6.322837577690994,False,,2016,TagoTu00,Tua Tagovailoa,4,Pass_ANY/A_adj,4,False
+StafMa00,Matthew Stafford,1.2816031514004462,5.951964240885889,True,2013.0,2009,TagoTu00,Tua Tagovailoa,4,Pass_ANY/A_adj,3,False
+WentCa00,Carson Wentz,1.3149425025358996,6.322837577690994,True,2019.0,2016,TagoTu00,Tua Tagovailoa,4,Pass_ANY/A_adj,4,False
 LuckAn00,Andrew Luck,1.3452880626950672,5.1318014970889925,True,2016.0,2012,TagoTu00,Tua Tagovailoa,4,Pass_ANY/A_adj,5,False
 FlacJo00,Joe Flacco,1.4164137808472497,5.851190675834313,True,2013.0,2008,TagoTu00,Tua Tagovailoa,4,Pass_ANY/A_adj,6,False
 WeedBr00,Brandon Weeden,1.4258013641741607,6.628576933739948,False,,2012,TagoTu00,Tua Tagovailoa,4,Pass_ANY/A_adj,7,False

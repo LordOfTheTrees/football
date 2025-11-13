@@ -7,5 +7,5 @@ TagoTu00,Tua Tagovailoa,737.2707942041571,4710.564790510043,True,2024.0,2020,Gof
 TannRy00,Ryan Tannehill,821.2068858414256,4455.971272540269,True,2015.0,2012,GoffJa00,Jared Goff,4,total_yards_adj,6,False
 JackLa00,Lamar Jackson,907.6032355325428,3678.435175680198,True,2023.0,2018,GoffJa00,Jared Goff,4,total_yards_adj,7,False
 MahoPa00,Patrick Mahomes,909.0920569010143,5102.440259975425,True,2020.0,2017,GoffJa00,Jared Goff,4,total_yards_adj,8,False
-MannEl00,Eli Manning,957.0380103585628,3566.734228582613,False,,2004,GoffJa00,Jared Goff,4,total_yards_adj,9,False
+MannEl00,Eli Manning,957.0380103585628,3566.734228582613,True,2009.0,2004,GoffJa00,Jared Goff,4,total_yards_adj,9,False
 RyanMa00,Matt Ryan,971.7301523415422,4414.060783499942,True,2013.0,2008,GoffJa00,Jared Goff,4,total_yards_adj,10,False

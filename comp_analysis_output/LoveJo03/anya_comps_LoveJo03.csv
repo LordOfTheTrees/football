@@ -1,8 +1,8 @@
 player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
 JackLa00,Lamar Jackson,1.3876182321034318,5.814672400569739,True,2023.0,2018,LoveJo03,Jordan Love,4,Pass_ANY/A_adj,1,False
-WentCa00,Carson Wentz,1.415649010675597,6.322837577690994,False,,2016,LoveJo03,Jordan Love,4,Pass_ANY/A_adj,2,False
+WentCa00,Carson Wentz,1.415649010675597,6.322837577690994,True,2019.0,2016,LoveJo03,Jordan Love,4,Pass_ANY/A_adj,2,False
 MahoPa00,Patrick Mahomes,1.4700736464643254,8.396758885686841,True,2020.0,2017,LoveJo03,Jordan Love,4,Pass_ANY/A_adj,3,False
-GoffJa00,Jared Goff,1.5467755928589635,6.52484516803256,False,,2016,LoveJo03,Jordan Love,4,Pass_ANY/A_adj,4,False
+GoffJa00,Jared Goff,1.5467755928589635,6.52484516803256,True,2019.0,2016,LoveJo03,Jordan Love,4,Pass_ANY/A_adj,4,False
 BurrJo01,Joe Burrow,1.6518518683370769,5.561053363889344,True,2023.0,2020,LoveJo03,Jordan Love,4,Pass_ANY/A_adj,5,False
 RoetBe00,Ben Roethlisberger,1.8495167594073834,6.779063574367354,True,2008.0,2004,LoveJo03,Jordan Love,4,Pass_ANY/A_adj,6,False
 MariMa01,Marcus Mariota,1.873768224110177,5.819401195954696,False,,2015,LoveJo03,Jordan Love,4,Pass_ANY/A_adj,7,False

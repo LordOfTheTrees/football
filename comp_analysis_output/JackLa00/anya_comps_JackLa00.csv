@@ -1,6 +1,6 @@
 player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
 BurrJo01,Joe Burrow,0.3695888591741987,5.561053363889344,True,2023.0,2020,JackLa00,Lamar Jackson,4,Pass_ANY/A_adj,1,False
-WentCa00,Carson Wentz,0.5673298004965692,6.322837577690994,False,,2016,JackLa00,Lamar Jackson,4,Pass_ANY/A_adj,2,False
+WentCa00,Carson Wentz,0.5673298004965692,6.322837577690994,True,2019.0,2016,JackLa00,Lamar Jackson,4,Pass_ANY/A_adj,2,False
 HerbJu00,Justin Herbert,0.7616385542378301,6.172268238118623,True,2023.0,2020,JackLa00,Lamar Jackson,4,Pass_ANY/A_adj,3,False
 MariMa01,Marcus Mariota,0.8590639830376963,5.819401195954696,False,,2015,JackLa00,Lamar Jackson,4,Pass_ANY/A_adj,4,False
 MurrKy00,Kyler Murray,0.8908839636730974,5.180594297586179,True,2022.0,2019,JackLa00,Lamar Jackson,4,Pass_ANY/A_adj,5,False

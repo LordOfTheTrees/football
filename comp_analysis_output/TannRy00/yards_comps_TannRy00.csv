@@ -1,6 +1,6 @@
 player_id,player_name,similarity_score,year_3_total_yards_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
 BortBl00,Blake Bortles,418.0903360393938,4085.278470432498,True,2018.0,2014,TannRy00,Ryan Tannehill,4,total_yards_adj,1,False
-WentCa00,Carson Wentz,503.0981852572622,4339.88019904702,False,,2016,TannRy00,Ryan Tannehill,4,total_yards_adj,2,False
+WentCa00,Carson Wentz,503.0981852572622,4339.88019904702,True,2019.0,2016,TannRy00,Ryan Tannehill,4,total_yards_adj,2,False
 FreeJo00,Josh Freeman,521.941917675704,4343.012745406038,False,,2009,TannRy00,Ryan Tannehill,4,total_yards_adj,3,False
 FlacJo00,Joe Flacco,558.3968048241994,3830.837075189576,True,2013.0,2008,TannRy00,Ryan Tannehill,4,total_yards_adj,4,False
 RyanMa00,Matt Ryan,650.8174557071591,4414.060783499942,True,2013.0,2008,TannRy00,Ryan Tannehill,4,total_yards_adj,5,False
@@ -8,4 +8,4 @@ NewtCa00,Cam Newton,705.5039988314988,3766.465337019326,True,2015.0,2011,TannRy0
 AlleJo02,Josh Allen,719.1284672189789,5211.704537754625,True,2021.0,2018,TannRy00,Ryan Tannehill,4,total_yards_adj,7,False
 JoneDa05,Daniel Jones,778.7675597194248,3933.9867485377777,True,2023.0,2019,TannRy00,Ryan Tannehill,4,total_yards_adj,8,False
 JackLa00,Lamar Jackson,798.002972763692,3678.435175680198,True,2023.0,2018,TannRy00,Ryan Tannehill,4,total_yards_adj,9,False
-GoffJa00,Jared Goff,821.2068858414256,4741.232968505829,False,,2016,TannRy00,Ryan Tannehill,4,total_yards_adj,10,False
+GoffJa00,Jared Goff,821.2068858414256,4741.232968505829,True,2019.0,2016,TannRy00,Ryan Tannehill,4,total_yards_adj,10,False

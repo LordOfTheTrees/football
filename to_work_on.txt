@@ -1,64 +1,9 @@
-
-formalize decision logic around payment timing...
-
-look into carson wentz, jared goff, matt stafford, eli manning (traded before in effect?)
-
-# QBs Who Need to Be Reclassified as PAID
-
-## Definite Corrections (Signed Extensions with Drafting Team Before Being Traded)
-
-1. **Carson Wentz** (2016, PHI)
-   - June 2019: Signed 4yr/$128M extension with Philadelphia Eagles
-   - February 2021: Traded to Indianapolis Colts
-   - **Currently marked: UNPAID → Should be: PAID**
-
-2. **Jared Goff** (2016, LAR)
-   - September 2019: Signed 4yr/$134M extension with LA Rams
-   - January 2021: Traded to Detroit Lions
-   - **Currently marked: UNPAID → Should be: PAID**
-
-3. **Matthew Stafford** (2009, DET)
-   - 2013: Signed 3yr/$53M extension with Detroit Lions
-   - 2017: Signed 5yr/$135M extension with Detroit Lions
-   - 2021: Traded to LA Rams
-   - **Currently marked: NOT IN DATASET → Should be: PAID**
-
-## Corrected Payment Statistics
-
-**Before Corrections:**
-- Total QBs who reached decision: 65
-- Paid: 24 (36.9%)
-- Unpaid: 41 (63.1%)
-
-**After Corrections (Adding Wentz, Goff, Stafford):**
-- Total QBs who reached decision: 65
-- **Paid: 27 (41.5%)**
-- **Unpaid: 38 (58.5%)**
-
-## Edge Cases to Consider
-
-**Draft Day Trades (May or may not count depending on your criteria):**
-- **Eli Manning** (2004) - Drafted by SD, traded to NYG on draft day, signed 2009 extension with NYG
-- **Philip Rivers** (2004) - Drafted by NYG, traded to SD on draft day, signed 2009 extension with SD
-
-*If you include Manning & Rivers: 29/65 = 44.6% paid*
-
-**Fifth-Year Options Only:**
-- **Marcus Mariota** (2015, TEN) - Fifth-year option exercised, no long-term extension
-- **Jameis Winston** (2015, TAM) - Fifth-year option exercised, no long-term extension
-
-## Recommendation for Article 1
-
-Use **27/65 (41.5%)** as the corrected success rate. This includes only QBs who signed actual contract extensions with their drafting team, even if they were later traded. This is the most defensible and consistent with your stated methodology.
-
-
-//////////////////////////////////////////later//////////////////////////////////
-
 organize, group, and sanitize the workflow of my code to be more comprehensible to others
+      probably breaking down into more files
 
 create more data validation functions
 
-set up scripts to auto run
+set up scripts to auto run based on current year
 
 to investigate:
 //////////////////////////////////////////later//////////////////////////////////

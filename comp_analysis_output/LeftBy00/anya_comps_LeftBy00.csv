@@ -8,4 +8,4 @@ TannRy00,Ryan Tannehill,0.6441721417590652,6.0176481840864975,True,2015.0,2012,L
 MayfBa00,Baker Mayfield,0.6607086051062121,5.442452887038458,False,,2018,LeftBy00,Byron Leftwich,4,Pass_ANY/A_adj,7,False
 BurrJo01,Joe Burrow,0.7295327097156921,5.561053363889344,True,2023.0,2020,LeftBy00,Byron Leftwich,4,Pass_ANY/A_adj,8,False
 NewtCa00,Cam Newton,0.7512615457877734,5.560523099147151,True,2015.0,2011,LeftBy00,Byron Leftwich,4,Pass_ANY/A_adj,9,False
-StafMa00,Matthew Stafford,0.7798517267051709,5.951964240885889,False,,2009,LeftBy00,Byron Leftwich,4,Pass_ANY/A_adj,10,False
+StafMa00,Matthew Stafford,0.7798517267051709,5.951964240885889,True,2013.0,2009,LeftBy00,Byron Leftwich,4,Pass_ANY/A_adj,10,False

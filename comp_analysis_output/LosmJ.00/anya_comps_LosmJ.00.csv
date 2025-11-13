@@ -1,11 +1,11 @@
 player_id,player_name,similarity_score,year_3_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
 RodgAa00,Aaron Rodgers,1.904053210695062,6.858102871284342,True,2008.0,2005,LosmJ.00,J.P. Losman,4,Pass_ANY/A_adj,1,False
 CarrDa00,David Carr,2.41176910824278,3.917962365591397,False,,2002,LosmJ.00,J.P. Losman,4,Pass_ANY/A_adj,2,False
-MannEl00,Eli Manning,2.419607646532369,4.988562813503916,False,,2004,LosmJ.00,J.P. Losman,4,Pass_ANY/A_adj,3,False
+MannEl00,Eli Manning,2.419607646532369,4.988562813503916,True,2009.0,2004,LosmJ.00,J.P. Losman,4,Pass_ANY/A_adj,3,False
 HarrJo00,Joey Harrington,2.574137196933832,4.655827956989247,False,,2002,LosmJ.00,J.P. Losman,4,Pass_ANY/A_adj,4,False
 SancMa00,Mark Sanchez,2.7062501756271597,4.466534266826589,True,2012.0,2009,LosmJ.00,J.P. Losman,4,Pass_ANY/A_adj,5,False
 BortBl00,Blake Bortles,2.7576474092349623,6.297621769383697,True,2018.0,2014,LosmJ.00,J.P. Losman,4,Pass_ANY/A_adj,6,False
-StafMa00,Matthew Stafford,2.844784280517549,5.951964240885889,False,,2009,LosmJ.00,J.P. Losman,4,Pass_ANY/A_adj,7,False
+StafMa00,Matthew Stafford,2.844784280517549,5.951964240885889,True,2013.0,2009,LosmJ.00,J.P. Losman,4,Pass_ANY/A_adj,7,False
 BradSa00,Sam Bradford,2.9464902183467157,6.236351742567642,False,,2010,LosmJ.00,J.P. Losman,4,Pass_ANY/A_adj,8,False
 FreeJo00,Josh Freeman,2.9546754173165373,6.453937128671446,False,,2009,LosmJ.00,J.P. Losman,4,Pass_ANY/A_adj,9,False
 VickMi00,Michael Vick,2.965978174576096,5.071610570788556,True,2004.0,2001,LosmJ.00,J.P. Losman,4,Pass_ANY/A_adj,10,False
