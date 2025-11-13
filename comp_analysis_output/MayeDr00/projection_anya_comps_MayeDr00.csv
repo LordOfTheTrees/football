@@ -1,5 +1,5 @@
 player_id,player_name,similarity_score,year_1_Pass_ANY/A_adj,got_paid,payment_year,draft_year,target_qb_id,target_qb_name,decision_year,metric,comp_rank,is_projection
-WentCa00,Carson Wentz,0.31191923392701143,7.534835707974373,False,,2016,MayeDr00,Drake Maye,2,Pass_ANY/A_adj,1,True
+WentCa00,Carson Wentz,0.31191923392701143,7.534835707974373,True,2019.0,2016,MayeDr00,Drake Maye,2,Pass_ANY/A_adj,1,True
 BurrJo01,Joe Burrow,0.5547650321911006,7.555050125999782,True,2023.0,2020,MayeDr00,Drake Maye,2,Pass_ANY/A_adj,2,True
 JackLa00,Lamar Jackson,0.71321410204103,8.2722108244871,True,2023.0,2018,MayeDr00,Drake Maye,2,Pass_ANY/A_adj,3,True
 TrubMi00,Mitchell Trubisky,0.9196870304318399,6.669539805450686,False,,2017,MayeDr00,Drake Maye,2,Pass_ANY/A_adj,4,True
