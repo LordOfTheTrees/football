@@ -3640,7 +3640,7 @@ def create_simple_knn_payment_surface(
         
         # Save to CSV
         safe_metric_name = metric.replace('/', '_').replace('%', 'pct')
-        output_file = f'simple_knn_decision{decision_year}_{safe_metric_name}_k{k}.csv'
+        output_file = f'KNN_surfaces/simple_knn_decision{decision_year}_{safe_metric_name}_k{k}.csv'
         results_df.to_csv(output_file, index=False)
         print(f"  ✓ Saved to: {output_file}")
     
@@ -5648,6 +5648,12 @@ if __name__ == "__main__":
     if payment_model_results is None:
         print("✗ ERROR: Payment prediction model failed")
         exit(1)
+    
+    # STEP 8C: re-generate KNN surfaces
+    print("\n" + "="*80)
+    print("RUNNING PAYMENT PREDICTION MODEL")
+    print("="*80)
+    run_all_simple_knn_surfaces()
 
     # STEP 9: Generate Tableau exports
     print("\n" + "="*80)
