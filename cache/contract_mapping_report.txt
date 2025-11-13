@@ -2,7 +2,7 @@ CONTRACT MAPPING VALIDATION REPORT
 ================================================================================
 
 total_contracts: 2024
-mapped_contracts: 257
-unmapped_contracts: 1767
-unique_players: 67
+mapped_contracts: 270
+unmapped_contracts: 1754
+unique_players: 71
 issues: ['Found 15 player-years with multiple contracts']

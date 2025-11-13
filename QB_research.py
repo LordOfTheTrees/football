@@ -24,7 +24,7 @@ from sklearn.linear_model import Ridge, RidgeCV, LogisticRegression
 from sklearn.model_selection import cross_val_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import confusion_matrix, classification_report, roc_auc_score, roc_curve, precision_recall_curve
-
+import argparse
 
 def load_csv_safe(filepath, description="file"):
     """
@@ -1813,13 +1813,30 @@ def create_payment_year_mapping(contract_df):
         'Football Team': 'WAS', 'Redskins': 'WAS'
     }
     
-    paid_contracts['team_normalized'] = paid_contracts['Team'].map(team_mapping).fillna(paid_contracts['Team'])
-    
+    # First, extract signing team from multi-team strings (e.g., "PHI/WAS/IND" -> "PHI")
+    paid_contracts['Team_signing'] = paid_contracts['Team'].apply(
+        lambda x: x.split('/')[0].strip() if pd.notna(x) and isinstance(x, str) else x
+    )
+
+    # Then normalize using the mapping
+    paid_contracts['team_normalized'] = paid_contracts['Team_signing'].map(team_mapping).fillna(paid_contracts['Team_signing'])
+
     # For each player, find FIRST contract with draft team in Years 2-6
     payment_mapping = {}
     excluded_other_team = 0
     excluded_outside_window = 0
     
+    # Handle draft-day trades
+    draft_day_trade_corrections = {
+        'MannEl00': 'NYG',  # Eli Manning: drafted by SDG, traded to NYG
+        'RivePh00': 'SDG',  # back half of the swap
+    }
+
+    for player_id, corrected_team in draft_day_trade_corrections.items():
+        if player_id in paid_contracts['player_id'].values:
+            paid_contracts.loc[paid_contracts['player_id'] == player_id, 'draft_team'] = corrected_team
+            print(f"  ✓ Corrected draft_team for player {player_id} → {corrected_team}")
+
     for player_id, group in paid_contracts.groupby('player_id'):
         draft_year = group.iloc[0]['draft_year']
         draft_team = group.iloc[0]['draft_team']
@@ -2612,7 +2629,7 @@ def ridge_regression_payment_prediction(alpha_range=None, exclude_recent_drafts=
     }
     
     # Save CSV files
-    importance_df.to_csv('payment_prediction_logistic_importance.csv', index=False)
+    importance_df.to_csv('payment_prediction_min_variables/payment_prediction_logistic_importance.csv', index=False)
     
     # Save predictions
     test_results_df = pd.DataFrame({
@@ -2620,7 +2637,7 @@ def ridge_regression_payment_prediction(alpha_range=None, exclude_recent_drafts=
         'Predicted_Probability': y_test_prob,
         'Predicted_Class': y_test_pred
     })
-    test_results_df.to_csv('payment_prediction_logistic_test_results.csv', index=False)
+    test_results_df.to_csv('payment_prediction_min_variables/payment_prediction_logistic_test_results.csv', index=False)
     
     print(f"\n✓ Results saved to:")
     print(f"  - payment_prediction_logistic_importance.csv")
@@ -3271,14 +3288,8 @@ def create_era_adjusted_payment_data(force_refresh=False):
         print("Run prepare_qb_payment_data() first")
         return None
 
-    # Try to load era-adjusted version first, fall back to regular
-    if os.path.exists('qb_seasons_payment_labeled_era_adjusted.csv'):
-        payment_df = load_csv_safe('qb_seasons_payment_labeled_era_adjusted.csv')
-        print(f"✓ Using ERA-ADJUSTED data")
-    else:
-        payment_df = load_csv_safe('qb_seasons_payment_labeled.csv')
-        print(f"⚠️  Using non-adjusted data (run create_era_adjusted_payment_data() first)")
-
+    payment_df = load_csv_safe('qb_seasons_payment_labeled.csv')
+    print(f"✓ Loaded fresh payment_labeled.csv")
     print(f"✓ Loaded {len(payment_df)} seasons")
     
     # Apply adjustments
@@ -3848,7 +3859,7 @@ def export_individual_qb_trajectories(
     
     # Save to CSV
     output_file = 'qb_trajectories_for_tableau.csv'
-    trajectories_df.to_csv(output_file, index=False)
+    trajectories_df.to_csv(output_file, index=False, mode='w')  # 'w' = write mode (overwrite)
     print(f"\n✓ Saved to: {output_file}")
     
     return trajectories_df
@@ -3954,7 +3965,7 @@ def export_cohort_summary_stats(
     
     # Save to CSV
     output_file = 'cohort_summary_stats.csv'
-    summary_df.to_csv(output_file, index=False)
+    summary_df.to_csv(output_file, index=False, mode='w')
     print(f"\n✓ Saved to: {output_file}")
     
     return summary_df
@@ -5016,9 +5027,9 @@ def payment_prediction_logistic_ridge(alpha_range=None, exclude_recent_drafts=Tr
         print(f"  {row['Feature']}: {direction} payment probability (p = {row['P_Value_Bootstrap']:.4f}) {sig_marker}")
     
     # Save results with p-values
-    threshold_df.to_csv('payment_prediction_confusion_matrix_analysis.csv', index=False)
-    feature_importance.to_csv('payment_prediction_classification_importance.csv', index=False)
-    p_values_df.to_csv('payment_prediction_pvalues_bootstrap.csv', index=False)
+    threshold_df.to_csv('payment_prediction_min_variables/payment_prediction_confusion_matrix_analysis.csv', index=False)
+    feature_importance.to_csv('payment_prediction_min_variables/payment_prediction_classification_importance.csv', index=False)
+    p_values_df.to_csv('payment_prediction_min_variables/payment_prediction_pvalues_bootstrap.csv', index=False)
     
     print(f"\n✓ Results saved to:")
     print(f"  - payment_prediction_confusion_matrix_analysis.csv")
@@ -5363,8 +5374,117 @@ def batch_comp_analysis(qb_list, decision_year=4, n_comps=5, use_year_weights=Tr
     
     return all_results
 
+def debug_specific_qb(qb_name, data_stage='all'):
+    """
+    Debug a specific QB through the pipeline.
+    
+    Args:
+        qb_name (str): QB name to search for (case-insensitive, partial match)
+        data_stage (str): Which stage to check - 'contracts', 'payment', 'prepared', 'era', 'export', 'all'
+    """
+    print("\n" + "="*80)
+    print(f"🔍 DEBUGGING: {qb_name}")
+    print("="*80)
+    
+    stages_to_check = ['contracts', 'payment', 'prepared', 'era', 'export'] if data_stage == 'all' else [data_stage]
+    
+    for stage in stages_to_check:
+        print(f"\n--- Stage: {stage.upper()} ---")
+        
+        if stage == 'contracts':
+            # Check mapped contracts
+            if os.path.exists('cache/contract_player_id_mapping.csv'):
+                df = load_csv_safe('cache/contract_player_id_mapping.csv')
+                if df is not None:
+                    qb_data = df[df['Player'].str.contains(qb_name, case=False, na=False)]
+                    if len(qb_data) > 0:
+                        print(f"  ✅ Found {len(qb_data)} contracts")
+                        for _, row in qb_data.iterrows():
+                            print(f"    {row['Year']}: {row['Player']} → player_id: {row.get('player_id', 'NO_ID')}, Team: {row['Team']}")
+                    else:
+                        print(f"  ❌ Not found in contracts")
+            else:
+                print(f"  ⚠️  Contract mapping file not found")
+        
+        elif stage == 'payment':
+            # Check payment mapping (this is a dict, need to reconstruct)
+            print(f"  ℹ️  Payment mapping is in-memory dict - run full pipeline to check")
+        
+        elif stage == 'prepared':
+            # Check prepared payment data
+            if os.path.exists('qb_seasons_payment_labeled.csv'):
+                df = load_csv_safe('qb_seasons_payment_labeled.csv')
+                if df is not None:
+                    qb_data = df[df['player_name'].str.contains(qb_name, case=False, na=False)]
+                    if len(qb_data) > 0:
+                        print(f"  ✅ Found {len(qb_data)} seasons")
+                        sample = qb_data.iloc[0]
+                        print(f"    player_id: {sample['player_id']}")
+                        print(f"    draft_year: {sample['draft_year']}")
+                        print(f"    got_paid: {sample['got_paid']}")
+                        print(f"    payment_year: {sample['payment_year']}")
+                    else:
+                        print(f"  ❌ Not found in prepared data")
+            else:
+                print(f"  ⚠️  Prepared data file not found")
+        
+        elif stage == 'era':
+            # Check era-adjusted data
+            if os.path.exists('qb_seasons_payment_labeled_era_adjusted.csv'):
+                df = load_csv_safe('qb_seasons_payment_labeled_era_adjusted.csv')
+                if df is not None:
+                    qb_data = df[df['player_name'].str.contains(qb_name, case=False, na=False)]
+                    if len(qb_data) > 0:
+                        print(f"  ✅ Found {len(qb_data)} seasons")
+                        print(f"    got_paid: {qb_data.iloc[0]['got_paid']}")
+                        print(f"    payment_year: {qb_data.iloc[0]['payment_year']}")
+                    else:
+                        print(f"  ❌ Not found in era-adjusted data")
+            else:
+                print(f"  ⚠️  Era-adjusted data file not found")
+        
+        elif stage == 'export':
+            # Check Tableau export
+            if os.path.exists('qb_trajectories_for_tableau.csv'):
+                df = load_csv_safe('qb_trajectories_for_tableau.csv')
+                if df is not None:
+                    qb_data = df[df['player_name'].str.contains(qb_name, case=False, na=False)]
+                    if len(qb_data) > 0:
+                        print(f"  ✅ Found {len(qb_data)} seasons in export")
+                        print(f"    got_paid: {qb_data.iloc[0]['got_paid']}")
+                        print(f"    payment_year: {qb_data.iloc[0]['payment_year']}")
+                    else:
+                        print(f"  ❌ Not found in Tableau export")
+            else:
+                print(f"  ⚠️  Tableau export file not found")
+    
+    print("\n" + "="*80)
 
 if __name__ == "__main__":
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description='QB Data Pipeline and Analysis')
+    parser.add_argument('-q', '--qb', type=str, help='Debug specific QB (e.g., "Stafford")')
+    parser.add_argument('--stage', type=str, default='all', 
+                       choices=['contracts', 'payment', 'prepared', 'era', 'export', 'all'],
+                       help='Which pipeline stage to check')
+    parser.add_argument('--skip-rebuild', action='store_true', 
+                       help='Skip full rebuild, just run QB debug')
+    
+    args = parser.parse_args()
+    
+    # If QB debug mode requested
+    if args.qb:
+        if args.skip_rebuild:
+            # Just debug the QB without rebuilding
+            debug_specific_qb(args.qb, args.stage)
+            exit(0)
+        else:
+            # Set up debugging for this QB during rebuild
+            DEBUG_QB = args.qb
+            print(f"\n🎯 Will debug {DEBUG_QB} throughout pipeline")
+    else:
+        DEBUG_QB = None
+    
     print("="*80)
     print("QB DATA REBUILD WORKFLOW")
     print("="*80)
@@ -5412,7 +5532,17 @@ if __name__ == "__main__":
     if mapped_contracts is None:
         print("✗ ERROR: Failed to create contract mapping")
         exit(1)
-        
+    
+    if DEBUG_QB:
+        print(f"\n🔍 DEBUG {DEBUG_QB}: After contract mapping")
+        if mapped_contracts is not None:
+            qb_data = mapped_contracts[mapped_contracts['Player'].str.contains(DEBUG_QB, case=False, na=False)]
+            if len(qb_data) > 0:
+                print(f"  ✅ Found {len(qb_data)} contracts with player_id: {qb_data.iloc[0].get('player_id', 'NO_ID')}")
+            else:
+                print(f"  ❌ Not found in contracts")
+
+    
     # STEP 4: Test name matching for debugging
     print("\n" + "="*80)
     print("TESTING NAME MATCHING")
@@ -5433,6 +5563,19 @@ if __name__ == "__main__":
     payment_mapping = create_payment_year_mapping(mapped_contracts)
     print(f"✓ Payment mapping created: {len(payment_mapping)} players")
     
+    if DEBUG_QB:
+        print(f"\n🔍 DEBUG {DEBUG_QB}: After payment mapping")
+        # Find player_id for this QB
+        if os.path.exists('cache/contract_player_id_mapping.csv'):
+            contracts = pd.read_csv('cache/contract_player_id_mapping.csv')
+            qb_contracts = contracts[contracts['Player'].str.contains(DEBUG_QB, case=False, na=False)]
+            if len(qb_contracts) > 0:
+                qb_id = qb_contracts.iloc[0]['player_id']
+                if qb_id in payment_mapping:
+                    print(f"  ✅ {qb_id} → payment_year: {payment_mapping[qb_id]}")
+                else:
+                    print(f"  ❌ {qb_id} NOT in payment_mapping")
+
     # STEP 6: Prepare QB payment data (this builds the main dataset)
     print("\n" + "="*80)
     print("PREPARING QB PAYMENT DATA")
@@ -5446,12 +5589,30 @@ if __name__ == "__main__":
     # Validate the prepared data
     report = validate_payment_data(prepared_df)
     
+    if DEBUG_QB:
+        print(f"\n🔍 DEBUG {DEBUG_QB}: After prepared data")
+        if prepared_df is not None:
+            qb_data = prepared_df[prepared_df['player_name'].str.contains(DEBUG_QB, case=False, na=False)]
+            if len(qb_data) > 0:
+                print(f"  ✅ Found {len(qb_data)} seasons, got_paid: {qb_data.iloc[0]['got_paid']}")
+            else:
+                print(f"  ❌ Not found")
+
     # STEP 7: Create era-adjusted version (force refresh to avoid circular dependency)
     print("\n" + "="*80)
     print("CREATING ERA-ADJUSTED DATA")
     print("="*80)
     adjusted_df = create_era_adjusted_payment_data(force_refresh=True)
     
+    if DEBUG_QB:
+        print(f"\n🔍 DEBUG {DEBUG_QB}: After era adjustment")
+        if adjusted_df is not None:
+            qb_data = adjusted_df[adjusted_df['player_name'].str.contains(DEBUG_QB, case=False, na=False)]
+            if len(qb_data) > 0:
+                print(f"  ✅ got_paid: {qb_data.iloc[0]['got_paid']}")
+            else:
+                print(f"  ❌ Not found")
+
     if adjusted_df is None:
         print("✗ ERROR: Failed to create era-adjusted data")
         exit(1)
@@ -5492,8 +5653,17 @@ if __name__ == "__main__":
     print("\n" + "="*80)
     print("GENERATING TABLEAU EXPORTS")
     print("="*80)
-    trajectories, summary = generate_complete_tableau_exports()
+    trajectories, summary = generate_complete_tableau_exports() #this alwasys does a forced refresh to ensure data is up to date
     
+    if DEBUG_QB:
+        print(f"\n🔍 DEBUG {DEBUG_QB}: In final Tableau export")
+        if trajectories is not None:
+            qb_data = trajectories[trajectories['player_name'].str.contains(DEBUG_QB, case=False, na=False)]
+            if len(qb_data) > 0:
+                print(f"  ✅ Found {len(qb_data)} seasons, got_paid: {qb_data.iloc[0]['got_paid']}")
+            else:
+                print(f"  ❌ Not found in export")
+
     # STEP 10: Verify data quality
     print("\n" + "="*80)
     print("VERIFYING DATA QUALITY")
