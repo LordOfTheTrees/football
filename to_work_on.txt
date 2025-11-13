@@ -8,6 +8,8 @@ set up scripts to auto run based on current year
 to investigate:
 //////////////////////////////////////////later//////////////////////////////////
 
+do an article on biggest differences between my model and what actually happened, and why?
+
 What is the probability for payment of the unsigned QBs in their last year at the team (year0-6)
 
 is injury removal and performance extrapolation more predictive of behavior or not adjusting?
