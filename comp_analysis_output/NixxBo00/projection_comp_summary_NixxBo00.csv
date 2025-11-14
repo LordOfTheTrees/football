@@ -1,3 +1,0 @@
-target_qb_id,target_qb_name,decision_year,metric,n_comps,payment_rate_pct,comps_paid,comps_not_paid,is_projection
-NixxBo00,Bo Nix,2,total_yards_adj,10,70.0,7,3,True
-NixxBo00,Bo Nix,2,Pass_ANY/A_adj,10,20.0,2,8,True

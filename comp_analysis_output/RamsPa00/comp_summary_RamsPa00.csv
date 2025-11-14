@@ -1,3 +1,0 @@
-target_qb_id,target_qb_name,decision_year,metric,n_comps,payment_rate_pct,comps_paid,comps_not_paid,is_projection
-RamsPa00,Patrick Ramsey,4,total_yards_adj,10,0.0,0,10,False
-RamsPa00,Patrick Ramsey,4,Pass_ANY/A_adj,10,30.0,3,7,False

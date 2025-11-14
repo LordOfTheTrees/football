@@ -1,3 +1,0 @@
-target_qb_id,target_qb_name,decision_year,metric,n_comps,payment_rate_pct,comps_paid,comps_not_paid,is_projection
-LoveJo03,Jordan Love,4,total_yards_adj,10,50.0,5,5,False
-LoveJo03,Jordan Love,4,Pass_ANY/A_adj,10,80.0,8,2,False
