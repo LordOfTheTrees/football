@@ -207,10 +207,12 @@ complete_variables_wins_payment/
 scatter_plots/
 old_analyses/
 old_csvs/
+old_scripts/
 
 # Tableau workbooks (can be large)
 *.twbx
 *.twb
+article_tableaus/
 
 # Test output files
 test_*.csv
