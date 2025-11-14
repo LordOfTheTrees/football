@@ -176,3 +176,62 @@ cython_debug/
 # my config.py file
 # This file is used to store sensitive information such as API keys, database URLs, etc.
 config.py
+
+# ============================================
+# Data Science / Research Project Specific
+# ============================================
+
+# Data directories (raw and processed)
+QB_Data/
+*.csv
+!config.example.py
+!requirements.txt
+!README.md
+
+# Cache and temporary files
+cache/
+*.cache
+*.tmp
+
+# Output directories (generated results)
+comp_analysis_output/
+KNN_surfaces/
+payment_heat_map_probabilities/
+payment_prediction_min_variables/
+wins_prediction_min_variables/
+regression_variable_statistics/
+year_weights_ridge_results/
+wins_ridge_results/
+team+personal_payment_prediction_logistic_results/
+complete_variables_wins_payment/
+scatter_plots/
+old_analyses/
+old_csvs/
+
+# Tableau workbooks (can be large)
+*.twbx
+*.twb
+
+# Test output files
+test_*.csv
+*_test_output/
+test_results/
+
+# Jupyter/IPython
+.ipynb_checkpoints/
+*.ipynb
+
+# IDE specific
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Keep example config and small reference files
+!config.example.py
+!data_structure_schema
