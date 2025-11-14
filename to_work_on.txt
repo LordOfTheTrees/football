@@ -1,7 +1,3 @@
-organize, group, and sanitize the workflow of my code to be more comprehensible to others
-      probably breaking down into more files
-
-create more data validation functions
 
 set up scripts to auto run based on current year
 
@@ -21,18 +17,12 @@ Add in all the other rounds of QBs
 What is the most predictive with % of salary cap at signing
     what is second beyond year of signing? (assuming this is nr 1)
 
-Comparison & Analysis Functions
-
 get_draft_slot_average_trajectory(draft_position, metric='Pass_ANY/A')
-
-Calculates average trajectory for QBs drafted at similar position
-Groups by draft slot (e.g., picks 1-5, 6-10, 11-20, 21-32)
-Returns: Average trajectory + confidence intervals
+    Calculates average trajectory for QBs drafted at similar position
+    Groups by draft slot (e.g., picks 1-5, 6-10, 11-20, 21-32)
+    Returns: Average trajectory + confidence intervals
 
 compare_qb_to_slot_average(qb_trajectory, slot_average)
-
-Calculates how QB performed vs. their draft slot expectation
-Identifies years above/below average
-Returns: Comparison metrics
-
-diving in to on field data
+    Calculates how QB performed vs. their draft slot expectation
+    Identifies years above/below average
+    Returns: Comparison metrics
