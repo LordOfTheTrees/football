@@ -235,5 +235,4 @@ test_results/
 Thumbs.db
 
 # Keep example config and small reference files
-!config.example.py
 !data_structure_schema
