@@ -26,217 +26,117 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import confusion_matrix, classification_report, roc_auc_score, roc_curve, precision_recall_curve
 import argparse
 
-# Backward compatibility: Import from new package structure
-try:
-    from qb_research.utils.data_loading import (
-        load_csv_safe,
-        validate_columns,
-        validate_payment_years
-    )
-except ImportError:
-    # Fallback if package structure doesn't exist yet
-    # This allows the file to work during transition
-    def load_csv_safe(filepath, description="file"):
-        """
-        Safely load a CSV file with consistent error handling.
-        
-        Args:
-            filepath (str): Path to CSV file
-            description (str): Human-readable description for error messages
-        
-        Returns:
-            DataFrame or None: Loaded dataframe, or None if file not found/invalid
-        """
-        if not os.path.exists(filepath):
-            print(f"✗ ERROR: {description} not found at: {filepath}")
-            return None
-        
-        try:
-            df = pd.read_csv(filepath)
-            print(f"✓ Loaded {len(df)} records from {description}")
-            return df
-        except Exception as e:
-            print(f"✗ ERROR: Failed to read {description}: {e}")
-            return None
+# ============================================================================
+# Import all functions from new package structure
+# ============================================================================
 
-    def validate_columns(df, required_cols, df_name="dataframe"):
-        """
-        Validates that required columns exist in a dataframe.
-        
-        Args:
-            df (DataFrame): Dataframe to validate
-            required_cols (list): List of required column names
-            df_name (str): Human-readable name for error messages
-        
-        Returns:
-            bool: True if all columns exist, False otherwise
-        """
-        missing = [col for col in required_cols if col not in df.columns]
-        
-        if missing:
-            print(f"✗ ERROR: Missing required columns in {df_name}:")
-            for col in missing:
-                print(f"  - {col}")
-            print(f"\nAvailable columns: {df.columns.tolist()}")
-            return False
-        
-        return True
+# Data loading utilities
+from qb_research.utils.data_loading import (
+    load_csv_safe,
+    validate_columns,
+    validate_payment_years
+)
 
-    def validate_payment_years(df, draft_year_col='draft_year', payment_year_col='payment_year', 
-                               years_to_payment_col='years_to_payment', max_years=12):
-        """
-        Validates that payment years make logical sense.
-        
-        Args:
-            df (DataFrame): Dataframe with payment data
-            draft_year_col (str): Column name for draft year
-            payment_year_col (str): Column name for payment year
-            years_to_payment_col (str): Column name for years to payment
-            max_years (int): Maximum reasonable years between draft and payment
-        
-        Returns:
-            DataFrame: Filtered dataframe with invalid records removed
-        """
-        print("\n" + "="*80)
-        print("VALIDATING PAYMENT YEARS")
-        print("="*80)
-        
-        initial_count = len(df)
-        paid_df = df[df[payment_year_col].notna()].copy()
-        
-        if len(paid_df) == 0:
-            print("No payment data to validate")
-            return df
-        
-        print(f"\nValidating {len(paid_df)} seasons with payment data...")
-        
-        # Check 1: Payment year should be after draft year
-        invalid_order = paid_df[paid_df[payment_year_col] < paid_df[draft_year_col]]
-        if len(invalid_order) > 0:
-            print(f"\n⚠️  Found {len(invalid_order)} records where payment year < draft year:")
-            for idx, row in invalid_order.head(5).iterrows():
-                print(f"  - Player {row.get('player_name', row.get('player_id', 'Unknown'))}: "
-                      f"Drafted {row[draft_year_col]}, Paid {row[payment_year_col]}")
-            if len(invalid_order) > 5:
-                print(f"  ... and {len(invalid_order) - 5} more")
-        
-        # Check 2: Payment shouldn't be too many years after draft (rookie deals are 4-5 years)
-        too_late = paid_df[paid_df[years_to_payment_col].abs() > max_years]
-        if len(too_late) > 0:
-            print(f"\n⚠️  Found {len(too_late)} records where payment is >{max_years} years from draft:")
-            for idx, row in too_late.head(5).iterrows():
-                print(f"  - Player {row.get('player_name', row.get('player_id', 'Unknown'))}: "
-                      f"Years to payment = {row[years_to_payment_col]}")
-            if len(too_late) > 5:
-                print(f"  ... and {len(too_late) - 5} more")
-        
-        # Check 3: Payment year shouldn't be in the future
-        current_year = 2025  # Update this as needed
-        future_payments = paid_df[paid_df[payment_year_col] > current_year]
-        if len(future_payments) > 0:
-            print(f"\n⚠️  Found {len(future_payments)} records with future payment years:")
-            for idx, row in future_payments.head(5).iterrows():
-                print(f"  - Player {row.get('player_name', row.get('player_id', 'Unknown'))}: "
-                      f"Payment year = {row[payment_year_col]}")
-        
-        # Summary
-        total_issues = len(invalid_order) + len(too_late) + len(future_payments)
-        
-        if total_issues == 0:
-            print("\n✓ All payment years look valid")
-        else:
-            print(f"\n⚠️  Total validation issues: {total_issues}")
-            print("These records will be kept but may need investigation")
-        
-        return df  # Return original df - just warning, not filtering
+# Name matching utilities
+from qb_research.utils.name_matching import (
+    normalize_player_name,
+    debug_name_matching
+)
 
-# Backward compatibility: Import from new package structure
-try:
-    from qb_research.utils.name_matching import (
-        normalize_player_name,
-        debug_name_matching
-    )
-except ImportError:
-    # Fallback if package structure doesn't exist yet
-    def normalize_player_name(name):
-        """
-        Normalizes player names for exact matching.
-        Handles common variations (Jr., III, periods, extra spaces, initials, etc.)
-        
-        Args:
-            name (str): Player name
-        
-        Returns:
-            str: Normalized name
-        """
-        if pd.isna(name):
-            return ""
-        
-        name = str(name).strip()
-        
-        # Remove periods (handles J.J. -> JJ, T.J. -> TJ, etc.)
-        name = name.replace('.', '')
-        
-        # Handle specific initial patterns that might need spaces
-        # "JJ McCarthy" should match "J.J. McCarthy" or "J J McCarthy"
-        name = name.replace('  ', ' ')  # Collapse double spaces
-        
-        # Remove suffixes
-        suffixes = [' Jr', ' Sr', ' III', ' II', ' IV', ' V']
-        for suffix in suffixes:
-            name = name.replace(suffix, '')
-        
-        # Remove extra whitespace
-        name = ' '.join(name.split())
-        
-        # Lowercase for case-insensitive matching
-        name = name.lower()
-        
-        return name
+# Statistical analysis
+from qb_research.analysis.statistical_analysis import (
+    analyze_qb_stat_correlations_with_wins,
+    pca_factor_analysis_qb_stats,
+    regression_with_pc1_factors
+)
 
-    def debug_name_matching(player_name, contracts_df, player_ids_df):
-        """
-        Debug why a specific player isn't matching.
-        
-        Args:
-            player_name (str): Name to search for (e.g., "Jalen Hurts")
-            contracts_df: Contract dataframe
-            player_ids_df: Player IDs dataframe
-        """
-        print("\n" + "="*80)
-        print(f"DEBUGGING: {player_name}")
-        print("="*80)
-        
-        # Check contracts
-        contract_matches = contracts_df[contracts_df['Player'].str.contains(player_name, case=False, na=False)]
-        print(f"\nIn contracts ({len(contract_matches)} matches):")
-        if len(contract_matches) > 0:
-            for _, row in contract_matches.iterrows():
-                print(f"  Raw: '{row['Player']}'")
-                print(f"  Normalized: '{normalize_player_name(row['Player'])}'")
-        else:
-            print("  Not found")
-        
-        # Check player_ids
-        player_id_matches = player_ids_df[player_ids_df['player_name'].str.contains(player_name, case=False, na=False)]
-        print(f"\nIn player_ids ({len(player_id_matches)} matches):")
-        if len(player_id_matches) > 0:
-            for _, row in player_id_matches.iterrows():
-                print(f"  Raw: '{row['player_name']}'")
-                print(f"  Normalized: '{normalize_player_name(row['player_name'])}'")
-                print(f"  ID: {row['player_id']}")
-        else:
-            print("  Not found")
-        
-        # Check if normalized versions match
-        if len(contract_matches) > 0 and len(player_id_matches) > 0:
-            contract_norm = normalize_player_name(contract_matches.iloc[0]['Player'])
-            player_id_norm = normalize_player_name(player_id_matches.iloc[0]['player_name'])
-            
-            print(f"\nNormalized comparison:")
-            print(f"  Contract: '{contract_norm}'")
-            print(f"  Player ID: '{player_id_norm}'")
-            print(f"  Match: {contract_norm == player_id_norm}")
+# Era adjustment
+from qb_research.analysis.era_adjustment import (
+    calculate_era_adjustment_factors,
+    apply_era_adjustments,
+    create_era_adjusted_payment_data
+)
+
+# Data builders
+from qb_research.data.builders import (
+    create_all_seasons_from_existing_qb_files,
+    create_player_ids_from_qb_data,
+    create_train_test_split
+)
+
+# Data loaders
+from qb_research.data.loaders import (
+    load_train_test_split,
+    load_contract_data,
+    load_first_round_qbs_with_ids
+)
+
+# Data mappers
+from qb_research.data.mappers import (
+    filter_contracts_to_first_round_qbs,
+    map_contract_to_player_ids,
+    create_contract_player_mapping,
+    create_payment_year_mapping,
+    create_pick_number_mapping
+)
+
+# Data validators
+from qb_research.data.validators import (
+    validate_contract_mapping,
+    test_name_mapping
+)
+
+# Feature engineering
+from qb_research.preprocessing.feature_engineering import (
+    label_seasons_relative_to_payment,
+    create_lookback_performance_features,
+    create_decision_point_dataset,
+    prepare_qb_payment_data,
+    validate_payment_data
+)
+
+# Prediction models
+from qb_research.modeling.prediction_models import (
+    ridge_regression_payment_prediction,
+    wins_prediction_linear_ridge,
+    payment_prediction_logistic_ridge
+)
+
+# Surface models
+from qb_research.modeling.surface_models import (
+    create_payment_probability_surface,
+    create_simple_knn_payment_surface,
+    run_all_simple_knn_surfaces
+)
+
+# Exports
+from qb_research.exports.tableau_exports import (
+    export_individual_qb_trajectories,
+    export_cohort_summary_stats,
+    generate_complete_tableau_exports,
+    check_recent_qb_inclusion
+)
+
+# Comparisons
+from qb_research.comparisons.trajectory_matching import (
+    find_most_similar_qbs,
+    find_comps_both_metrics
+)
+from qb_research.comparisons.year_weighting import (
+    year_weighting_regression,
+    extract_year_weights_from_regression_results
+)
+from qb_research.comparisons import batch_comp_analysis
+
+# Debug utilities
+from qb_research.utils.debug_utils import (
+    fix_individual_qb_files,
+    standardize_qb_columns,
+    debug_specific_qb
+)
+
+# Caching
+from qb_research.utils.caching import load_or_create_cache
 
 def bestqbseasons():
     try:
@@ -288,25 +188,20 @@ def best_season_records():
     except Exception as e:
         print(f"Error running the season records pull: {e}")
 
-# Backward compatibility: Import from new package structure
-try:
-    from qb_research.analysis.statistical_analysis import (
-        analyze_qb_stat_correlations_with_wins,
-        pca_factor_analysis_qb_stats,
-        regression_with_pc1_factors
-    )
-    from qb_research.analysis.era_adjustment import (
-        calculate_era_adjustment_factors,
-        apply_era_adjustments,
-        create_era_adjusted_payment_data
-    )
-except ImportError:
-    # Fallback if package structure doesn't exist yet
-    # Note: These functions are now in qb_research.analysis modules
-    # If import fails, the original definitions below will be used
-    pass
+# Import from new package structure
+from qb_research.analysis.statistical_analysis import (
+    analyze_qb_stat_correlations_with_wins,
+    pca_factor_analysis_qb_stats,
+    regression_with_pc1_factors
+)
+from qb_research.analysis.era_adjustment import (
+    calculate_era_adjustment_factors,
+    apply_era_adjustments,
+    create_era_adjusted_payment_data
+)
 
-# Original function definitions (kept for backward compatibility during transition)
+# DEPRECATED: Old function definition moved to backwards_compatibility/
+# Use qb_research.analysis.statistical_analysis.analyze_qb_stat_correlations_with_wins instead
 def analyze_qb_stat_correlations_with_wins():
     """
     Analyzes which QB performance statistics are most highly correlated with
@@ -852,18 +747,7 @@ def pca_factor_analysis_qb_stats():
     
     return results
 
-# Backward compatibility: Import from new package structure
-try:
-    from qb_research.data.builders import (
-        create_all_seasons_from_existing_qb_files,
-        create_player_ids_from_qb_data,
-        create_train_test_split
-    )
-except ImportError:
-    # Fallback if package structure doesn't exist yet
-    # Note: These functions are now in qb_research.data.builders
-    # If import fails, the original definitions below will be used
-    pass
+# Functions already imported at top of file from qb_research.data.builders
 
 # Original function definitions (kept for backward compatibility during transition)
 def create_train_test_split(test_size=0.2, random_state=42, split_by='random'):
