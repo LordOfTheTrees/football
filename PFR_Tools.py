@@ -781,11 +781,15 @@ def get_qb_seasons(qb_name, qb_id, draft_year=None, draft_team=None, debugging=F
         traceback.print_exc()
         return None
 
-def pull_updated_QB_data():
+def pull_updated_QB_data(overwrite=False, target_year=None):
     """
     Retrieves statistics for all first-round quarterbacks and compiles them into two DataFrames:
     1. all_seasons_df - containing all seasons for all QBs
     2. best_seasons_df - containing only each QB's best season by total yards
+    
+    Args:
+        overwrite (bool): If True, force re-scrape even if CSV exists (default: False)
+        target_year (int, optional): If provided, only update QBs who played in this year
     
     Returns:
         bool: True if successful, False otherwise
@@ -801,7 +805,8 @@ def pull_updated_QB_data():
                 qb_name=qb['player_name'], 
                 qb_id=qb['player_id'], 
                 draft_year=qb['draft_year'], 
-                draft_team=qb['draft_team']
+                draft_team=qb['draft_team'],
+                overwrite=overwrite
             )
             
             print(f"Found QB stats for: {qb['player_name']} ({qb['player_id']})")

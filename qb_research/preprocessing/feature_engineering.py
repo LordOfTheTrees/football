@@ -325,7 +325,8 @@ def prepare_qb_payment_data(
     qb_seasons_file='all_seasons_df.csv',
     pick_numbers_file='first_round_qbs_with_picks.csv',
     save_output=True,
-    output_file='qb_seasons_payment_labeled.csv'
+    output_file='qb_seasons_payment_labeled.csv',
+    force_refresh_contracts=False
 ):
     """
     Master function that runs the full data preparation pipeline.
@@ -342,6 +343,7 @@ def prepare_qb_payment_data(
         pick_numbers_file (str): Path to pick numbers CSV
         save_output (bool): Whether to save the prepared dataset
         output_file (str): Where to save the output
+        force_refresh_contracts (bool): Force refresh contract mapping from QB_contract_data.csv
     
     Returns:
         DataFrame: Fully prepared dataset ready for modeling
@@ -370,16 +372,16 @@ def prepare_qb_payment_data(
     # Step 2: Create payment mapping from existing contract mapping
     print("\n[2/5] Creating payment year mapping...")
 
-    # Use the cached contract mapping, create if missing
-    if os.path.exists('cache/contract_player_id_mapping.csv'):
-        contracts = load_csv_safe('cache/contract_player_id_mapping.csv')
-        print(f"✓ Loaded {len(contracts)} contracts from cache")
-    else:
-        print(f"⚠️  cache/contract_player_id_mapping.csv not found")
-        print("   Auto-creating contract mapping now...")
+    # Use the cached contract mapping, create/refresh if missing or forced
+    if force_refresh_contracts or not os.path.exists('cache/contract_player_id_mapping.csv'):
+        if force_refresh_contracts:
+            print("   Force refreshing contract mapping from QB_contract_data.csv...")
+        else:
+            print(f"⚠️  cache/contract_player_id_mapping.csv not found")
+            print("   Auto-creating contract mapping now...")
         
-        # Auto-create the mapping
-        mapped_contracts = create_contract_player_mapping(force_refresh=False)
+        # Create/refresh the mapping
+        mapped_contracts = create_contract_player_mapping(force_refresh=force_refresh_contracts)
 
         if mapped_contracts is None:
             print("✗ ERROR: Failed to create contract mapping")
@@ -387,7 +389,10 @@ def prepare_qb_payment_data(
             return None
         
         contracts = mapped_contracts
-        print(f"✓ Created mapping for {len(contracts)} contracts")
+        print(f"✓ Created/refreshed mapping for {len(contracts)} contracts")
+    else:
+        contracts = load_csv_safe('cache/contract_player_id_mapping.csv')
+        print(f"✓ Loaded {len(contracts)} contracts from cache")
     
     payment_mapping = create_payment_year_mapping(contracts)
     

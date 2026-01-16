@@ -7,6 +7,7 @@ data structures throughout the QB research pipeline.
 
 import os
 import pandas as pd
+from qb_research.utils.year_utils import get_current_year
 
 
 def load_csv_safe(filepath, description="file"):
@@ -106,7 +107,7 @@ def validate_payment_years(df, draft_year_col='draft_year', payment_year_col='pa
             print(f"  ... and {len(too_late) - 5} more")
     
     # Check 3: Payment year shouldn't be in the future
-    current_year = 2025  # Update this as needed
+    current_year = get_current_year()
     future_payments = paid_df[paid_df[payment_year_col] > current_year]
     if len(future_payments) > 0:
         print(f"\n⚠️  Found {len(future_payments)} records with future payment years:")

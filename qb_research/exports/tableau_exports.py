@@ -9,6 +9,7 @@ import os
 import pandas as pd
 
 from qb_research.utils.data_loading import load_csv_safe
+from qb_research.utils.year_utils import get_recent_draft_cutoff
 
 
 def export_individual_qb_trajectories(
@@ -16,7 +17,7 @@ def export_individual_qb_trajectories(
     qb_list=None,
     years_range=(0, 6),
     include_recent_drafts=True,
-    recent_draft_cutoff=2024
+    recent_draft_cutoff=None
 ):
     """
     Exports year-by-year performance trajectories for individual QBs.
@@ -28,11 +29,16 @@ def export_individual_qb_trajectories(
         qb_list (list): Specific player_ids to export (None = all)
         years_range (tuple): Min and max years since draft to include
         include_recent_drafts (bool): Whether to include QBs drafted after 2020
-        recent_draft_cutoff (int): Earliest year to include for recent drafts
+        recent_draft_cutoff (int, optional): Earliest year to include for recent drafts.
+            If None, uses dynamic cutoff (current year - 2)
     
     Returns:
         DataFrame: QB trajectories in long format
     """
+    # Use dynamic cutoff if not provided
+    if recent_draft_cutoff is None:
+        recent_draft_cutoff = get_recent_draft_cutoff()
+    
     print("\n" + "="*80)
     print("EXPORTING INDIVIDUAL QB TRAJECTORIES")
     print("="*80)
