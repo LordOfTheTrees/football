@@ -50,8 +50,8 @@ from qb_research.analysis.statistical_analysis import (
     regression_with_pc1_factors
 )
 
-# Era adjustment
-from qb_research.analysis.era_adjustment import (
+# Era adjustment (moved to adjustments package)
+from qb_research.adjustments.era_adjustment import (
     calculate_era_adjustment_factors,
     apply_era_adjustments,
     create_era_adjusted_payment_data
@@ -194,7 +194,7 @@ from qb_research.analysis.statistical_analysis import (
     pca_factor_analysis_qb_stats,
     regression_with_pc1_factors
 )
-from qb_research.analysis.era_adjustment import (
+from qb_research.adjustments.era_adjustment import (
     calculate_era_adjustment_factors,
     apply_era_adjustments,
     create_era_adjusted_payment_data

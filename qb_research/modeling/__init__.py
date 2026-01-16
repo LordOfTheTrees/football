@@ -11,7 +11,8 @@ This module contains functions for:
 from .prediction_models import (
     ridge_regression_payment_prediction,
     wins_prediction_linear_ridge,
-    payment_prediction_logistic_ridge
+    payment_prediction_logistic_ridge,
+    compare_injury_projection_predictiveness
 )
 
 from .surface_models import (

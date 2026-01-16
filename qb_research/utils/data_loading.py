@@ -21,15 +21,15 @@ def load_csv_safe(filepath, description="file"):
         DataFrame or None: Loaded dataframe, or None if file not found/invalid
     """
     if not os.path.exists(filepath):
-        print(f"✗ ERROR: {description} not found at: {filepath}")
+        print(f"[ERROR] {description} not found at: {filepath}")
         return None
     
     try:
         df = pd.read_csv(filepath)
-        print(f"✓ Loaded {len(df)} records from {description}")
+        print(f"[OK] Loaded {len(df)} records from {description}")
         return df
     except Exception as e:
-        print(f"✗ ERROR: Failed to read {description}: {e}")
+        print(f"[ERROR] Failed to read {description}: {e}")
         return None
 
 
@@ -48,7 +48,7 @@ def validate_columns(df, required_cols, df_name="dataframe"):
     missing = [col for col in required_cols if col not in df.columns]
     
     if missing:
-        print(f"✗ ERROR: Missing required columns in {df_name}:")
+        print(f"[ERROR] Missing required columns in {df_name}:")
         for col in missing:
             print(f"  - {col}")
         print(f"\nAvailable columns: {df.columns.tolist()}")
@@ -118,9 +118,9 @@ def validate_payment_years(df, draft_year_col='draft_year', payment_year_col='pa
     total_issues = len(invalid_order) + len(too_late) + len(future_payments)
     
     if total_issues == 0:
-        print("\n✓ All payment years look valid")
+        print("\n[OK] All payment years look valid")
     else:
-        print(f"\n⚠️  Total validation issues: {total_issues}")
+        print(f"\n[WARNING] Total validation issues: {total_issues}")
         print("These records will be kept but may need investigation")
     
     return df  # Return original df - just warning, not filtering
