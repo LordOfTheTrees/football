@@ -219,6 +219,11 @@ test_*.csv
 *_test_output/
 test_results/
 
+# Temporary debug/analysis scripts
+*_debug*.py
+*_temp*.py
+analyze_*.py
+
 # Jupyter/IPython
 .ipynb_checkpoints/
 *.ipynb

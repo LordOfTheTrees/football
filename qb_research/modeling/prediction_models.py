@@ -1035,3 +1035,399 @@ def payment_prediction_logistic_ridge(alpha_range=None, exclude_recent_drafts=Tr
     
     return enhanced_results
 
+
+def _prepare_and_train_payment_model(
+    payment_df,
+    season_records,
+    use_projection=False,
+    alpha_range=None,
+    random_seed=42,
+    dataset_name="Dataset"
+):
+    """
+    Prepares dataset and trains logistic regression model for payment prediction.
+    
+    Shared helper function for payment prediction models.
+    
+    Args:
+        payment_df: QB payment data with era-adjusted (and optionally projected) stats
+        season_records: Season records DataFrame for team metrics
+        use_projection: If True, use projected stats (_proj columns), else use era-adjusted (_adj)
+        alpha_range: Alpha values for regularization (converted to C)
+        random_seed: Random seed for train/test split
+        dataset_name: Name for logging/output
+        
+    Returns:
+        dict: Model results with metrics, or None if failed
+    """
+    print(f"\n{'='*80}")
+    print(f"RUNNING MODEL: {dataset_name}")
+    print('='*80)
+    
+    # Merge with team metrics
+    payment_df = payment_df.copy()
+    payment_df['season'] = pd.to_numeric(payment_df['season'], errors='coerce')
+    payment_df = payment_df.dropna(subset=['season'])
+    payment_df['season'] = payment_df['season'].astype(int)
+    
+    merged_df = pd.merge(
+        payment_df,
+        season_records[['Season', 'Team', 'W-L%', 'Pts']],
+        left_on=['season', 'Team'],
+        right_on=['Season', 'Team'],
+        how='inner'
+    )
+    
+    # Create adjusted Pts
+    if os.path.exists('era_adjustment_factors.csv'):
+        factor_df = pd.read_csv('era_adjustment_factors.csv')
+        pts_factors = factor_df[factor_df['stat'] == 'Pts'].set_index('year')['adjustment_factor'].to_dict()
+        merged_df['Pts_adj'] = merged_df['Pts'] * merged_df['season'].map(pts_factors)
+    else:
+        merged_df['Pts_adj'] = merged_df['Pts']
+    
+    # Define metrics - use projected versions if use_projection=True
+    if use_projection:
+        qb_metrics = [
+            'total_yards_adj_proj',
+            'Pass_TD_adj_proj',
+            'Pass_ANY/A_adj',  # Rate stat, no projection
+            'Rush_Rushing_Succ%_adj'  # Rate stat, no projection
+        ]
+    else:
+        qb_metrics = [
+            'total_yards_adj',
+            'Pass_TD_adj',
+            'Pass_ANY/A_adj',
+            'Rush_Rushing_Succ%_adj'
+        ]
+    
+    team_metrics = ['W-L%', 'Pts_adj']
+    all_metrics = qb_metrics + team_metrics
+    
+    # Create lags and averages
+    merged_df = merged_df.sort_values(['player_id', 'season'])
+    
+    for metric in all_metrics:
+        if metric not in merged_df.columns:
+            continue
+        merged_df[metric] = pd.to_numeric(merged_df[metric], errors='coerce')
+        for lag in [1, 2, 3]:
+            lag_col = f"{metric}_lag{lag}"
+            merged_df[lag_col] = merged_df.groupby('player_id')[metric].shift(lag)
+    
+    # Create averaged features
+    features = []
+    for metric in all_metrics:
+        if metric not in merged_df.columns:
+            continue
+        avg_col = f"{metric}_avg"
+        lag_cols = [f"{metric}_lag1", f"{metric}_lag2", f"{metric}_lag3"]
+        if all(col in merged_df.columns for col in lag_cols):
+            # Average available lags (skipna=True), but if all are NaN (first season), use current value
+            merged_df[avg_col] = merged_df[lag_cols].mean(axis=1, skipna=True)
+            # For first seasons (all lags NaN), use the current season's value
+            first_season_mask = merged_df[lag_cols].isna().all(axis=1)
+            merged_df.loc[first_season_mask, avg_col] = merged_df.loc[first_season_mask, metric]
+            features.append(avg_col)
+    
+    # Prepare features and target
+    X = merged_df[features + ['got_paid', 'player_id', 'player_name', 'season', 'GS']].copy()
+    
+    # Debug: Show filtering steps
+    print(f"\nFiltering analysis:")
+    print(f"  Initial merged rows: {len(merged_df)}")
+    
+    # Check which features are missing
+    missing_by_feature = {}
+    for feat in features:
+        missing_count = X[feat].isna().sum()
+        if missing_count > 0:
+            missing_by_feature[feat] = missing_count
+    
+    if missing_by_feature:
+        print(f"  Missing values by feature:")
+        for feat, count in sorted(missing_by_feature.items(), key=lambda x: x[1], reverse=True):
+            print(f"    {feat}: {count} missing")
+    
+    X_before_dropna = len(X)
+    
+    # Identify which rows will be dropped and why
+    rows_with_missing = X[X[features].isna().any(axis=1)]
+    if len(rows_with_missing) > 0:
+        print(f"\n  Rows that will be dropped: {len(rows_with_missing)}")
+        
+        # If using projection, specifically check projected columns
+        if use_projection:
+            proj_cols_in_features = [f for f in features if '_proj' in f]
+            if proj_cols_in_features:
+                for proj_feat in proj_cols_in_features:
+                    missing_proj_rows = rows_with_missing[rows_with_missing[proj_feat].isna()]
+                    if len(missing_proj_rows) > 0:
+                        print(f"\n    Rows missing {proj_feat}: {len(missing_proj_rows)}")
+                        # Show details
+                        for idx, row in missing_proj_rows.head(10).iterrows():
+                            gs_val = f"{row['GS']:.0f}" if pd.notna(row['GS']) else "NaN"
+                            # Check if era-adjusted version exists
+                            era_adj_col = proj_feat.replace('_proj', '')
+                            era_adj_val = "exists" if era_adj_col in row.index and pd.notna(row[era_adj_col]) else "missing"
+                            print(f"      {row.get('player_name', 'Unknown')}: Season={row['season']:.0f}, GS={gs_val}, {era_adj_col}={era_adj_val}")
+        
+        # Check for other missing features (non-projected)
+        non_proj_features = [f for f in features if '_proj' not in f]
+        for feat in non_proj_features:
+            missing_non_proj = rows_with_missing[rows_with_missing[feat].isna()]
+            if len(missing_non_proj) > 0:
+                print(f"\n    Rows missing {feat}: {len(missing_non_proj)}")
+                for idx, row in missing_non_proj.head(5).iterrows():
+                    gs_val = f"{row['GS']:.0f}" if pd.notna(row['GS']) else "NaN"
+                    print(f"      {row.get('player_name', 'Unknown')}: Season={row['season']:.0f}, GS={gs_val}")
+    
+    X = X.dropna(subset=features)
+    X_after_dropna = len(X)
+    rows_dropped = X_before_dropna - X_after_dropna
+    
+    print(f"\n  Summary:")
+    print(f"    Rows before dropna: {X_before_dropna}")
+    print(f"    Rows after dropna: {X_after_dropna}")
+    print(f"    Rows dropped: {rows_dropped}")
+    
+    # Remove debug columns before proceeding
+    X = X.drop(columns=['player_name', 'season', 'GS'], errors='ignore')
+    
+    if len(X) < 30:
+        print(f"✗ ERROR: Insufficient complete cases ({len(X)})")
+        return None
+    
+    y = X['got_paid'].astype(int)
+    X_features = X[features]
+    
+    # Train/test split (80/20) with fixed random seed
+    # Use same split method for both datasets to ensure fair comparison
+    np.random.seed(random_seed)
+    indices = np.arange(len(X_features))
+    np.random.shuffle(indices)
+    split_idx = int(len(X_features) * 0.8)
+    train_indices = indices[:split_idx]
+    test_indices = indices[split_idx:]
+    
+    X_train = X_features.iloc[train_indices]
+    X_test = X_features.iloc[test_indices]
+    y_train = y.iloc[train_indices]
+    y_test = y.iloc[test_indices]
+    
+    print(f"Complete cases: {len(X)}")
+    print(f"Train: {len(X_train)} ({y_train.sum()} paid)")
+    print(f"Test: {len(X_test)} ({y_test.sum()} paid)")
+    
+    # Standardize features
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+    
+    # Cross-validation to find best C
+    if alpha_range is None:
+        C_values = [0.001, 0.01, 0.1, 1.0, 10.0, 100.0]
+    else:
+        C_values = [1.0/alpha for alpha in alpha_range]
+    
+    best_score = -np.inf
+    best_C = 1.0
+    
+    for C in C_values:
+        model = LogisticRegression(penalty='l2', C=C, max_iter=1000, random_state=random_seed)
+        scores = cross_val_score(model, X_train_scaled, y_train, cv=5, scoring='roc_auc')
+        mean_score = scores.mean()
+        if mean_score > best_score:
+            best_score = mean_score
+            best_C = C
+    
+    print(f"Best C: {best_C} (CV AUC: {best_score:.4f})")
+    
+    # Train final model
+    final_model = LogisticRegression(penalty='l2', C=best_C, max_iter=1000, random_state=random_seed)
+    final_model.fit(X_train_scaled, y_train)
+    
+    # Test performance
+    y_test_prob = final_model.predict_proba(X_test_scaled)[:, 1]
+    y_test_pred = final_model.predict(X_test_scaled)
+    
+    test_auc = roc_auc_score(y_test, y_test_prob)
+    test_acc = np.mean(y_test == y_test_pred)
+    
+    # Confusion matrix
+    cm = confusion_matrix(y_test, y_test_pred)
+    tn, fp, fn, tp = cm.ravel()
+    
+    precision = tp / (tp + fp) if (tp + fp) > 0 else 0
+    recall = tp / (tp + fn) if (tp + fn) > 0 else 0
+    f1 = 2 * (precision * recall) / (precision + recall) if (precision + recall) > 0 else 0
+    
+    print(f"\nTest Performance:")
+    print(f"  AUC: {test_auc:.4f}")
+    print(f"  Accuracy: {test_acc:.4f}")
+    print(f"  Precision: {precision:.4f}")
+    print(f"  Recall: {recall:.4f}")
+    print(f"  F1-Score: {f1:.4f}")
+    
+    return {
+        'test_auc': test_auc,
+        'test_accuracy': test_acc,
+        'test_precision': precision,
+        'test_recall': recall,
+        'test_f1_score': f1,
+        'best_C': best_C,
+        'cv_auc': best_score,
+        'n_samples': len(X),
+        'n_train': len(X_train),
+        'n_test': len(X_test),
+        'features': features,
+        'model': final_model,
+        'scaler': scaler
+    }
+
+
+def compare_injury_projection_predictiveness(alpha_range=None, exclude_recent_drafts=True, random_seed=42):
+    """
+    Compares predictive power of era-adjusted vs injury-projected counting stats for QB contracts.
+    
+    Runs logistic regression models on both datasets and compares F1 score, accuracy, and other metrics
+    to determine which approach is more predictive of QB free-agent contracts.
+    
+    Args:
+        alpha_range: Alpha values for ridge regression (converted to C for logistic regression)
+        exclude_recent_drafts: Whether to exclude QBs drafted after 2020
+        random_seed: Random seed for train/test split (ensures identical splits)
+        
+    Returns:
+        dict: Comparison results with metrics for both approaches
+    """
+    print("\n" + "="*80)
+    print("INJURY PROJECTION PREDICTIVENESS COMPARISON")
+    print("="*80)
+    print("Comparing era-adjusted vs injury-projected counting stats")
+    print("="*80)
+    
+    # Load era-adjusted data
+    if not os.path.exists('qb_seasons_payment_labeled_era_adjusted.csv'):
+        print("✗ ERROR: qb_seasons_payment_labeled_era_adjusted.csv not found")
+        print("Run create_era_adjusted_payment_data() first")
+        return None
+    
+    payment_df = load_csv_safe('qb_seasons_payment_labeled_era_adjusted.csv')
+    print(f"✓ Loaded {len(payment_df)} seasons with era-adjusted and projected stats")
+    
+    # Verify projected columns exist
+    proj_cols = [col for col in payment_df.columns if col.endswith('_proj')]
+    if not proj_cols:
+        print("⚠️  WARNING: No projected columns found in dataset")
+        print("   Projected columns should already be in the master DataFrame")
+        print("   Run create_era_adjusted_payment_data() to regenerate with projections")
+    else:
+        print(f"✓ Found {len(proj_cols)} projected columns: {proj_cols[:3]}...")
+    
+    # Filter to eligible QBs
+    if exclude_recent_drafts:
+        cutoff_year = 2020
+        payment_df['draft_year'] = pd.to_numeric(payment_df['draft_year'], errors='coerce')
+        payment_df = payment_df[payment_df['draft_year'] <= cutoff_year]
+        print(f"✓ Filtered to QBs drafted ≤{cutoff_year}")
+    
+    # Load season records
+    season_records = load_csv_safe("season_records.csv", "season records")
+    if season_records is None:
+        return None
+    
+    season_records['Season'] = pd.to_numeric(season_records['Season'], errors='coerce')
+    season_records = season_records.dropna(subset=['Season'])
+    season_records['Season'] = season_records['Season'].astype(int)
+    
+    # Run models on both datasets using shared helper function
+    # Both use the same DataFrame - just different columns (_adj vs _adj_proj)
+    baseline_results = _prepare_and_train_payment_model(
+        payment_df.copy(),
+        season_records,
+        use_projection=False,
+        alpha_range=alpha_range,
+        random_seed=random_seed,
+        dataset_name="BASELINE (Era-Adjusted)"
+    )
+    projected_results = _prepare_and_train_payment_model(
+        payment_df.copy(),  # Same DataFrame, just uses different columns
+        season_records,
+        use_projection=True,
+        alpha_range=alpha_range,
+        random_seed=random_seed,
+        dataset_name="PROJECTED (Era-Adjusted + Injury Projection)"
+    )
+    
+    if baseline_results is None or projected_results is None:
+        print("\n✗ ERROR: Failed to run one or both models")
+        return None
+    
+    # Compare results
+    print("\n" + "="*80)
+    print("COMPARISON RESULTS")
+    print("="*80)
+    
+    comparison_data = {
+        'Metric': ['F1-Score', 'Accuracy', 'Precision', 'Recall', 'AUC-ROC', 'Best C', 'CV AUC'],
+        'Baseline (Era-Adjusted)': [
+            baseline_results['test_f1_score'],
+            baseline_results['test_accuracy'],
+            baseline_results['test_precision'],
+            baseline_results['test_recall'],
+            baseline_results['test_auc'],
+            baseline_results['best_C'],
+            baseline_results['cv_auc']
+        ],
+        'Projected (Era-Adjusted + Projection)': [
+            projected_results['test_f1_score'],
+            projected_results['test_accuracy'],
+            projected_results['test_precision'],
+            projected_results['test_recall'],
+            projected_results['test_auc'],
+            projected_results['best_C'],
+            projected_results['cv_auc']
+        ]
+    }
+    
+    comparison_df = pd.DataFrame(comparison_data)
+    comparison_df['Difference'] = comparison_df['Projected (Era-Adjusted + Projection)'] - comparison_df['Baseline (Era-Adjusted)']
+    comparison_df['Improvement'] = comparison_df['Difference'] > 0
+    
+    print("\n" + comparison_df.to_string(index=False))
+    
+    # Determine winner
+    f1_improvement = projected_results['test_f1_score'] - baseline_results['test_f1_score']
+    acc_improvement = projected_results['test_accuracy'] - baseline_results['test_accuracy']
+    
+    print(f"\n{'='*80}")
+    print("CONCLUSION")
+    print("="*80)
+    
+    if f1_improvement > 0:
+        print(f"✓ INJURY PROJECTION IS MORE PREDICTIVE")
+        print(f"  F1-Score improvement: +{f1_improvement:.4f}")
+        print(f"  Accuracy improvement: {acc_improvement:+.4f}")
+    elif f1_improvement < 0:
+        print(f"✗ ERA-ADJUSTED (BASELINE) IS MORE PREDICTIVE")
+        print(f"  F1-Score difference: {f1_improvement:.4f}")
+        print(f"  Accuracy difference: {acc_improvement:+.4f}")
+    else:
+        print(f"≈ NO SIGNIFICANT DIFFERENCE")
+        print(f"  F1-Score difference: {f1_improvement:.4f}")
+    
+    # Save results
+    comparison_df.to_csv('injury_projection_predictiveness_comparison.csv', index=False)
+    print(f"\n✓ Comparison saved to: injury_projection_predictiveness_comparison.csv")
+    
+    return {
+        'comparison': comparison_df,
+        'baseline_results': baseline_results,
+        'projected_results': projected_results,
+        'winner': 'projected' if f1_improvement > 0 else ('baseline' if f1_improvement < 0 else 'tie'),
+        'f1_improvement': f1_improvement,
+        'accuracy_improvement': acc_improvement
+    }
+
