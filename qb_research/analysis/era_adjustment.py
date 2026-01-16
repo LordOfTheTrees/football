@@ -13,9 +13,10 @@ import os
 from sklearn.linear_model import LinearRegression
 
 from qb_research.utils.data_loading import load_csv_safe
+from qb_research.utils.year_utils import get_reference_year
 
 
-def calculate_era_adjustment_factors(reference_year=2024):
+def calculate_era_adjustment_factors(reference_year=None):
     """
     Calculates linear inflation adjustment factors for offensive stats.
     
@@ -23,11 +24,16 @@ def calculate_era_adjustment_factors(reference_year=2024):
     Then creates adjustment factor: factor = reference_year_avg / year_avg
     
     Args:
-        reference_year (int): Year to adjust all stats to (default 2024)
+        reference_year (int, optional): Year to adjust all stats to. 
+            If None, uses most recent completed season (default: None)
     
     Returns:
         dict: Adjustment factors by year and stat
     """
+    # Use dynamic reference year if not provided
+    if reference_year is None:
+        reference_year = get_reference_year()
+    
     print("\n" + "="*80)
     print(f"CALCULATING ERA ADJUSTMENT FACTORS (baseline: {reference_year})")
     print("="*80)
@@ -310,7 +316,7 @@ def create_era_adjusted_payment_data(force_refresh=False):
     
     # Calculate or load adjustment factors
     if force_refresh or not os.path.exists('era_adjustment_factors.csv'):
-        adjustment_factors = calculate_era_adjustment_factors(reference_year=2024)
+        adjustment_factors = calculate_era_adjustment_factors(reference_year=None)
     else:
         print("Loading existing adjustment factors from era_adjustment_factors.csv")
         factor_df = load_csv_safe('era_adjustment_factors.csv')

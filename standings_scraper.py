@@ -258,10 +258,20 @@ def get_stat_value(row, stat_names, default=None):
     
     return default
 
-def scrape_all_nfl_standings(start_year=2000, end_year=2024, save_individual=True):
+def scrape_all_nfl_standings(start_year=2000, end_year=None, save_individual=True):
     """
     Scrapes NFL standings for all years in the specified range.
+    
+    Args:
+        start_year (int): First year to scrape (default: 2000)
+        end_year (int, optional): Last year to scrape. If None, uses most recent completed season
+        save_individual (bool): Whether to save individual year files
     """
+    # Use dynamic end_year if not provided
+    if end_year is None:
+        from datetime import datetime
+        end_year = datetime.now().year - 1
+    
     # Create requester instance
     requester = HumanLikeRequester()
     
@@ -310,7 +320,7 @@ def scrape_all_nfl_standings(start_year=2000, end_year=2024, save_individual=Tru
         combined_df = combined_df.sort_values(['year', 'win_pct'], ascending=[True, False])
         
         # Save combined data
-        combined_path = 'nfl_standings_2000_2024.csv'
+        combined_path = f'nfl_standings_{start_year}_{end_year}.csv'
         combined_df.to_csv(combined_path, index=False)
         print(f"\nSaved combined standings to {combined_path}")
         print(f"Total records: {len(combined_df)}")

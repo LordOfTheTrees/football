@@ -2634,7 +2634,7 @@ def year_weighting_regression(metric='total_yards_adj', max_decision_year=6, n_b
     
     return all_results
 
-def calculate_era_adjustment_factors(reference_year=2024):
+def calculate_era_adjustment_factors(reference_year=None):
     """
     Calculates linear inflation adjustment factors for offensive stats.
     
@@ -2642,7 +2642,8 @@ def calculate_era_adjustment_factors(reference_year=2024):
     Then creates adjustment factor: factor = reference_year_avg / year_avg
     
     Args:
-        reference_year (int): Year to adjust all stats to (default 2024)
+        reference_year (int, optional): Year to adjust all stats to. 
+            If None, uses most recent completed season (default: None)
     
     Returns:
         dict: Adjustment factors by year and stat
@@ -2928,7 +2929,7 @@ def create_era_adjusted_payment_data(force_refresh=False):
     
     # Calculate or load adjustment factors
     if force_refresh or not os.path.exists('era_adjustment_factors.csv'):
-        adjustment_factors = calculate_era_adjustment_factors(reference_year=2024)
+        adjustment_factors = calculate_era_adjustment_factors(reference_year=None)
     else:
         print("Loading existing adjustment factors from era_adjustment_factors.csv")
         factor_df = load_csv_safe('era_adjustment_factors.csv')
@@ -3420,7 +3421,7 @@ def export_individual_qb_trajectories(
     qb_list=None,
     years_range=(0, 6),
     include_recent_drafts=True,
-    recent_draft_cutoff=2024
+    recent_draft_cutoff=None
 ):
     """
     Exports year-by-year performance trajectories for individual QBs.
@@ -3432,11 +3433,16 @@ def export_individual_qb_trajectories(
         qb_list (list): Specific player_ids to export (None = all)
         years_range (tuple): Min and max years since draft to include
         include_recent_drafts (bool): Whether to include QBs drafted after 2020
-        recent_draft_cutoff (int): Earliest year to include for recent drafts
+        recent_draft_cutoff (int, optional): Earliest year to include for recent drafts.
+            If None, uses dynamic cutoff (current year - 2)
     
     Returns:
         DataFrame: QB trajectories in long format
     """
+    # Use dynamic cutoff if not provided
+    if recent_draft_cutoff is None:
+        from qb_research.utils.year_utils import get_recent_draft_cutoff
+        recent_draft_cutoff = get_recent_draft_cutoff()
     print("\n" + "="*80)
     print("EXPORTING INDIVIDUAL QB TRAJECTORIES")
     print("="*80)
