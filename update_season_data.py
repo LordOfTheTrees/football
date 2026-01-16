@@ -246,6 +246,23 @@ def validate_output(target_year):
         print("✗ all_seasons_df.csv not found")
         return False
     
+    # Check payment-labeled file
+    if os.path.exists('qb_seasons_payment_labeled.csv'):
+        df = pd.read_csv('qb_seasons_payment_labeled.csv')
+        df['season'] = pd.to_numeric(df['season'], errors='coerce')
+        max_season = df['season'].max()
+        
+        print(f"\nqb_seasons_payment_labeled.csv:")
+        print(f"  Max season: {max_season}")
+        if max_season >= target_year:
+            print(f"  ✓ Contains {target_year} data")
+        else:
+            print(f"  ✗ Missing {target_year} data (latest is {max_season})")
+            return False
+    else:
+        print("✗ qb_seasons_payment_labeled.csv not found")
+        return False
+    
     # Check era-adjusted file
     if os.path.exists('qb_seasons_payment_labeled_era_adjusted.csv'):
         df = pd.read_csv('qb_seasons_payment_labeled_era_adjusted.csv')
@@ -349,8 +366,8 @@ def main():
         print("\n✗ Pipeline failed at payment data preparation step")
         return 1
     
-    # Step 4: Regenerate adjustments
-    if not regenerate_adjustments(force_refresh=args.force_refresh):
+    # Step 4: Regenerate adjustments (always refresh factors when updating for new season)
+    if not regenerate_adjustments(force_refresh=True):
         print("\n✗ Pipeline failed at adjustment step")
         return 1
     
