@@ -215,6 +215,8 @@ def get_draft_class(year):
     Notes:
         - Data is cached in the 'draft_data' directory as 'draft_class_{year}.csv'
         - Uses various fallback methods to locate the draft table on the page
+        - Source URL format: https://www.pro-football-reference.com/years/{YEAR}/draft.htm
+        - Example: https://www.pro-football-reference.com/years/2025/draft.htm
     """
     print(f"Scraping draft year: {year}")
     url = f"https://www.pro-football-reference.com/years/{year}/draft.htm"

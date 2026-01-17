@@ -117,6 +117,7 @@ results = compare_injury_projection_predictiveness()
 ### Input Files (Required)
 - `qb_seasons_payment_labeled.csv`: Main dataset with QB seasons and contract labels
 - `era_adjustment_factors.csv`: Pre-calculated era adjustment factors
+- `season_averages.csv`: League-wide per-game averages by season (used for era adjustment)
 - Individual QB files in `QB_Data/` directory (if using scraping pipeline)
 
 ### Output Files (Generated)
@@ -124,6 +125,30 @@ results = compare_injury_projection_predictiveness()
 - `injury_projection_predictiveness_comparison.csv`: Model comparison results
 - `all_seasons_df.csv`: Consolidated seasons data
 - `player_ids.csv`: Player ID mappings
+
+## Data Sources
+
+All data is scraped from [Pro-Football-Reference.com](https://www.pro-football-reference.com/):
+
+### Season Averages (Per-Game)
+- **Source URL**: `https://www.pro-football-reference.com/years/NFL/`
+- **Purpose**: League-wide per-game averages used for era adjustment calculations
+- **Data File**: `season_averages.csv`
+- **Table Location**: "Team Offense League Averages Per Team Game" table
+- **Update Frequency**: After each NFL season ends (typically February)
+
+### Draft Data
+- **Source URL Format**: `https://www.pro-football-reference.com/years/{YEAR}/draft.htm`
+- **Example**: `https://www.pro-football-reference.com/years/2025/draft.htm`
+- **Purpose**: Draft order and player information for determining draft position
+- **Data File**: `draft_data/draft_class_{YEAR}.csv`
+- **Update Frequency**: After each NFL draft (typically late April/early May)
+
+### Player Statistics
+- **Source URL Format**: `https://www.pro-football-reference.com/players/{FIRST_LETTER}/{PLAYER_ID}.htm`
+- **Purpose**: Individual quarterback season-by-season statistics
+- **Data Files**: Individual CSV files in `QB_Data/` directory
+- **Update Frequency**: After each NFL season ends, or as needed for active players
 
 ## Key Concepts
 

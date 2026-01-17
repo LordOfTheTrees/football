@@ -8,10 +8,6 @@ do an article on biggest differences between my model and what actually happened
 
 What is the probability for payment of the unsigned QBs in their last year at the team (year0-6)
 
-is injury removal and performance extrapolation more predictive of behavior or not adjusting?
-
-whether or not teams use the 5th year option for those with L&H or H&L production in practice
-
 Add in all the other rounds of QBs
 
 What is the most predictive with % of salary cap at signing
@@ -26,3 +22,188 @@ compare_qb_to_slot_average(qb_trajectory, slot_average)
     Calculates how QB performed vs. their draft slot expectation
     Identifies years above/below average
     Returns: Comparison metrics
+
+////////////////////////////////////////////////////////////////////////////////
+AUTOMATION PLAN: Data Pulls
+////////////////////////////////////////////////////////////////////////////////
+
+Phase 1: Unified Data Pull Script
+----------------------------------
+TODO:
+- [ ] Create scrape_season_averages() function in PFR_Tools.py to pull from /years/NFL/
+- [ ] Create pull_all_data.py script that orchestrates all three data pulls
+- [ ] Test unified script locally to ensure all data sources work
+
+Phase 2: GitHub Actions Automation
+-----------------------------------
+TODO:
+- [ ] Create .github/workflows/update_data.yml for automated runs
+- [ ] Test GitHub Actions workflow with manual trigger
+
+FULL PLAN DOCUMENT:
+===================
+
+# Automation Plan: Data Pulls
+
+## Phase 1: Unified Data Pull Script
+
+### 1.1 Create Season Averages Scraper
+
+**File**: `PFR_Tools.py` (add new function)
+
+Add `scrape_season_averages()` function that:
+- Scrapes from `https://www.pro-football-reference.com/years/NFL/`
+- Finds the "Team Offense League Averages Per Team Game" table
+- Parses table into DataFrame matching `season_averages.csv` format
+- Saves/updates `season_averages.csv` (append new years or replace if needed)
+- Uses existing `requester` instance from `PFR_Tools.py` for rate limiting
+
+**Key implementation details**:
+- Use BeautifulSoup to find table (similar to existing scrapers)
+- Handle table structure (may be in comments or visible)
+- Map columns to expected format: `Year,Teams,PF,Total_Yards,Plays,Y/P,TO,FL,1stD,Pass_Cmp,Pass_Att,Pass_Yds,Pass_TD,Int,NY/A,Pass_1stD,Rush_Att,Rush_Yds,Rush_TD,Rush_Y/A,Rush_1stD,Penalties,Pen_Yds,1stPy,Drives,Drive_Sc%,Drive_TO%,Drive_Plays,Drive_Yds,Drive_Pts`
+- Merge with existing `season_averages.csv` if it exists (preserve historical data)
+
+### 1.2 Create Unified Pull Script
+
+**File**: `pull_all_data.py` (new file)
+
+Create a script that orchestrates all three data pulls:
+
+```python
+"""
+Unified script to pull all data from Pro-Football-Reference.
+
+Pulls:
+1. Season averages from /years/NFL/
+2. Draft data for specified year(s) from /years/{YEAR}/draft.htm
+3. Player statistics (via existing update_season_data.py workflow)
+"""
+
+def pull_all_data(draft_years=None, update_qbs=True, overwrite=False):
+    """
+    Pull all data sources.
+    
+    Args:
+        draft_years: List of years to pull draft data for (default: current year)
+        update_qbs: Whether to update QB player statistics
+        overwrite: Force re-scrape existing data
+    """
+    # 1. Pull season averages
+    scrape_season_averages()
+    
+    # 2. Pull draft data for specified years
+    for year in draft_years:
+        get_draft_class(year)
+    
+    # 3. Update QB data (if requested)
+    if update_qbs:
+        # Call existing update workflow
+        from update_season_data import update_qb_data, rebuild_all_seasons, prepare_payment_data, regenerate_adjustments
+        update_qb_data(overwrite=overwrite)
+        rebuild_all_seasons()
+        prepare_payment_data()
+        regenerate_adjustments(force_refresh=True)
+```
+
+**Command-line interface**:
+- `--draft-years`: Comma-separated years (e.g., "2024,2025") or "all" for all years
+- `--skip-qbs`: Skip QB player updates
+- `--overwrite`: Force re-scrape existing data
+- `--season-only`: Only pull season averages
+- `--draft-only`: Only pull draft data
+
+### 1.3 Enhance Draft Scraper (Optional)
+
+**File**: `PFR_Tools.py` (enhance `get_draft_class()`)
+
+Add helper function to pull multiple draft years:
+```python
+def pull_draft_data_for_years(years, overwrite=False):
+    """Pull draft data for multiple years."""
+    for year in years:
+        get_draft_class(year)
+```
+
+## Phase 2: GitHub Actions Automation
+
+### 2.1 Create GitHub Actions Workflow
+
+**File**: `.github/workflows/update_data.yml` (new file)
+
+Create workflow that:
+- Runs on a schedule (weekly during off-season, monthly during season)
+- Runs on manual trigger (workflow_dispatch)
+- Checks out code
+- Sets up Python environment
+- Installs dependencies
+- Runs `pull_all_data.py` with appropriate flags
+- Commits changes if data was updated
+- Optionally creates a PR for review
+
+**Workflow structure**:
+```yaml
+name: Update Data
+
+on:
+  schedule:
+    # Weekly on Sundays at 2 AM UTC (during off-season)
+    - cron: '0 2 * * 0'
+  workflow_dispatch:
+    inputs:
+      draft_years:
+        description: 'Draft years to pull (comma-separated)'
+        required: false
+      overwrite:
+        description: 'Force re-scrape existing data'
+        type: boolean
+        default: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - run: pip install -r requirements.txt
+      - run: python pull_all_data.py --draft-years ${{ inputs.draft_years || 'current' }}
+      - name: Commit changes
+        if: success()
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add *.csv draft_data/*.csv QB_Data/*.csv
+          git commit -m "Auto-update data" || exit 0
+          git push
+```
+
+### 2.2 Handle Authentication
+
+Since GitHub Actions will commit changes:
+- Ensure repository has write permissions for the workflow
+- Consider using a separate branch for automated updates
+- Or use a personal access token if needed
+
+## Implementation Order
+
+1. **Create season averages scraper** in `PFR_Tools.py`
+2. **Test season averages scraper** manually
+3. **Create `pull_all_data.py`** script
+4. **Test unified script** locally
+5. **Create GitHub Actions workflow**
+6. **Test workflow** with manual trigger
+7. **Enable scheduled runs**
+
+## Files to Modify/Create
+
+- **Modify**: `PFR_Tools.py` - Add `scrape_season_averages()` function
+- **Create**: `pull_all_data.py` - Unified pull script
+- **Create**: `.github/workflows/update_data.yml` - GitHub Actions workflow
+
+## Data Sources Reference
+
+- Season Averages: `https://www.pro-football-reference.com/years/NFL/` (Table: "Team Offense League Averages Per Team Game")
+- Draft Data: `https://www.pro-football-reference.com/years/{YEAR}/draft.htm`
+- Player Stats: `https://www.pro-football-reference.com/players/{FIRST_LETTER}/{PLAYER_ID}.htm`
